@@ -3,15 +3,31 @@
 import { useState } from "react";
 
 import {
+  AgendaCard,
+  BackButton,
   Button,
   Chip,
   Dropdown,
   FileUpload,
   Footer,
+  FriendRequestCard,
   Header,
   Input,
+  MaterialCard,
+  MemberCard,
+  ParticipantCard,
+  ProgressBar,
+  QuotaCard,
+  SearchInput,
   Sidebar,
   StatusBadge,
+  SubmissionReviewCard,
+  TaskCard,
+  TaskFileUpload,
+  TaskSubmissionPanel,
+  Textarea,
+  TimelineItem,
+  WeekCalendar,
 } from "@/components";
 
 const palettes = [
@@ -239,6 +255,118 @@ export function DesignSystemPreview() {
           <div className="mt-6 flex flex-wrap gap-4">
             <StatusBadge status="submitted" />
             <StatusBadge status="not-submitted" />
+          </div>
+        </PreviewSection>
+
+        <PreviewSection title="Progress and navigation">
+          <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
+            <div className="flex flex-col gap-3">
+              <ProgressBar value={70} label="Contoh progress" />
+              <ProgressBar value={50} label="Contoh progress glow" glow />
+            </div>
+            <BackButton href="/design-system" />
+          </div>
+        </PreviewSection>
+
+        <PreviewSection title="Task overview">
+          <div className="grid gap-5 md:grid-cols-2">
+            <TaskCard title="Networking" progress={70} />
+            <TaskCard title="KMBUI Explorer" progress={55} />
+            <TaskCard title="Mentoring" progress={35} />
+            <TaskCard title="Foster Siblings" progress={0} />
+          </div>
+          <div className="mt-8 grid gap-5 xl:grid-cols-[1fr_344px]">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <AgendaCard
+                category="Networking"
+                title="Deadline Angkatan"
+                date="13 Juni"
+              />
+              <AgendaCard
+                category="KMBUI Explorer"
+                title="Puja Rutin"
+                date="15 Juni"
+              />
+            </div>
+            <WeekCalendar
+              month="Juni"
+              days={[
+                { label: "Mon", date: 8 },
+                { label: "Tue", date: 9 },
+                { label: "Wed", date: 10 },
+                { label: "Thu", date: 11 },
+                { label: "Fri", date: 12, selected: true },
+                { label: "Sat", date: 13, hasEvent: true },
+                { label: "Sun", date: 14 },
+              ]}
+            />
+          </div>
+        </PreviewSection>
+
+        <PreviewSection title="Task submission">
+          <TaskSubmissionPanel>
+            <div className="grid gap-4 lg:grid-cols-3">
+              <TaskFileUpload fileType="image" maxSizeMb={5} />
+              <TaskFileUpload fileType="video" maxSizeMb={50} />
+              <TaskFileUpload fileType="pdf" maxSizeMb={10} />
+            </div>
+            <Textarea placeholder="Jelaskan apa saja yang didapatkan saat kegiatan..." />
+          </TaskSubmissionPanel>
+        </PreviewSection>
+
+        <PreviewSection title="Task quota">
+          <div className="grid gap-4 md:grid-cols-3">
+            <QuotaCard label="Angkatan 26" completed={5} total={10} />
+            <QuotaCard label="Angkatan 25" completed={8} total={10} />
+            <QuotaCard label="Angkatan 24" completed={10} total={10} />
+          </div>
+        </PreviewSection>
+
+        <PreviewSection title="Kalyanamitta and participants">
+          <SearchInput placeholder="Cari Kalyanamitta" />
+          <div className="mt-6 grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
+            <MemberCard name="Jaysen Lestari" batch={2024} />
+            <FriendRequestCard name="Jaysen Lestari" batch={2024} />
+            <ParticipantCard name="Jaysen Lestari" batch={2024} progress={70} />
+          </div>
+        </PreviewSection>
+
+        <PreviewSection title="Material and timeline cards">
+          <div className="grid gap-8 lg:grid-cols-2">
+            <MaterialCard
+              title="Judul materi"
+              description="Deskripsi singkat materi."
+            />
+            <TimelineItem
+              date="26 Juli 2026"
+              title="Welcoming Mahasiswa Baru"
+              description="Deskripsi kegiatan dan informasi yang diperlukan peserta."
+              location="Zoom"
+            />
+          </div>
+        </PreviewSection>
+
+        <PreviewSection title="Admin submission review">
+          <div className="grid gap-5">
+            <SubmissionReviewCard
+              title="Networking"
+              status="submitted"
+              media={<div className="h-full bg-background" />}
+              answer="Jawaban networking peserta"
+            />
+            <SubmissionReviewCard
+              title="Mentoring"
+              status="submitted"
+              answer="Jawaban esai peserta"
+              media={<div className="h-full bg-background" />}
+              answerFirst
+            />
+            <SubmissionReviewCard
+              title="Foster Siblings"
+              status="submitted"
+              file={{ href: "#", label: "Link download PDF" }}
+            />
+            <SubmissionReviewCard title="KMBUI Explorer" status="not-submitted" />
           </div>
         </PreviewSection>
 
