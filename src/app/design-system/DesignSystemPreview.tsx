@@ -1,0 +1,289 @@
+"use client";
+
+import { useState } from "react";
+
+import {
+  Button,
+  Chip,
+  Dropdown,
+  FileUpload,
+  Footer,
+  Header,
+  Input,
+  Sidebar,
+  StatusBadge,
+} from "@/components";
+
+const palettes = [
+  {
+    name: "Purple",
+    colors: [
+      "bg-purple-50",
+      "bg-purple-100",
+      "bg-purple-200",
+      "bg-purple-300",
+      "bg-purple-400",
+      "bg-purple-500",
+      "bg-purple-600",
+      "bg-purple-700",
+      "bg-purple-800",
+      "bg-purple-900",
+    ],
+  },
+  {
+    name: "Yellow",
+    colors: [
+      "bg-yellow-50",
+      "bg-yellow-100",
+      "bg-yellow-200",
+      "bg-yellow-300",
+      "bg-yellow-400",
+      "bg-yellow-500",
+      "bg-yellow-600",
+      "bg-yellow-700",
+      "bg-yellow-800",
+      "bg-yellow-900",
+    ],
+  },
+  {
+    name: "Blue",
+    colors: [
+      "bg-blue-50",
+      "bg-blue-100",
+      "bg-blue-200",
+      "bg-blue-300",
+      "bg-blue-400",
+      "bg-blue-500",
+      "bg-blue-600",
+      "bg-blue-700",
+      "bg-blue-800",
+      "bg-blue-900",
+    ],
+  },
+  {
+    name: "Grey",
+    colors: [
+      "bg-grey-50",
+      "bg-grey-100",
+      "bg-grey-200",
+      "bg-grey-300",
+      "bg-grey-400",
+      "bg-grey-500",
+      "bg-grey-600",
+      "bg-grey-700",
+      "bg-grey-800",
+      "bg-grey-900",
+    ],
+  },
+  {
+    name: "Red",
+    colors: [
+      "bg-red-50",
+      "bg-red-100",
+      "bg-red-200",
+      "bg-red-300",
+      "bg-red-400",
+      "bg-red-500",
+      "bg-red-600",
+      "bg-red-700",
+      "bg-red-800",
+      "bg-red-900",
+    ],
+  },
+  {
+    name: "Green",
+    colors: [
+      "bg-green-50",
+      "bg-green-100",
+      "bg-green-200",
+      "bg-green-300",
+      "bg-green-400",
+      "bg-green-500",
+      "bg-green-600",
+      "bg-green-700",
+      "bg-green-800",
+      "bg-green-900",
+    ],
+  },
+] as const;
+
+const typography = [
+  ["H1 · 64 px", "font-heading text-h1", "Faculty Glyphic"],
+  ["H2 · 48 px", "font-heading text-h2", "Faculty Glyphic"],
+  ["H3 · 32 px", "font-heading text-h3", "Faculty Glyphic"],
+  ["H4 · 24 px", "font-heading text-h4", "Faculty Glyphic"],
+  ["H5 · 20 px", "font-heading text-h5", "Faculty Glyphic"],
+  ["H6 · 16 px", "font-heading text-h6", "Faculty Glyphic"],
+  ["S1 · 48 px", "font-subheading text-s1 font-semibold", "Palanquin Dark"],
+  ["S2 · 30 px", "font-subheading text-s2 font-semibold", "Palanquin Dark"],
+  ["S3 · 24 px", "font-subheading text-s3 font-semibold", "Palanquin Dark"],
+  ["B1 · 24 px", "font-body text-b1", "Pangolin"],
+  ["B2 · 20 px", "font-body text-b2", "Pangolin"],
+  ["B3 · 16 px", "font-body text-b3", "Pangolin"],
+] as const;
+
+function PreviewSection({
+  title,
+  children,
+}: Readonly<{ title: string; children: React.ReactNode }>) {
+  return (
+    <section className="rounded-2xl border border-white/10 bg-purple-900/40 p-5 shadow-modal md:p-8">
+      <h2 className="mb-6 font-heading text-h3 text-yellow-100">{title}</h2>
+      {children}
+    </section>
+  );
+}
+
+export function DesignSystemPreview() {
+  const [selectedChip, setSelectedChip] = useState("Semua");
+
+  return (
+    <main className="min-h-screen bg-background text-foreground">
+      <div className="mx-auto flex max-w-page flex-col gap-8 px-4 py-10 md:px-page-x">
+        <header>
+          <p className="mb-2 font-subheading text-s5 font-semibold uppercase tracking-wider text-yellow-300">
+            Development only
+          </p>
+          <h1 className="font-heading text-h2 md:text-h1">PPMB 2026 Design System</h1>
+          <p className="mt-4 max-w-3xl text-b3 text-purple-100 md:text-b2">
+            Preview token dan komponen yang diekstrak dari Figma. Route ini tidak
+            tersedia pada production build.
+          </p>
+        </header>
+
+        <PreviewSection title="Color palettes">
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {palettes.map((palette) => (
+              <div key={palette.name}>
+                <h3 className="mb-2 font-subheading text-s5 font-semibold">
+                  {palette.name}
+                </h3>
+                <div className="grid grid-cols-10 overflow-hidden rounded-lg">
+                  {palette.colors.map((color, index) => (
+                    <div
+                      key={color}
+                      title={`${palette.name} ${index === 0 ? 50 : index * 100}`}
+                      className={`aspect-square ${color}`}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </PreviewSection>
+
+        <PreviewSection title="Typography">
+          <div className="grid gap-7 overflow-hidden">
+            {typography.map(([label, className, family]) => (
+              <div key={label} className="border-b border-white/10 pb-5">
+                <p className="mb-2 text-b4 text-purple-200">
+                  {label} · {family}
+                </p>
+                <p className={className}>Begin your journey</p>
+              </div>
+            ))}
+          </div>
+        </PreviewSection>
+
+        <PreviewSection title="Buttons and states">
+          <div className="grid max-w-3xl gap-4 sm:grid-cols-2">
+            <Button>Default button</Button>
+            <Button disabled>Disabled button</Button>
+            <Button isLoading>Loading button</Button>
+          </div>
+        </PreviewSection>
+
+        <PreviewSection title="Form controls">
+          <div className="grid gap-8 lg:grid-cols-2">
+            <div className="flex flex-col gap-6">
+              <Input label="Default input" placeholder="Masukkan data" />
+              <Input label="Filled input" defaultValue="Contoh isi" />
+              <Input
+                label="Invalid input"
+                defaultValue="Data tidak valid"
+                error="Periksa kembali data yang dimasukkan."
+              />
+            </div>
+            <FileUpload
+              label="Unggah foto"
+              hint="JPG atau PNG, maksimal 2 MB"
+              maxSizeMb={2}
+            />
+          </div>
+        </PreviewSection>
+
+        <PreviewSection title="Dropdown">
+          <div className="grid gap-5">
+            <Dropdown title="Default dropdown">
+              Konten dropdown menggunakan panel transparan dari desain Figma.
+            </Dropdown>
+            <Dropdown title="Opened dropdown" open>
+              State aktif dapat dilihat langsung dan tetap menggunakan elemen
+              HTML native.
+            </Dropdown>
+          </div>
+        </PreviewSection>
+
+        <PreviewSection title="Chips and status">
+          <div className="flex flex-wrap gap-4">
+            {["Semua", "Belum selesai", "Selesai"].map((chip) => (
+              <Chip
+                key={chip}
+                selected={selectedChip === chip}
+                onClick={() => setSelectedChip(chip)}
+              >
+                {chip}
+              </Chip>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-wrap gap-4">
+            <StatusBadge status="submitted" />
+            <StatusBadge status="not-submitted" />
+          </div>
+        </PreviewSection>
+
+        <PreviewSection title="Header variants">
+          <div className="overflow-hidden rounded-2xl">
+            <Header />
+          </div>
+          <div className="mt-5 overflow-hidden rounded-2xl">
+            <Header user={{ fullName: "Nama Peserta", batch: 2026 }} />
+          </div>
+        </PreviewSection>
+
+        <PreviewSection title="Sidebar variants">
+          <p className="mb-5 text-b3 text-purple-100">
+            Arahkan pointer atau fokuskan keyboard ke sidebar untuk membukanya.
+            Gunakan tombol pin untuk mempertahankan state terbuka.
+          </p>
+          <div className="h-[620px] overflow-auto rounded-2xl bg-gradient-to-br from-purple-900 to-blue-900">
+            <Sidebar
+              activeItem="tasks"
+              className="min-h-full"
+              panelClassName="pt-20"
+            />
+          </div>
+        </PreviewSection>
+
+        <PreviewSection title="Footer">
+          <div className="overflow-hidden rounded-2xl">
+            <Footer
+              contacts={[
+                {
+                  type: "instagram",
+                  label: "Instagram PPMB",
+                  href: "https://instagram.com/",
+                },
+                {
+                  type: "line",
+                  label: "LINE PPMB",
+                  href: "https://line.me/",
+                },
+              ]}
+            />
+          </div>
+        </PreviewSection>
+      </div>
+    </main>
+  );
+}
