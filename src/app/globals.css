@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 :root {
   --gradient-cards-start: #f9f00e;
   --gradient-cards-end: #683592;

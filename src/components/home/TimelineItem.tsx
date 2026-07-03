@@ -10,6 +10,7 @@ export interface TimelineItemProps extends HTMLAttributes<HTMLElement> {
   media?: ReactNode;
   location?: string;
   locationHref?: string;
+  reversed?: boolean;
 }
 
 export function TimelineItem({
@@ -19,17 +20,41 @@ export function TimelineItem({
   media,
   location,
   locationHref,
+  reversed = false,
   className,
   ...props
 }: TimelineItemProps) {
   return (
-    <article className={cn("flex w-full flex-col gap-5", className)} {...props}>
+    <article
+      className={cn(
+        "grid w-full grid-cols-[1fr_6rem_1fr] items-start",
+        className,
+      )}
+      {...props}
+    >
+      <div className="flex items-center justify-center h-full" aria-hidden="true">
+        <div className="size-6 rounded-xs bg-blue-800 rotate-45 shrink-0" />
+      </div>
       {media && (
-        <div className="aspect-[600/290] w-full overflow-hidden rounded-lg bg-background">
-          {media}
+        <div
+          className={cn(
+            "flex row-start-1",
+            reversed ? "col-start-3 justify-start" : "col-start-1 justify-end",
+          )}
+        >
+          <div className="h-56 w-auto aspect-video overflow-hidden rounded-lg bg-background">
+            {media}
+          </div>
         </div>
       )}
-      <div className="flex flex-col gap-3">
+      <div
+        className={cn(
+          "flex flex-col gap-3 row-start-1 h-full justify-center",
+          reversed
+            ? "col-start-1 items-end text-right"
+            : "col-start-3 items-start text-left",
+        )}
+      >
         <time className="text-b4 text-foreground">{date}</time>
         <h3 className="font-heading text-h3 text-yellow-100">{title}</h3>
         <p className="text-b3 text-foreground">{description}</p>
