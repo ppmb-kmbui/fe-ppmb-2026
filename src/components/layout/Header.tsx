@@ -7,7 +7,8 @@ import { cn } from "@/lib/cn";
 
 export interface HeaderUser {
   fullName: string;
-  batch: string | number;
+  batch?: string | number;
+  subtitle?: string;
 }
 
 export interface HeaderProps extends HTMLAttributes<HTMLElement> {
@@ -65,7 +66,11 @@ export function Header({
             />
             <div className="hidden flex-col items-end gap-2 sm:flex">
               <p className="font-heading text-h5">{user.fullName}</p>
-              <p className="text-b3">Angkatan {user.batch}</p>
+              {(user.subtitle || user.batch) && (
+                <p className="text-b3">
+                  {user.subtitle || `Angkatan ${user.batch}`}
+                </p>
+              )}
             </div>
           </Link>
         ) : (
