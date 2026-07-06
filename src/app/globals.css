@@ -7,6 +7,11 @@
   --gradient-header-end: #8c37d2;
   --gradient-blue-start: #200735;
   --gradient-blue-end: #03bcd8;
+  --gradient-dashboard: linear-gradient(
+    to bottom,
+    var(--gradient-blue-start) 56.059%,
+    var(--gradient-blue-end) 193.94%
+  );
   --gradient-purple-start: #210736;
   --gradient-purple-end: #4d1e74;
   --gradient-app-header: linear-gradient(

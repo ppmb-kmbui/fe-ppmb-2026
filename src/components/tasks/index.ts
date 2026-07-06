@@ -12,6 +12,6 @@ export {
 } from "./TaskSubmissionPanel";
 export {
   WeekCalendar,
-  type CalendarDay,
+  type CalendarDate,
   type WeekCalendarProps,
 } from "./WeekCalendar";
