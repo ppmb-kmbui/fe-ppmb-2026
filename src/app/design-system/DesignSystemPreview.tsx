@@ -7,6 +7,7 @@ import {
   BackButton,
   Button,
   Chip,
+  DashboardPageLayout,
   Dropdown,
   FileUpload,
   Footer,
@@ -139,11 +140,15 @@ const typography = [
 ] as const;
 
 function PreviewSection({
+  id,
   title,
   children,
-}: Readonly<{ title: string; children: React.ReactNode }>) {
+}: Readonly<{ id?: string; title: string; children: React.ReactNode }>) {
   return (
-    <section className="rounded-2xl border border-white/10 bg-purple-900/40 p-5 shadow-modal md:p-8">
+    <section
+      id={id}
+      className="scroll-mt-6 rounded-2xl border border-white/10 bg-purple-900/40 p-5 shadow-modal md:p-8"
+    >
       <h2 className="mb-6 font-heading text-h3 text-yellow-100">{title}</h2>
       {children}
     </section>
@@ -152,9 +157,10 @@ function PreviewSection({
 
 export function DesignSystemPreview() {
   const [selectedChip, setSelectedChip] = useState("Semua");
+  const [calendarDate, setCalendarDate] = useState(new Date(2026, 5, 12));
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="mx-auto flex max-w-page flex-col gap-8 px-4 py-10 md:px-page-x">
         <header>
           <p className="mb-2 font-subheading text-s5 font-semibold uppercase tracking-wider text-yellow-300">
@@ -289,16 +295,9 @@ export function DesignSystemPreview() {
               />
             </div>
             <WeekCalendar
-              month="Juni"
-              days={[
-                { label: "Mon", date: 8 },
-                { label: "Tue", date: 9 },
-                { label: "Wed", date: 10 },
-                { label: "Thu", date: 11 },
-                { label: "Fri", date: 12, selected: true },
-                { label: "Sat", date: 13, hasEvent: true },
-                { label: "Sun", date: 14 },
-              ]}
+              selectedDate={calendarDate}
+              eventDates={["2026-06-13", "2026-06-15"]}
+              onDateChange={setCalendarDate}
             />
           </div>
         </PreviewSection>
@@ -379,6 +378,47 @@ export function DesignSystemPreview() {
           </div>
         </PreviewSection>
 
+        <PreviewSection
+          id="shared-dashboard-layout"
+          title="Shared dashboard page layout"
+        >
+          <p className="mb-5 text-b3 text-purple-100">
+            Layout responsif untuk Tugas, Networking, KMBUI Explorer, Fossib,
+            dan Kalyanamitta. Area kanan dapat diisi kalender, kuota, atau daftar
+            permintaan pertemanan sesuai kebutuhan halaman.
+          </p>
+          <div className="h-[760px] overflow-auto rounded-2xl border border-white/10">
+            <DashboardPageLayout
+              activeItem="tasks"
+              user={{ fullName: "Nama Peserta", batch: 2026 }}
+              className="min-h-[760px]"
+              rightRail={
+                <div className="flex flex-col gap-5">
+                  <h2 className="font-heading text-h4">Agenda</h2>
+                  <WeekCalendar
+                    selectedDate={calendarDate}
+                    eventDates={["2026-06-13", "2026-06-15"]}
+                    onDateChange={setCalendarDate}
+                  />
+                  <QuotaCard label="Angkatan 26" completed={5} total={10} />
+                </div>
+              }
+            >
+              <div className="flex max-w-2xl flex-col gap-6">
+                <BackButton onClick={() => undefined} />
+                <div>
+                  <p className="mb-2 text-b3 text-yellow-300">Tugas</p>
+                  <h2 className="font-heading text-h2">Networking</h2>
+                </div>
+                <TaskSubmissionPanel>
+                  <Textarea placeholder="Tuliskan jawaban tugas..." />
+                  <TaskFileUpload fileType="image" maxSizeMb={5} />
+                </TaskSubmissionPanel>
+              </div>
+            </DashboardPageLayout>
+          </div>
+        </PreviewSection>
+
         <PreviewSection title="Sidebar variants">
           <p className="mb-5 text-b3 text-purple-100">
             Arahkan pointer atau fokuskan keyboard ke sidebar untuk membukanya.
@@ -412,6 +452,6 @@ export function DesignSystemPreview() {
           </div>
         </PreviewSection>
       </div>
-    </main>
+    </div>
   );
 }
