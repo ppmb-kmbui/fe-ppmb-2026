@@ -69,7 +69,7 @@ export function SubmissionReviewCard({
       {...props}
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <h3 className="font-subheading text-s3">{title}</h3>
+        <h3 className="font-subheading pt-2 text-s3">{title}</h3>
         <StatusBadge status={status} />
       </div>
       {visiblePanels.length > 0 && (
