@@ -40,7 +40,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     <div className={cn("flex w-full flex-col gap-3", wrapperClassName)}>
       <label
         htmlFor={inputId}
-        className="font-subheading text-s3 font-semibold text-foreground"
+        className="font-subheading text-s5 font-semibold text-foreground sm:text-s3"
       >
         {label}
       </label>

@@ -17,14 +17,20 @@ export interface SignupFormValues {
   photo: File | null;
 }
 
+export type SignupFieldErrors = Partial<Record<keyof SignupFormValues, string>>;
+
 export interface SignupFormProps {
   onSubmit?: (values: SignupFormValues) => Promise<void> | void;
   formError?: string;
+  serverErrors?: SignupFieldErrors;
 }
 
-type FieldErrors = Partial<Record<keyof SignupFormValues, string>>;
+const WHATSAPP_REGEX = /^(?:\+62|62|0)8\d{7,12}$/;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MIN_BATCH = 2020;
+const MAX_BATCH = 2100;
 
-export function SignupForm({ onSubmit, formError }: SignupFormProps) {
+export function SignupForm({ onSubmit, formError, serverErrors }: SignupFormProps) {
   const [fullName, setFullName] = useState("");
   const [lineId, setLineId] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
@@ -34,22 +40,56 @@ export function SignupForm({ onSubmit, formError }: SignupFormProps) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [fieldErrors, setFieldErrors] = useState<SignupFieldErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const displayedErrors: SignupFieldErrors = {
+    fullName: fieldErrors.fullName ?? serverErrors?.fullName,
+    lineId: fieldErrors.lineId ?? serverErrors?.lineId,
+    whatsapp: fieldErrors.whatsapp ?? serverErrors?.whatsapp,
+    email: fieldErrors.email ?? serverErrors?.email,
+    faculty: fieldErrors.faculty ?? serverErrors?.faculty,
+    batch: fieldErrors.batch ?? serverErrors?.batch,
+    password: fieldErrors.password ?? serverErrors?.password,
+    confirmPassword: fieldErrors.confirmPassword ?? serverErrors?.confirmPassword,
+    photo: fieldErrors.photo ?? serverErrors?.photo,
+  };
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const nextErrors: FieldErrors = {};
-    if (!fullName) nextErrors.fullName = "Nama lengkap wajib diisi";
-    if (!lineId) nextErrors.lineId = "ID Line wajib diisi";
-    if (!whatsapp) nextErrors.whatsapp = "Nomor WhatsApp wajib diisi";
-    if (!email) nextErrors.email = "Email wajib diisi";
-    if (!faculty) nextErrors.faculty = "Fakultas wajib diisi";
+    const nextErrors: SignupFieldErrors = {};
+    if (!fullName) {
+      nextErrors.fullName = "Nama lengkap wajib diisi";
+    } else if (fullName.trim().length < 3) {
+      nextErrors.fullName = "Nama lengkap minimal 3 karakter";
+    }
+    if (!lineId) {
+      nextErrors.lineId = "ID Line wajib diisi";
+    } else if (lineId.trim().length < 2) {
+      nextErrors.lineId = "ID Line minimal 2 karakter";
+    }
+    if (!whatsapp) {
+      nextErrors.whatsapp = "Nomor WhatsApp wajib diisi";
+    } else if (!WHATSAPP_REGEX.test(whatsapp.trim())) {
+      nextErrors.whatsapp = "Nomor WhatsApp tidak valid";
+    }
+    if (!email) {
+      nextErrors.email = "Email wajib diisi";
+    } else if (!EMAIL_REGEX.test(email)) {
+      nextErrors.email = "Format email tidak valid";
+    }
+    if (!faculty) {
+      nextErrors.faculty = "Fakultas wajib diisi";
+    } else if (faculty.trim().length < 2) {
+      nextErrors.faculty = "Fakultas minimal 2 karakter";
+    }
     if (!batch) {
       nextErrors.batch = "Angkatan wajib diisi";
     } else if (!/^\d+$/.test(batch)) {
       nextErrors.batch = "Angkatan harus berupa angka";
+    } else if (Number(batch) < MIN_BATCH || Number(batch) > MAX_BATCH) {
+      nextErrors.batch = `Angkatan harus antara ${MIN_BATCH}-${MAX_BATCH}`;
     }
     if (!password) {
       nextErrors.password = "Kata sandi wajib diisi";
@@ -89,7 +129,7 @@ export function SignupForm({ onSubmit, formError }: SignupFormProps) {
     <div className="flex w-full flex-col items-start gap-8">
       <div className="flex w-full flex-col items-start gap-4">
         <h1
-          className="w-full bg-clip-text break-words font-heading text-h1 leading-[1.35] text-transparent"
+          className="w-full bg-clip-text break-words font-heading text-h2 leading-[1.35] text-transparent sm:text-h1"
           style={{
             backgroundImage:
               "linear-gradient(175.54deg, var(--gradient-header-start) 11.592%, var(--gradient-header-end) 72.166%)",
@@ -97,7 +137,7 @@ export function SignupForm({ onSubmit, formError }: SignupFormProps) {
         >
           Mulai Perjalananmu
         </h1>
-        <p className="font-body text-b1 text-foreground">
+        <p className="font-body text-b3 text-foreground sm:text-b1">
           Lengkapi data diri di bawah ini untuk bergabung.
         </p>
       </div>
@@ -116,7 +156,7 @@ export function SignupForm({ onSubmit, formError }: SignupFormProps) {
             placeholder="Masukan nama lengkap kamu!"
             value={fullName}
             onChange={(event) => setFullName(event.target.value)}
-            error={fieldErrors.fullName}
+            error={displayedErrors.fullName}
           />
           <Input
             type="text"
@@ -125,7 +165,7 @@ export function SignupForm({ onSubmit, formError }: SignupFormProps) {
             placeholder="Masukkan id line kamu!"
             value={lineId}
             onChange={(event) => setLineId(event.target.value)}
-            error={fieldErrors.lineId}
+            error={displayedErrors.lineId}
           />
           <Input
             type="tel"
@@ -135,7 +175,7 @@ export function SignupForm({ onSubmit, formError }: SignupFormProps) {
             placeholder="Contoh : 0812XXXXX"
             value={whatsapp}
             onChange={(event) => setWhatsapp(event.target.value)}
-            error={fieldErrors.whatsapp}
+            error={displayedErrors.whatsapp}
           />
           <Input
             type="email"
@@ -145,7 +185,7 @@ export function SignupForm({ onSubmit, formError }: SignupFormProps) {
             placeholder="Contoh : johndoe@gmail.com"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            error={fieldErrors.email}
+            error={displayedErrors.email}
           />
           <Input
             type="text"
@@ -154,7 +194,7 @@ export function SignupForm({ onSubmit, formError }: SignupFormProps) {
             placeholder="Masukkan fakultas kamu!"
             value={faculty}
             onChange={(event) => setFaculty(event.target.value)}
-            error={fieldErrors.faculty}
+            error={displayedErrors.faculty}
           />
           <Input
             type="text"
@@ -164,7 +204,7 @@ export function SignupForm({ onSubmit, formError }: SignupFormProps) {
             placeholder="Contoh : 2024"
             value={batch}
             onChange={(event) => setBatch(event.target.value)}
-            error={fieldErrors.batch}
+            error={displayedErrors.batch}
           />
           <Input
             type="password"
@@ -174,7 +214,7 @@ export function SignupForm({ onSubmit, formError }: SignupFormProps) {
             placeholder="Masukkan kata sandi!"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
-            error={fieldErrors.password}
+            error={displayedErrors.password}
           />
           <Input
             type="password"
@@ -184,7 +224,7 @@ export function SignupForm({ onSubmit, formError }: SignupFormProps) {
             placeholder="Masukkan kembali kata sandi yang telah dibuat!"
             value={confirmPassword}
             onChange={(event) => setConfirmPassword(event.target.value)}
-            error={fieldErrors.confirmPassword}
+            error={displayedErrors.confirmPassword}
           />
         </div>
 
@@ -194,7 +234,7 @@ export function SignupForm({ onSubmit, formError }: SignupFormProps) {
           accept="image/png,image/jpeg"
           maxSizeMb={5}
           onFileChange={setPhoto}
-          error={fieldErrors.photo}
+          error={displayedErrors.photo}
         />
 
         {formError && (
@@ -208,7 +248,7 @@ export function SignupForm({ onSubmit, formError }: SignupFormProps) {
         </Button>
       </form>
 
-      <p className="w-full text-center font-subheading text-s3 font-semibold text-foreground">
+      <p className="w-full text-center font-subheading text-s5 font-semibold text-foreground sm:text-s3">
         Sudah punya akun?{" "}
         <Link href="/login" className="text-blue-200 hover:text-blue-100">
           Masuk di sini

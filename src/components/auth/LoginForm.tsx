@@ -10,25 +10,36 @@ export interface LoginFormValues {
   password: string;
 }
 
+export type LoginFieldErrors = Partial<Record<keyof LoginFormValues, string>>;
+
 export interface LoginFormProps {
   onSubmit?: (values: LoginFormValues) => Promise<void> | void;
   formError?: string;
+  serverErrors?: LoginFieldErrors;
 }
 
-export function LoginForm({ onSubmit, formError }: LoginFormProps) {
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export function LoginForm({ onSubmit, formError, serverErrors }: LoginFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fieldErrors, setFieldErrors] = useState<{
-    email?: string;
-    password?: string;
-  }>({});
+  const [fieldErrors, setFieldErrors] = useState<LoginFieldErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const displayedErrors: LoginFieldErrors = {
+    email: fieldErrors.email ?? serverErrors?.email,
+    password: fieldErrors.password ?? serverErrors?.password,
+  };
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const nextErrors: typeof fieldErrors = {};
-    if (!email) nextErrors.email = "Email wajib diisi";
+    const nextErrors: LoginFieldErrors = {};
+    if (!email) {
+      nextErrors.email = "Email wajib diisi";
+    } else if (!EMAIL_REGEX.test(email)) {
+      nextErrors.email = "Format email tidak valid";
+    }
     if (!password) nextErrors.password = "Kata sandi wajib diisi";
     setFieldErrors(nextErrors);
 
@@ -48,7 +59,7 @@ export function LoginForm({ onSubmit, formError }: LoginFormProps) {
     <div className="flex w-full flex-col items-start gap-8">
       <div className="flex w-full flex-col items-start gap-4">
         <h1
-          className="w-full bg-clip-text break-words font-heading text-h1 leading-[1.35] text-transparent"
+          className="w-full bg-clip-text break-words font-heading text-h2 leading-[1.35] text-transparent sm:text-h1"
           style={{
             backgroundImage:
               "linear-gradient(161.67deg, var(--gradient-header-start) 11.592%, var(--gradient-header-end) 72.166%)",
@@ -56,7 +67,7 @@ export function LoginForm({ onSubmit, formError }: LoginFormProps) {
         >
           Selamat Datang Kembali!
         </h1>
-        <p className="font-body text-b1 text-foreground">
+        <p className="font-body text-b3 text-foreground sm:text-b1">
           Silakan masuk untuk melanjutkan aktivitas dan tugas kamu.
         </p>
       </div>
@@ -75,7 +86,7 @@ export function LoginForm({ onSubmit, formError }: LoginFormProps) {
             placeholder="Masukan email akun PPMB kamu!"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            error={fieldErrors.email}
+            error={displayedErrors.email}
           />
           <Input
             type="password"
@@ -85,7 +96,7 @@ export function LoginForm({ onSubmit, formError }: LoginFormProps) {
             placeholder="Masukan kata sandi kamu!"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
-            error={fieldErrors.password}
+            error={displayedErrors.password}
           />
         </div>
 
@@ -100,7 +111,7 @@ export function LoginForm({ onSubmit, formError }: LoginFormProps) {
         </Button>
       </form>
 
-      <p className="w-full text-center font-subheading text-s3 font-semibold text-foreground">
+      <p className="w-full text-center font-subheading text-s5 font-semibold text-foreground sm:text-s3">
         Belum punya akun?{" "}
         <Link href="/signup" className="text-blue-200 hover:text-blue-100">
           Daftar Sekarang
