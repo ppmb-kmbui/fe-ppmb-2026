@@ -107,8 +107,16 @@ const SponsorData: { src: string; alt: string }[] = [
 export default function HomePage() {
   return (
     <DashboardPageLayout activeItem="home">
-      <main className="flex flex-col overflow-hidden gap-20 p-8">
-        <section id="timeline" className="flex flex-col gap-16">
+      <main className="flex flex-col overflow-hidden gap-20 ">
+        <section id="sponsor" className="flex flex-col gap-8 md:gap-16 md:hidden">
+          <h1 className="text-6xl max-lg:text-4xl max-md:text-3xl font-heading">
+            <span className="bg-linear-to-br from-yellow-600 to-purple-600 text-transparent bg-clip-text">
+              Sponsor
+            </span>
+          </h1>
+          <SponsorMarquee items={SponsorData} />
+        </section>
+        <section id="timeline" className="flex flex-col gap-8 md:gap-16">
           <h1 className="text-6xl max-lg:text-4xl max-md:text-3xl font-heading">
             <span className="bg-linear-to-br from-yellow-600 to-purple-600 text-transparent bg-clip-text">
               Timeline Kegiatan
@@ -116,7 +124,7 @@ export default function HomePage() {
           </h1>
           <div className="relative flex flex-col gap-4">
             <div
-              className="absolute left-1/2 top-0 bottom-0 w-1 -translate-x-1/2 bg-blue-800"
+              className="absolute left-3 md:left-1/2 top-8 md:top-0 bottom-0 w-1 -translate-x-1/2 max-md:bg-linear-to-b from-white to-blue-800 md:bg-blue-800"
               aria-hidden="true"
             />
             {TimelineData.map((data, i) => (
@@ -133,7 +141,7 @@ export default function HomePage() {
             ))}
           </div>
         </section>
-        <section id="faq" className="flex flex-col gap-16">
+        <section id="faq" className="flex flex-col gap-8 md:gap-16">
           <h1 className="text-6xl max-lg:text-4xl max-md:text-3xl font-heading ">
             <span className="bg-linear-to-br from-yellow-600 to-purple-600 text-transparent bg-clip-text">
               Frequently Asked Question
@@ -150,7 +158,7 @@ export default function HomePage() {
           ))}
           </div>
         </section>
-        <section id="sponsor" className="flex flex-col gap-16 pb-24">
+        <section id="sponsor" className="flex flex-col gap-8 md:gap-16 pb-24 max-md:hidden">
           <h1 className="text-6xl max-lg:text-4xl max-md:text-3xl font-heading">
             <span className="bg-linear-to-br from-yellow-600 to-purple-600 text-transparent bg-clip-text">
               Sponsor

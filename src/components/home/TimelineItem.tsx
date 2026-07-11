@@ -27,50 +27,62 @@ export function TimelineItem({
   return (
     <article
       className={cn(
-        "grid w-full grid-cols-[1fr_6rem_1fr] items-start",
+        "relative flex w-full flex-col gap-4 pl-12 md:grid md:grid-cols-[1fr_6rem_1fr] md:items-center md:pl-0",
         className,
       )}
       {...props}
     >
-      <div className="flex items-center justify-center h-full" aria-hidden="true">
-        <div className="size-6 rounded-xs bg-blue-800 rotate-45 shrink-0" />
+      <div 
+        className="absolute left-3 top-8 flex -translate-x-1/2 items-center justify-center md:static md:col-start-2 md:row-start-1 md:translate-x-0 md:h-full" 
+        aria-hidden="true"
+      >
+        <div className="size-5 md:size-6 rounded-xs bg-white md:bg-blue-500 rotate-45 shrink-0" />
       </div>
+
       {media && (
         <div
           className={cn(
-            "flex row-start-1",
-            reversed ? "col-start-3 justify-start" : "col-start-1 justify-end",
+            "hidden md:flex w-full md:row-start-1",
+            reversed ? "md:col-start-3 md:justify-start" : "md:col-start-1 md:justify-end",
           )}
         >
-          <div className="h-56 w-auto aspect-video overflow-hidden rounded-lg bg-background">
+          <div className="w-auto h-full aspect-video overflow-hidden rounded-lg bg-background">
             {media}
           </div>
         </div>
       )}
+
       <div
         className={cn(
-          "flex flex-col gap-3 row-start-1 h-full justify-center",
+          "flex flex-col gap-3 rounded-lg border border-white/10 bg-purple-900 p-5 md:border-none md:bg-transparent md:p-0 md:row-start-1 md:h-full md:justify-center",
           reversed
-            ? "col-start-1 items-end text-right"
-            : "col-start-3 items-start text-left",
+            ? "md:col-start-1 md:items-end md:text-right"
+            : "md:col-start-3 md:items-start md:text-left",
         )}
       >
-        <time className="text-b4 text-foreground">{date}</time>
-        <h3 className="font-heading text-h3 text-yellow-100">{title}</h3>
+        <time className="text-b4 text-white md:text-foreground">{date}</time>
+        
+        {media && (
+           <div className="w-full h-auto aspect-video overflow-hidden rounded-lg bg-background md:hidden">
+             {media}
+           </div>
+        )}
+
+        <h3 className="font-heading text-xl text-yellow-300 md:text-h3 md:text-yellow-100">{title}</h3>
         <p className="text-b3 text-foreground">{description}</p>
         {location && locationHref && (
           <a
             href={locationHref}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex w-fit items-center gap-2 rounded-xs bg-blue-500 px-4 py-2 text-b3 text-yellow-50 hover:bg-blue-600"
+            className="inline-flex w-fit items-center gap-2 rounded-sm bg-blue-500 px-4 py-2 text-b3 text-white hover:bg-blue-600 font-semibold"
           >
             <FaLocationDot aria-hidden="true" />
             {location}
           </a>
         )}
         {location && !locationHref && (
-          <span className="inline-flex w-fit items-center gap-2 rounded-xs bg-blue-500 px-4 py-2 text-b3 text-yellow-50">
+          <span className="inline-flex w-fit items-center gap-2 rounded-sm bg-blue-500 px-4 py-2 text-b3 text-white font-semibold">
             <FaLocationDot aria-hidden="true" />
             {location}
           </span>
