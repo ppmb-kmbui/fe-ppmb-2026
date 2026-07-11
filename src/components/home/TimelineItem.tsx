@@ -36,7 +36,7 @@ export function TimelineItem({
         className="absolute left-3 top-8 flex -translate-x-1/2 items-center justify-center md:static md:col-start-2 md:row-start-1 md:translate-x-0 md:h-full" 
         aria-hidden="true"
       >
-        <div className="size-5 md:size-6 rounded-xs bg-white md:bg-blue-500 rotate-45 shrink-0" />
+        <div className="size-5 md:size-6 rounded-xs bg-white md:bg-blue-800 rotate-45 shrink-0" />
       </div>
 
       {media && (

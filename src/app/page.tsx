@@ -107,13 +107,8 @@ const SponsorData: { src: string; alt: string }[] = [
 export default function HomePage() {
   return (
     <DashboardPageLayout activeItem="home">
-      <main className="flex flex-col overflow-hidden gap-20 ">
+      <main className="flex flex-col overflow-hidden gap-20 max-md:gap-14">
         <section id="sponsor" className="flex flex-col gap-8 md:gap-16 md:hidden">
-          <h1 className="text-6xl max-lg:text-4xl max-md:text-3xl font-heading">
-            <span className="bg-linear-to-br from-yellow-600 to-purple-600 text-transparent bg-clip-text">
-              Sponsor
-            </span>
-          </h1>
           <SponsorMarquee items={SponsorData} />
         </section>
         <section id="timeline" className="flex flex-col gap-8 md:gap-16">
@@ -143,8 +138,11 @@ export default function HomePage() {
         </section>
         <section id="faq" className="flex flex-col gap-8 md:gap-16">
           <h1 className="text-6xl max-lg:text-4xl max-md:text-3xl font-heading ">
-            <span className="bg-linear-to-br from-yellow-600 to-purple-600 text-transparent bg-clip-text">
-              Frequently Asked Question
+            <span className="bg-linear-to-br from-yellow-600 to-purple-600 text-transparent bg-clip-text max-md:hidden">
+              Frequently Asked Question (FAQ)
+            </span>
+            <span className="bg-linear-to-br from-yellow-600 to-purple-600 text-transparent bg-clip-text md:hidden">
+              FAQ
             </span>
           </h1>
           <div className="space-y-4">
