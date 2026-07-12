@@ -51,6 +51,7 @@ export default function RootLayout({
     <html
       lang="id"
       className={`${facultyGlyphic.variable} ${palanquinDark.variable} ${pangolin.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
