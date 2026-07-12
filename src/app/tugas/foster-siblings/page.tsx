@@ -23,7 +23,7 @@ export default function FosterSiblingsTaskPage() {
         <section id="timeline" className="flex flex-col gap-6">
           <Link href={"/tugas"} className="w-fit">
             <Button className="rounded-full">
-              <span className="flex gap-3 font-body font-extralight px-5">
+              <span className="flex gap-3 max-md:gap-1 font-body max-md:font-xs font-extralight md:px-5">
                 <LuCornerUpLeft />
                 Back
               </span>
