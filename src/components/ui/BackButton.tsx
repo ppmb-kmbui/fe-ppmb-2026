@@ -12,7 +12,7 @@ export interface BackButtonProps {
 }
 
 const styles =
-  "inline-flex min-h-[50px] items-center justify-center gap-2.5 rounded-2xl bg-purple-600 px-6 py-2.5 text-b1 text-foreground transition-colors hover:bg-purple-700";
+  "inline-flex h-[50px] w-fit min-w-[140px] items-center justify-center gap-2.5 rounded-[24px] bg-purple-600 px-5 py-2.5 text-b2 text-foreground transition-colors hover:bg-purple-700";
 
 export function BackButton({
   href,

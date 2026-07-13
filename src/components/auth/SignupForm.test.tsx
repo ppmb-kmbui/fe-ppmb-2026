@@ -15,6 +15,10 @@ async function fillValidForm(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText("Konfirmasi Kata Sandi"), "password123");
 }
 
+function makePhoto(): File {
+  return new File(["fake-image-bytes"], "photo.png", { type: "image/png" });
+}
+
 describe("SignupForm", () => {
   it("shows required-field errors and does not call onSubmit when the form is empty", async () => {
     const user = userEvent.setup();
@@ -58,12 +62,14 @@ describe("SignupForm", () => {
     expect(await screen.findByText("Konfirmasi kata sandi tidak cocok")).toBeInTheDocument();
   });
 
-  it("calls onSubmit with the entered values, including a null photo, when the form is valid", async () => {
+  it("calls onSubmit with the entered values and selected photo when the form is valid", async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn().mockResolvedValue(undefined);
     render(<SignupForm onSubmit={onSubmit} />);
+    const photo = makePhoto();
 
     await fillValidForm(user);
+    await user.upload(screen.getByLabelText("Foto Profil"), photo);
     await user.click(screen.getByRole("button", { name: "Daftar" }));
 
     expect(onSubmit).toHaveBeenCalledWith({
@@ -75,7 +81,7 @@ describe("SignupForm", () => {
       batch: 2026,
       password: "password123",
       confirmPassword: "password123",
-      photo: null,
+      photo,
     });
   });
 

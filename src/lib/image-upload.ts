@@ -24,6 +24,17 @@ function getCloudinaryConfig(): { cloudName: string; uploadPreset: string } {
 }
 
 export async function uploadImage(file: File): Promise<string> {
+  return uploadToCloudinary(file, "image");
+}
+
+export async function uploadRawFile(file: File): Promise<string> {
+  return uploadToCloudinary(file, "raw");
+}
+
+async function uploadToCloudinary(
+  file: File,
+  resourceType: "image" | "raw",
+): Promise<string> {
   const { cloudName, uploadPreset } = getCloudinaryConfig();
 
   const formData = new FormData();
@@ -32,12 +43,15 @@ export async function uploadImage(file: File): Promise<string> {
 
   let response: Response;
   try {
-    response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-      method: "POST",
-      body: formData,
-    });
+    response = await fetch(
+      `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`,
+      {
+        method: "POST",
+        body: formData,
+      },
+    );
   } catch {
-    throw new ImageUploadError("Tidak dapat mengunggah foto. Periksa koneksi internet kamu.");
+    throw new ImageUploadError("Tidak dapat mengunggah file. Periksa koneksi internet kamu.");
   }
 
   const payload = (await response.json().catch(() => undefined)) as
@@ -46,12 +60,12 @@ export async function uploadImage(file: File): Promise<string> {
 
   if (!response.ok) {
     const message =
-      typeof payload?.error?.message === "string" ? payload.error.message : "Gagal mengunggah foto";
+      typeof payload?.error?.message === "string" ? payload.error.message : "Gagal mengunggah file";
     throw new ImageUploadError(message);
   }
 
   if (typeof payload?.secure_url !== "string") {
-    throw new ImageUploadError("Respons layanan unggah foto tidak valid");
+    throw new ImageUploadError("Respons layanan unggah file tidak valid");
   }
 
   return payload.secure_url;

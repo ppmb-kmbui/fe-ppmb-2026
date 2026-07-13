@@ -49,6 +49,7 @@ export async function apiFetch<T>(
   const response = await fetch(`${getApiBaseUrl()}/${normalizedPath}`, {
     ...requestInit,
     headers,
+    credentials: requestInit.credentials ?? "same-origin",
   });
 
   const isJson = response.headers
