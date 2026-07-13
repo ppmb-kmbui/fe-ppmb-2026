@@ -6,6 +6,7 @@ import {
   TimelineItem,
   type TimelineItemProps,
 } from "@/components";
+import Image from "next/image";
 
 const TimelineData: TimelineItemProps[] = [
   {
@@ -83,24 +84,12 @@ const FAQData: { question: string; answer: string }[] = [
 
 const SponsorData: { src: string; alt: string }[] = [
   {
-    src: "assets/logo_ppmb.webp",
-    alt: "logo",
+    src: "assets/sponsor-onassis.webp",
+    alt: "Onassis Logo",
   },
   {
-    src: "assets/logo_ppmb.webp",
-    alt: "logo1",
-  },
-  {
-    src: "assets/logo_ppmb.webp",
-    alt: "logo2",
-  },
-  {
-    src: "assets/logo_ppmb.webp",
-    alt: "logo3",
-  },
-  {
-    src: "assets/logo_ppmb.webp",
-    alt: "logo4",
+    src: "assets/sponsor-king.webp",
+    alt: "King Logo",
   },
 ];
 
@@ -109,7 +98,7 @@ export default function HomePage() {
     <DashboardPageLayout activeItem="home">
       <main className="flex flex-col overflow-hidden gap-20 max-md:gap-14">
         <section id="sponsor" className="flex flex-col gap-8 md:gap-16 md:hidden">
-          <SponsorMarquee items={SponsorData} />
+          <SponsorMarquee items={SponsorData} speed={10}/>
         </section>
         <section id="timeline" className="flex flex-col gap-8 md:gap-16">
           <h1 className="text-6xl max-lg:text-4xl max-md:text-3xl font-heading">
@@ -162,7 +151,11 @@ export default function HomePage() {
               Sponsor
             </span>
           </h1>
-          <SponsorMarquee items={SponsorData} />
+          <div className="w-full flex items-center justify-center gap-12">
+            {SponsorData.map((sponsor)=>(
+              <img key={`${sponsor.src}-${sponsor.alt}`} src={sponsor.src} alt={sponsor.alt} className="w-auto h-34"/>
+            ))}
+          </div>
         </section>
       </main>
     </DashboardPageLayout>
