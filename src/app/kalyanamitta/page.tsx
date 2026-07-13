@@ -74,8 +74,13 @@ export default function KalyanamittaPage() {
     "connected",
   );
 
-  const displayedFriends =
-    activeTab === "connected" ? connectedFriends : notConnectedFriends;
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const displayedFriends = (
+    activeTab === "connected" ? connectedFriends : notConnectedFriends
+  ).filter((f) =>
+    f.fullname?.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   return (
     <DashboardPageLayout
@@ -134,7 +139,11 @@ export default function KalyanamittaPage() {
                   Kenali Teman
                 </button>
               </div>
-              <SearchInput placeholder="Cari Kalyanamitta" />
+              <SearchInput
+                placeholder="Cari Kalyanamitta"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
               <div className="mt-6 grid gap-5 lg:grid-cols-2">
                 {displayedFriends.length === 0 ? (
                   <div className="col-span-full flex flex-col items-center justify-center py-10 text-center">
