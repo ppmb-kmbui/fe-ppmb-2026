@@ -47,3 +47,10 @@ export async function getConnectionRequests() {
   const response = await apiFetch<ConnectionRequestsResponse>("connection-requests");
   return response.data;
 }
+
+export async function sendConnectionRequest(toId: number) {
+  const response = await apiFetch<unknown>(`connect/${toId}`, {
+    method: "POST",
+  });
+  return response;
+}

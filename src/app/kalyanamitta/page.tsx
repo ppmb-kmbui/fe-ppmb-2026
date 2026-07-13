@@ -8,20 +8,24 @@ import {
   Button,
 } from "@/components";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { FaArrowLeft } from "react-icons/fa6";
 import {
   getFriends,
   getConnectionRequests,
+  sendConnectionRequest,
   type FriendUser,
   type ConnectionRequestItem,
 } from "@/lib/friend-api";
-import { LuCornerUpLeft, LuUserPlus } from "react-icons/lu";
+import { LuCornerUpLeft, LuUser, LuUserPlus } from "react-icons/lu";
 
 export default function KalyanamittaPage() {
+  const router = useRouter();
   const [allFriends, setAllFriends] = useState<FriendUser[]>([]);
   const [friendRequests, setFriendRequests] = useState<ConnectionRequestItem[]>(
     [],
   );
+  const [sentRequestIds, setSentRequestIds] = useState<Set<number>>(new Set());
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -95,7 +99,7 @@ export default function KalyanamittaPage() {
             <h1 className="text-6xl max-lg:text-4xl max-md:text-3xl font-heading">
               {requestOpen ? (
                 <Button onClick={() => setRequestOpen(false)}>
-                  <LuCornerUpLeft  />
+                  <LuCornerUpLeft />
                 </Button>
               ) : (
                 <span className="bg-linear-to-br from-yellow-600 to-purple-600 text-transparent bg-clip-text">
@@ -159,16 +163,44 @@ export default function KalyanamittaPage() {
                     </p>
                   </div>
                 ) : (
-                  displayedFriends.map((friend) => (
-                    <MemberCard
-                      key={`${activeTab}-${friend.id}`}
-                      name={friend.fullname ?? "Unknown"}
-                      batch={friend.batch}
-                      actionLabel={
-                        activeTab === "connected" ? "Lihat Profil" : undefined
-                      }
-                    />
-                  ))
+                  displayedFriends.map((friend) => {
+                    const isSent = sentRequestIds.has(friend.id);
+                    const avatar = friend.imgUrl ? (
+                      <img
+                        src={friend.imgUrl}
+                        alt={`${friend.fullname}'s Picture`}
+                      />
+                    ) : (
+                      <LuUser />
+                    );
+                    return (
+                      <MemberCard
+                        key={`${activeTab}-${friend.id}`}
+                        avatar={avatar}
+                        name={friend.fullname ?? "Unknown"}
+                        batch={friend.batch}
+                        actionLabel={
+                          activeTab === "connected"
+                            ? "Lihat Profil"
+                            : isSent
+                              ? "Terkirim"
+                              : undefined
+                        }
+                        onAction={
+                          activeTab === "connected"
+                            ? () => router.push(`/profil/${friend.id}`)
+                            : isSent
+                              ? undefined
+                              : async () => {
+                                  await sendConnectionRequest(friend.id);
+                                  setSentRequestIds((prev) =>
+                                    new Set(prev).add(friend.id),
+                                  );
+                                }
+                        }
+                      />
+                    );
+                  })
                 )}
               </div>
             </div>
