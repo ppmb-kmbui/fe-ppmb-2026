@@ -7,69 +7,75 @@ import {
   SearchInput,
   Button,
 } from "@/components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa6";
+import {
+  getFriends,
+  getConnectionRequests,
+  type FriendUser,
+  type ConnectionRequestItem,
+} from "@/lib/friend-api";
 
 export default function KalyanamittaPage() {
-  const friendRequestData: { name: string; batch: string }[] = [
-    {
-      name: "Nanda",
-      batch: "2024",
-    },
-    {
-      name: "Jaysen",
-      batch: "2024",
-    },
-    {
-      name: "Derrick",
-      batch: "2024",
-    },
-    {
-      name: "Darrel",
-      batch: "2024",
-    },
-    {
-      name: "Matthew",
-      batch: "2024",
-    },
-  ];
+  const [allFriends, setAllFriends] = useState<FriendUser[]>([]);
+  const [friendRequests, setFriendRequests] = useState<ConnectionRequestItem[]>(
+    [],
+  );
+  const [loading, setLoading] = useState(true);
 
-  const memberCardData: { name: string; batch: string }[] = [
-    {
-      name: "Nanda",
-      batch: "2024",
-    },
-    {
-      name: "Jaysen",
-      batch: "2024",
-    },
-    {
-      name: "Derrick",
-      batch: "2024",
-    },
-    {
-      name: "Darrel",
-      batch: "2024",
-    },
-    {
-      name: "Matthew",
-      batch: "2024",
-    },
-  ];
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [friends, connectionRequests] = await Promise.all([
+          getFriends(),
+          getConnectionRequests(),
+        ]);
+        setAllFriends(friends);
+        setFriendRequests(connectionRequests?.received ?? []);
+      } catch {
+        // silently fail — data stays as empty arrays
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  const notConnectedFriends = allFriends.filter(
+    (f) => f.status === "not_connected",
+  );
+  const connectedFriends = allFriends.filter(
+    (f) => f.status !== "not_connected",
+  );
 
   const friendRequest = (
     <div className="space-y-2">
-      {friendRequestData.map((data, i) => (
-        <FriendRequestCard
-          key={`${i}-${data.name}-${data.batch}`}
-          name={data.name}
-          batch={data.batch}
-        />
-      ))}
+      <h1 className="text-h3 font-heading text-yellow-600">
+          Permintaan Pertemanan
+      </h1>
+      {friendRequests.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-10 text-center">
+          <p className="text-b3">Belum ada permintaan pertemanan</p>
+        </div>
+      ) : (
+        friendRequests.map((req) => (
+          <FriendRequestCard
+            key={`fr-${req.id}`}
+            name={req.from?.fullname ?? "Unknown"}
+            batch={req.from?.batch ?? "—"}
+          />
+        ))
+      )}
     </div>
   );
 
   const [requestOpen, setRequestOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"connected" | "not-connected">(
+    "connected",
+  );
+
+  const displayedFriends =
+    activeTab === "connected" ? connectedFriends : notConnectedFriends;
 
   return (
     <DashboardPageLayout
@@ -96,19 +102,60 @@ export default function KalyanamittaPage() {
               Permintaan
             </Button>
           </div>
-          {requestOpen ? (
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <span className="text-b3">Memuat data...</span>
+            </div>
+          ) : requestOpen ? (
             friendRequest
           ) : (
             <div className="">
+              <div className="mb-6 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("not-connected")}
+                  className={`inline-flex h-11 min-w-35 items-center justify-center rounded-2xl px-6 text-b2 transition-colors ${
+                    activeTab === "not-connected"
+                      ? "bg-purple-300/50"
+                      : "bg-[#683592]/25 hover:bg-purple-300/30"
+                  }`}
+                >
+                  Cari Teman
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("connected")}
+                  className={`inline-flex h-11 min-w-35 items-center justify-center rounded-2xl px-6 text-b2 transition-colors ${
+                    activeTab === "connected"
+                      ? "bg-purple-300/50"
+                      : "bg-[#683592]/25 hover:bg-purple-300/30"
+                  }`}
+                >
+                  Kenali Teman
+                </button>
+              </div>
               <SearchInput placeholder="Cari Kalyanamitta" />
               <div className="mt-6 grid gap-5 lg:grid-cols-2">
-                {memberCardData.map((data, i) => (
-                  <MemberCard
-                    key={`${i}-${data.name}-${data.batch}`}
-                    name={data.name}
-                    batch={data.batch}
-                  />
-                ))}
+                {displayedFriends.length === 0 ? (
+                  <div className="col-span-full flex flex-col items-center justify-center py-10 text-center">
+                    <p className="text-b3">
+                      {activeTab === "connected"
+                        ? "Belum ada teman yang terhubung"
+                        : "Tidak ada teman yang belum terhubung"}
+                    </p>
+                  </div>
+                ) : (
+                  displayedFriends.map((friend) => (
+                    <MemberCard
+                      key={`${activeTab}-${friend.id}`}
+                      name={friend.fullname ?? "Unknown"}
+                      batch={friend.batch}
+                      actionLabel={
+                        activeTab === "connected" ? "Lihat Profil" : undefined
+                      }
+                    />
+                  ))
+                )}
               </div>
             </div>
           )}
