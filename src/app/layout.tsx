@@ -50,6 +50,7 @@ export default function RootLayout({
   return (
     <html
       lang="id"
+      data-scroll-behavior="smooth"
       className={`${facultyGlyphic.variable} ${palanquinDark.variable} ${pangolin.variable} h-full antialiased`}
       suppressHydrationWarning
     >

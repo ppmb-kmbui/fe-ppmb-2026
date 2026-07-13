@@ -1,25 +1,26 @@
 import { BackButton } from "@/components";
 
-import { MentoringIsianForm } from "../_components/MentoringIsianForm";
-import { TaskPageShell } from "../_components/TaskPageShell";
-import { TaskRightRail } from "../_components/TaskRightRail";
+import { committeeVideos } from "../../_components/task-page-data";
+import { CommitteeVideosClient } from "../../_components/CommitteeVideosClient";
+import { TaskPageShell } from "../../_components/TaskPageShell";
+import { TaskRightRail } from "../../_components/TaskRightRail";
 import {
   GradientTaskTitle,
   TaskDescription,
   TaskSectionCard,
-} from "../_components/TaskTypography";
+} from "../../_components/TaskTypography";
 
-export default function MentoringTaskPage() {
+export default function CommitteeVideoCollectionPage() {
   return (
     <TaskPageShell
       rightRail={
         <TaskRightRail
-          title="Tugas Mentoring"
+          title="Video Panitia"
           showCalendar={false}
           progress={{
-            label: "Tugas Diperlukan : 2",
+            label: "Video Ditonton : 0",
             completed: 0,
-            total: 2,
+            total: committeeVideos.length,
           }}
           agenda={[
             {
@@ -33,12 +34,12 @@ export default function MentoringTaskPage() {
       withConstellation
     >
       <div className="flex max-w-[958px] flex-col gap-8">
-        <BackButton href="/tugas" />
-        <GradientTaskTitle>Mentoring</GradientTaskTitle>
+        <BackButton href="/tugas/mentoring" />
+        <GradientTaskTitle>Kumpulan Video dari Panitia</GradientTaskTitle>
 
         <TaskSectionCard>
           <TaskDescription />
-          <MentoringIsianForm />
+          <CommitteeVideosClient />
         </TaskSectionCard>
       </div>
     </TaskPageShell>

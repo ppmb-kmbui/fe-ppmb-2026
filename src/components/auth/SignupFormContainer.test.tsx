@@ -26,6 +26,10 @@ vi.mock("@/lib/image-upload", async () => {
 
 import { SignupFormContainer } from "./SignupFormContainer";
 
+function makePhoto(): File {
+  return new File(["fake-image-bytes"], "photo.png", { type: "image/png" });
+}
+
 async function fillValidForm(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText("Nama Lengkap (sesuai SIAK)"), "Danniel Sigma");
   await user.type(screen.getByLabelText("ID Line"), "danniel26");
@@ -35,6 +39,7 @@ async function fillValidForm(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText("Angkatan"), "2026");
   await user.type(screen.getByLabelText("Kata Sandi (Min. 8 Karakter)"), "password123");
   await user.type(screen.getByLabelText("Konfirmasi Kata Sandi"), "password123");
+  await user.upload(screen.getByLabelText("Foto Profil"), makePhoto());
 }
 
 describe("SignupFormContainer", () => {
@@ -42,6 +47,7 @@ describe("SignupFormContainer", () => {
     pushMock.mockReset();
     registerMock.mockReset();
     uploadImageMock.mockReset();
+    uploadImageMock.mockResolvedValue("https://res.cloudinary.com/xuytis3l/image/upload/v1/photo.png");
   });
 
   it("redirects to the login page with a registered flag after successful signup", async () => {
@@ -52,7 +58,7 @@ describe("SignupFormContainer", () => {
     await fillValidForm(user);
     await user.click(screen.getByRole("button", { name: "Daftar" }));
 
-    expect(registerMock).toHaveBeenCalled();
+    await vi.waitFor(() => expect(registerMock).toHaveBeenCalled());
     expect(pushMock).toHaveBeenCalledWith("/login?registered=1");
   });
 
@@ -82,12 +88,12 @@ describe("SignupFormContainer", () => {
     render(<SignupFormContainer />);
 
     await fillValidForm(user);
-    const photo = new File(["fake-image-bytes"], "photo.png", { type: "image/png" });
+    const photo = makePhoto();
     await user.upload(screen.getByLabelText("Foto Profil"), photo);
     await user.click(screen.getByRole("button", { name: "Daftar" }));
 
     await vi.waitFor(() => expect(registerMock).toHaveBeenCalled());
-    expect(uploadImageMock).toHaveBeenCalledWith(photo);
+    expect(uploadImageMock).toHaveBeenLastCalledWith(photo);
     expect(registerMock).toHaveBeenCalledWith(
       expect.objectContaining({
         imgUrl: "https://res.cloudinary.com/xuytis3l/image/upload/v1/photo.png",
@@ -102,7 +108,7 @@ describe("SignupFormContainer", () => {
     render(<SignupFormContainer />);
 
     await fillValidForm(user);
-    const photo = new File(["fake-image-bytes"], "photo.png", { type: "image/png" });
+    const photo = makePhoto();
     await user.upload(screen.getByLabelText("Foto Profil"), photo);
     await user.click(screen.getByRole("button", { name: "Daftar" }));
 

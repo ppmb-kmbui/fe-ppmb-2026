@@ -1,7 +1,6 @@
 "use client";
 
 import type { HTMLAttributes } from "react";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 
 import { cn } from "@/lib/cn";
 
@@ -55,7 +54,6 @@ function addDays(date: Date, amount: number) {
 export function WeekCalendar({
   selectedDate,
   eventDates = [],
-  onDateChange,
   className,
   ...props
 }: WeekCalendarProps) {
@@ -74,10 +72,6 @@ export function WeekCalendar({
     selected,
   );
 
-  function selectDate(date: Date) {
-    onDateChange?.(new Date(date));
-  }
-
   return (
     <div
       className={cn(
@@ -87,23 +81,7 @@ export function WeekCalendar({
       {...props}
     >
       <div className="flex items-center justify-center gap-2.5">
-        <button
-          type="button"
-          onClick={() => selectDate(addDays(selected, -7))}
-          aria-label="Minggu sebelumnya"
-          className="grid size-9 place-items-center rounded-full text-yellow-400 hover:bg-white/10"
-        >
-          <FaChevronLeft aria-hidden="true" />
-        </button>
         <p className="min-w-20 text-center font-heading text-h4">{month}</p>
-        <button
-          type="button"
-          onClick={() => selectDate(addDays(selected, 7))}
-          aria-label="Minggu berikutnya"
-          className="grid size-9 place-items-center rounded-full text-yellow-400 hover:bg-white/10"
-        >
-          <FaChevronRight aria-hidden="true" />
-        </button>
       </div>
 
       <div className="grid w-full grid-cols-7 gap-2" role="grid">
@@ -113,16 +91,14 @@ export function WeekCalendar({
           const hasEvent = eventDateKeys.has(dateKey);
 
           return (
-            <button
-              type="button"
+            <div
               key={dateKey}
               role="gridcell"
               aria-selected={isSelected}
               aria-label={new Intl.DateTimeFormat("id-ID", {
                 dateStyle: "full",
               }).format(day.value)}
-              onClick={() => selectDate(day.value)}
-              className="flex min-w-0 flex-col items-center gap-2 rounded-lg text-center text-b3 hover:bg-white/10"
+              className="flex min-w-0 flex-col items-center gap-2 rounded-lg text-center text-b3"
             >
               <span>{day.label}</span>
               <span
@@ -135,7 +111,7 @@ export function WeekCalendar({
               >
                 {day.value.getDate()}
               </span>
-            </button>
+            </div>
           );
         })}
       </div>

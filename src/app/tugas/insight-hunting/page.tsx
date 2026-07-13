@@ -1,6 +1,6 @@
 import { BackButton } from "@/components";
 
-import { MentoringIsianForm } from "../_components/MentoringIsianForm";
+import { InsightHuntingForm } from "../_components/InsightHuntingForm";
 import { TaskPageShell } from "../_components/TaskPageShell";
 import { TaskRightRail } from "../_components/TaskRightRail";
 import {
@@ -9,23 +9,24 @@ import {
   TaskSectionCard,
 } from "../_components/TaskTypography";
 
-export default function MentoringTaskPage() {
+export default function InsightHuntingTaskPage() {
   return (
     <TaskPageShell
       rightRail={
         <TaskRightRail
-          title="Tugas Mentoring"
+          title="Insight Hunting"
           showCalendar={false}
           progress={{
-            label: "Tugas Diperlukan : 2",
+            label: "Tugas Diperlukan : 1",
             completed: 0,
-            total: 2,
+            total: 1,
           }}
+          agendaHeading="Kegiatan Terdekat"
           agenda={[
             {
-              category: "Mentoring",
-              title: "Tugas Vlog",
-              date: "13 Juni",
+              category: "Insight Hunting",
+              title: "Puja Rutin",
+              date: "15 Juni",
             },
           ]}
         />
@@ -34,11 +35,12 @@ export default function MentoringTaskPage() {
     >
       <div className="flex max-w-[958px] flex-col gap-8">
         <BackButton href="/tugas" />
-        <GradientTaskTitle>Mentoring</GradientTaskTitle>
+        <GradientTaskTitle>Insight Hunting</GradientTaskTitle>
 
         <TaskSectionCard>
           <TaskDescription />
-          <MentoringIsianForm />
+
+          <InsightHuntingForm />
         </TaskSectionCard>
       </div>
     </TaskPageShell>

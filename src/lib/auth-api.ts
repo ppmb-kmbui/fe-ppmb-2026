@@ -32,6 +32,9 @@ export interface AuthUser {
   updatedAt: string;
 }
 
+let cachedProfile: AuthUser | null = null;
+let profileRequest: Promise<AuthUser> | null = null;
+
 export async function login(input: LoginInput): Promise<void> {
   await apiFetch<{ token: string }>("auth/login", {
     method: "POST",
@@ -65,8 +68,38 @@ export async function register(input: RegisterInput): Promise<AuthUser> {
   return response.data;
 }
 
+export function getCachedProfileSnapshot(): AuthUser | null {
+  return cachedProfile;
+}
+
+export async function getProfile(): Promise<AuthUser> {
+  const response = await apiFetch<AuthUser>("auth/profile");
+
+  if (!response.data) {
+    throw new Error("Data profil tidak diterima dari server");
+  }
+
+  cachedProfile = response.data;
+  return response.data;
+}
+
+export async function getProfileCached(): Promise<AuthUser> {
+  if (cachedProfile) return cachedProfile;
+
+  profileRequest ??= getProfile().finally(() => {
+    profileRequest = null;
+  });
+
+  return profileRequest;
+}
+
 export async function logout(): Promise<void> {
-  await apiFetch<void>("auth/logout", { method: "POST" });
+  try {
+    await apiFetch<void>("auth/logout", { method: "POST" });
+  } finally {
+    cachedProfile = null;
+    profileRequest = null;
+  }
 }
 
 export interface AuthErrorResult {

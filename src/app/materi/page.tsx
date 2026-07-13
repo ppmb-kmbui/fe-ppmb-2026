@@ -1,3 +1,19 @@
+import { DashboardPageLayout } from "@/components";
+
+import { MaterialsClient } from "./MaterialsClient";
+import { GradientTaskTitle } from "../tugas/_components/TaskTypography";
+
 export default function MaterialsPage() {
-  return null;
+  return (
+    <DashboardPageLayout
+      activeItem="materials"
+      user={{ fullName: "Nama Lengkap", batch: "20XX" }}
+      mainClassName="md:pt-9"
+    >
+      <div className="flex max-w-[958px] flex-col gap-8">
+        <GradientTaskTitle>Materi</GradientTaskTitle>
+        <MaterialsClient />
+      </div>
+    </DashboardPageLayout>
+  );
 }

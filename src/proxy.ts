@@ -8,12 +8,6 @@ function decodeBase64Url(value: string): string {
   return atob(padded);
 }
 
-/**
- * Best-effort, unverified check used only to decide whether to redirect an
- * already-logged-in visitor away from /login and /signup. The backend is the
- * sole source of truth for authorization; a forged or expired token here
- * only affects this UX shortcut, never actual access to protected data.
- */
 function hasLikelyValidSession(token: string): boolean {
   const parts = token.split(".");
   if (parts.length !== 3) return false;
@@ -28,14 +22,41 @@ function hasLikelyValidSession(token: string): boolean {
 
 export function proxy(req: NextRequest) {
   const token = req.cookies.get(AUTH_COOKIE_NAME)?.value;
+  const pathname = req.nextUrl.pathname;
+  const hasSession = !!token && hasLikelyValidSession(token);
 
-  if (token && hasLikelyValidSession(token)) {
+  if ((pathname === "/login" || pathname === "/signup") && hasSession) {
     return NextResponse.redirect(new URL("/", req.url));
+  }
+
+  const protectedPrefixes = [
+    "/admin",
+    "/kalyanamitta",
+    "/materi",
+    "/profil",
+    "/tugas",
+  ];
+  const isProtectedRoute = protectedPrefixes.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+
+  if (isProtectedRoute && !hasSession) {
+    const loginUrl = new URL("/login", req.url);
+    loginUrl.searchParams.set("next", pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/login", "/signup"],
+  matcher: [
+    "/login",
+    "/signup",
+    "/admin/:path*",
+    "/kalyanamitta/:path*",
+    "/materi/:path*",
+    "/profil/:path*",
+    "/tugas/:path*",
+  ],
 };

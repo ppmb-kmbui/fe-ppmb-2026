@@ -1,15 +1,15 @@
 import { BackButton } from "@/components";
 
-import { MentoringIsianForm } from "../_components/MentoringIsianForm";
-import { TaskPageShell } from "../_components/TaskPageShell";
-import { TaskRightRail } from "../_components/TaskRightRail";
+import { MentoringIsianForm } from "../../_components/MentoringIsianForm";
+import { TaskPageShell } from "../../_components/TaskPageShell";
+import { TaskRightRail } from "../../_components/TaskRightRail";
 import {
   GradientTaskTitle,
   TaskDescription,
   TaskSectionCard,
-} from "../_components/TaskTypography";
+} from "../../_components/TaskTypography";
 
-export default function MentoringTaskPage() {
+export default function MentoringIsianPage() {
   return (
     <TaskPageShell
       rightRail={
@@ -17,9 +17,9 @@ export default function MentoringTaskPage() {
           title="Tugas Mentoring"
           showCalendar={false}
           progress={{
-            label: "Tugas Diperlukan : 2",
+            label: "Tugas Diperlukan : 1",
             completed: 0,
-            total: 2,
+            total: 1,
           }}
           agenda={[
             {
@@ -33,11 +33,12 @@ export default function MentoringTaskPage() {
       withConstellation
     >
       <div className="flex max-w-[958px] flex-col gap-8">
-        <BackButton href="/tugas" />
+        <BackButton href="/tugas/mentoring" />
         <GradientTaskTitle>Mentoring</GradientTaskTitle>
 
         <TaskSectionCard>
           <TaskDescription />
+
           <MentoringIsianForm />
         </TaskSectionCard>
       </div>
