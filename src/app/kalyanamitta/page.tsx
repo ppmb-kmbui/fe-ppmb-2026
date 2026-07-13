@@ -15,6 +15,7 @@ import {
   type FriendUser,
   type ConnectionRequestItem,
 } from "@/lib/friend-api";
+import { LuCornerUpLeft, LuUserPlus } from "react-icons/lu";
 
 export default function KalyanamittaPage() {
   const [allFriends, setAllFriends] = useState<FriendUser[]>([]);
@@ -51,7 +52,7 @@ export default function KalyanamittaPage() {
   const friendRequest = (
     <div className="space-y-2">
       <h1 className="text-h3 font-heading text-yellow-600">
-          Permintaan Pertemanan
+        Permintaan Pertemanan
       </h1>
       {friendRequests.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-10 text-center">
@@ -88,24 +89,28 @@ export default function KalyanamittaPage() {
       rightRail={friendRequest}
       rightRailClassName="max-lg:hidden"
     >
-      <main>
+      <main className="min-h-screen">
         <section id="timeline" className="flex flex-col gap-6">
           <div className="flex flex-wrap w-full justify-between items-center">
             <h1 className="text-6xl max-lg:text-4xl max-md:text-3xl font-heading">
               {requestOpen ? (
-                <FaArrowLeft onClick={() => setRequestOpen(false)} />
+                <Button onClick={() => setRequestOpen(false)}>
+                  <LuCornerUpLeft  />
+                </Button>
               ) : (
                 <span className="bg-linear-to-br from-yellow-600 to-purple-600 text-transparent bg-clip-text">
                   Kalyanamitta
                 </span>
               )}
             </h1>
-            <Button
-              className="lg:hidden flex-0 max-md:text-sm"
-              onClick={() => setRequestOpen(true)}
-            >
-              Permintaan
-            </Button>
+            {!requestOpen && (
+              <Button
+                className="lg:hidden flex-0"
+                onClick={() => setRequestOpen(true)}
+              >
+                <LuUserPlus />
+              </Button>
+            )}
           </div>
           {loading ? (
             <div className="flex items-center justify-center py-20">
@@ -115,7 +120,7 @@ export default function KalyanamittaPage() {
             friendRequest
           ) : (
             <div className="">
-              <div className="mb-6 flex gap-3">
+              <div className="mb-6 flex gap-3 max-md:justify-center">
                 <button
                   type="button"
                   onClick={() => setActiveTab("not-connected")}
