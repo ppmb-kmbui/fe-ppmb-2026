@@ -17,16 +17,19 @@ export function SignupFormContainer() {
     setServerErrors({});
     setFormError(undefined);
 
-    let imgUrl: string | undefined;
-    if (values.photo) {
-      try {
-        imgUrl = await uploadImage(values.photo);
-      } catch (error) {
-        setFormError(
-          error instanceof ImageUploadError ? error.message : "Gagal mengunggah foto",
-        );
-        return;
-      }
+    if (!values.photo) {
+      setServerErrors({ photo: "Foto profil wajib diunggah" });
+      return;
+    }
+
+    let imgUrl: string;
+    try {
+      imgUrl = await uploadImage(values.photo);
+    } catch (error) {
+      setFormError(
+        error instanceof ImageUploadError ? error.message : "Gagal mengunggah foto",
+      );
+      return;
     }
 
     try {

@@ -57,7 +57,7 @@ describe("uploadImage", () => {
     );
 
     await expect(uploadImage(makeFile())).rejects.toThrow(
-      "Tidak dapat mengunggah foto. Periksa koneksi internet kamu.",
+      "Tidak dapat mengunggah file. Periksa koneksi internet kamu.",
     );
   });
 

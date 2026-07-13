@@ -101,6 +101,9 @@ export function SignupForm({ onSubmit, formError, serverErrors }: SignupFormProp
     } else if (confirmPassword !== password) {
       nextErrors.confirmPassword = "Konfirmasi kata sandi tidak cocok";
     }
+    if (!photo) {
+      nextErrors.photo = "Foto profil wajib diunggah";
+    }
     setFieldErrors(nextErrors);
 
     if (Object.keys(nextErrors).length > 0 || !onSubmit) return;
