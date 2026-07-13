@@ -97,9 +97,6 @@ export default function HomePage() {
   return (
     <DashboardPageLayout activeItem="home">
       <main className="flex flex-col overflow-hidden gap-20 max-md:gap-14">
-        <section id="sponsor" className="flex flex-col gap-8 md:gap-16 md:hidden">
-          <SponsorMarquee items={SponsorData} speed={10}/>
-        </section>
         <section id="timeline" className="flex flex-col gap-8 md:gap-16">
           <h1 className="text-6xl max-lg:text-4xl max-md:text-3xl font-heading">
             <span className="bg-linear-to-br from-yellow-600 to-purple-600 text-transparent bg-clip-text">
@@ -135,27 +132,36 @@ export default function HomePage() {
             </span>
           </h1>
           <div className="space-y-4">
-          {FAQData.map((data) => (
-            <Dropdown
-              key={`${data.question}-${data.answer}`}
-              title={data.question}
-            >
-              {data.answer}
-            </Dropdown>
-          ))}
+            {FAQData.map((data) => (
+              <Dropdown
+                key={`${data.question}-${data.answer}`}
+                title={data.question}
+              >
+                {data.answer}
+              </Dropdown>
+            ))}
           </div>
         </section>
-        <section id="sponsor" className="flex flex-col gap-8 md:gap-16 pb-24 max-md:hidden">
+        <section
+          id="sponsor"
+          className="flex flex-col gap-8 md:gap-16 pb-24"
+        >
           <h1 className="text-6xl max-lg:text-4xl max-md:text-3xl font-heading">
             <span className="bg-linear-to-br from-yellow-600 to-purple-600 text-transparent bg-clip-text">
               Sponsor
             </span>
           </h1>
-          <div className="w-full flex items-center justify-center gap-12">
-            {SponsorData.map((sponsor)=>(
-              <img key={`${sponsor.src}-${sponsor.alt}`} src={sponsor.src} alt={sponsor.alt} className="w-auto h-34"/>
+          <div className="w-full flex items-center justify-center gap-12 max-lg:hidden">
+            {SponsorData.map((sponsor) => (
+              <img
+                key={`${sponsor.src}-${sponsor.alt}`}
+                src={sponsor.src}
+                alt={sponsor.alt}
+                className="w-auto h-34"
+              />
             ))}
           </div>
+          <SponsorMarquee items={SponsorData} speed={10} className="lg:hidden" />
         </section>
       </main>
     </DashboardPageLayout>
