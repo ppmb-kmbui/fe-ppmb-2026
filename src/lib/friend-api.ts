@@ -43,6 +43,11 @@ export async function getFriends(name?: string) {
   return response.data?.friends ?? [];
 }
 
+export async function getMyConnections() {
+  const response = await apiFetch<FriendListResponse>("connect");
+  return response.data?.friends ?? [];
+}
+
 export async function getConnectionRequests() {
   const response = await apiFetch<ConnectionRequestsResponse>("connection-requests");
   return response.data;

@@ -16,11 +16,13 @@ import {
   sendConnectionRequest,
   type FriendUser,
   type ConnectionRequestItem,
+  getMyConnections,
 } from "@/lib/friend-api";
 import { LuCornerUpLeft, LuUser, LuUserPlus } from "react-icons/lu";
 
 export default function KalyanamittaPage() {
   const router = useRouter();
+  const [myConnections, setMyConnection] = useState<FriendUser[]>([]);
   const [allFriends, setAllFriends] = useState<FriendUser[]>([]);
   const [friendRequests, setFriendRequests] = useState<ConnectionRequestItem[]>(
     [],
@@ -31,11 +33,13 @@ export default function KalyanamittaPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [friends, connectionRequests] = await Promise.all([
+        const [friends, connections, connectionRequests] = await Promise.all([
           getFriends(),
+          getMyConnections(),
           getConnectionRequests(),
         ]);
         setAllFriends(friends);
+        setMyConnection(connections)
         setFriendRequests(connectionRequests?.received ?? []);
       } catch {
         // silently fail — data stays as empty arrays
@@ -49,9 +53,7 @@ export default function KalyanamittaPage() {
   const notConnectedFriends = allFriends.filter(
     (f) => f.status === "not_connected",
   );
-  const connectedFriends = allFriends.filter(
-    (f) => f.status !== "not_connected",
-  );
+  const connectedFriends = myConnections;
 
   const friendRequest = (
     <div className="space-y-2">
