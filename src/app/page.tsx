@@ -1,7 +1,7 @@
+import Image from "next/image";
 import {
   DashboardPageLayout,
   Dropdown,
-  MaterialCard,
   SponsorMarquee,
   TimelineItem,
   type TimelineItemProps,
@@ -13,9 +13,11 @@ const TimelineData: TimelineItemProps[] = [
     title: "Main",
     description: "main",
     media: (
-      <img
-        src="assets/timeline-img.jpg"
+      <Image
+        src="/assets/timeline-img.jpg"
         alt=""
+        width={800}
+        height={600}
         className="object-cover w-full h-full"
       />
     ),
@@ -27,9 +29,11 @@ const TimelineData: TimelineItemProps[] = [
     title: "Main",
     description: "main",
     media: (
-      <img
-        src="assets/timeline-img.jpg"
+      <Image
+        src="/assets/timeline-img.jpg"
         alt=""
+        width={800}
+        height={600}
         className="object-cover w-full h-full"
       />
     ),
@@ -41,9 +45,11 @@ const TimelineData: TimelineItemProps[] = [
     title: "Main",
     description: "main",
     media: (
-      <img
-        src="assets/timeline-img.jpg"
+      <Image
+        src="/assets/timeline-img.jpg"
         alt=""
+        width={800}
+        height={600}
         className="object-cover w-full h-full"
       />
     ),
@@ -55,9 +61,11 @@ const TimelineData: TimelineItemProps[] = [
     title: "Main",
     description: "main",
     media: (
-      <img
-        src="assets/timeline-img.jpg"
+      <Image
+        src="/assets/timeline-img.jpg"
         alt=""
+        width={800}
+        height={600}
         className="object-cover w-full h-full"
       />
     ),
@@ -83,24 +91,12 @@ const FAQData: { question: string; answer: string }[] = [
 
 const SponsorData: { src: string; alt: string }[] = [
   {
-    src: "assets/logo_ppmb.webp",
-    alt: "logo",
+    src: "assets/sponsor-onassis.webp",
+    alt: "Onassis Logo",
   },
   {
-    src: "assets/logo_ppmb.webp",
-    alt: "logo1",
-  },
-  {
-    src: "assets/logo_ppmb.webp",
-    alt: "logo2",
-  },
-  {
-    src: "assets/logo_ppmb.webp",
-    alt: "logo3",
-  },
-  {
-    src: "assets/logo_ppmb.webp",
-    alt: "logo4",
+    src: "assets/sponsor-king.webp",
+    alt: "King Logo",
   },
 ];
 
@@ -108,9 +104,6 @@ export default function HomePage() {
   return (
     <DashboardPageLayout activeItem="home">
       <main className="flex flex-col overflow-hidden gap-20 max-md:gap-14">
-        <section id="sponsor" className="flex flex-col gap-8 md:gap-16 md:hidden">
-          <SponsorMarquee items={SponsorData} />
-        </section>
         <section id="timeline" className="flex flex-col gap-8 md:gap-16">
           <h1 className="text-6xl max-lg:text-4xl max-md:text-3xl font-heading">
             <span className="bg-linear-to-br from-yellow-600 to-purple-600 text-transparent bg-clip-text">
@@ -146,23 +139,38 @@ export default function HomePage() {
             </span>
           </h1>
           <div className="space-y-4">
-          {FAQData.map((data) => (
-            <Dropdown
-              key={`${data.question}-${data.answer}`}
-              title={data.question}
-            >
-              {data.answer}
-            </Dropdown>
-          ))}
+            {FAQData.map((data) => (
+              <Dropdown
+                key={`${data.question}-${data.answer}`}
+                title={data.question}
+              >
+                {data.answer}
+              </Dropdown>
+            ))}
           </div>
         </section>
-        <section id="sponsor" className="flex flex-col gap-8 md:gap-16 pb-24 max-md:hidden">
+        <section
+          id="sponsor"
+          className="flex flex-col gap-8 md:gap-16 pb-24"
+        >
           <h1 className="text-6xl max-lg:text-4xl max-md:text-3xl font-heading">
             <span className="bg-linear-to-br from-yellow-600 to-purple-600 text-transparent bg-clip-text">
               Sponsor
             </span>
           </h1>
-          <SponsorMarquee items={SponsorData} />
+          <div className="w-full flex items-center justify-center gap-12 max-lg:hidden">
+            {SponsorData.map((sponsor) => (
+              <Image
+                key={`${sponsor.src}-${sponsor.alt}`}
+                src={`/${sponsor.src}`}
+                alt={sponsor.alt}
+                width={136}
+                height={136}
+                className="w-auto h-34"
+              />
+            ))}
+          </div>
+          <SponsorMarquee items={SponsorData} speed={10} className="lg:hidden" />
         </section>
       </main>
     </DashboardPageLayout>

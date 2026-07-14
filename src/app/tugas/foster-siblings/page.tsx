@@ -1,47 +1,47 @@
+import { BackButton } from "@/components";
+
+import { FosterSiblingsForm } from "../_components/FosterSiblingsForm";
+import { TaskPageShell } from "../_components/TaskPageShell";
+import { TaskRightRail } from "../_components/TaskRightRail";
 import {
-  Button,
-  DashboardPageLayout,
-  QuotaCard,
-  TaskFileUpload,
-  TaskSubmissionPanel,
-  Textarea,
-} from "@/components";
-import Link from "next/link";
-import { LuCornerUpLeft } from "react-icons/lu";
+  GradientTaskTitle,
+  TaskSectionCard,
+} from "../_components/TaskTypography";
 
 export default function FosterSiblingsTaskPage() {
-  const networkingProgress =  (
-    <div className="flex flex-col gap-2">
-      <QuotaCard label="Angkatan 26" completed={5} total={10} />
-      <QuotaCard label="Angkatan 25" completed={8} total={10} />
-      <QuotaCard label="Angkatan 24" completed={10} total={10} />
-    </div>
-  );
   return (
-    <DashboardPageLayout activeItem="tasks" rightRail={networkingProgress}>
-      <main className="">
-        <section id="timeline" className="flex flex-col gap-6">
-          <Link href={"/tugas"} className="w-fit">
-            <Button className="rounded-full">
-              <span className="flex gap-3 max-md:gap-1 font-body max-md:font-xs font-extralight md:px-5">
-                <LuCornerUpLeft />
-                Back
-              </span>
-            </Button>
-          </Link>
-          <h1 className="text-6xl max-lg:text-4xl max-md:text-3xl font-heading">
-            <span className="bg-linear-to-br from-yellow-600 to-purple-600 text-transparent bg-clip-text">
-              Foster Siblings
-            </span>
-          </h1>
-          <TaskSubmissionPanel>
-            <Textarea placeholder="Jelaskan apa saja yang didapatkan saat kegiatan..." />
-          </TaskSubmissionPanel>
-          <TaskSubmissionPanel>
-            <TaskFileUpload fileType="pdf" maxSizeMb={10} />
-          </TaskSubmissionPanel>
-        </section>
-      </main>
-    </DashboardPageLayout>
+    <TaskPageShell
+      rightRail={
+        <TaskRightRail
+          title="Foster Siblings"
+          showCalendar={false}
+          progress={{
+            label: "Tugas Diperlukan : 1",
+            completed: 0,
+            total: 1,
+          }}
+        />
+      }
+      withConstellation
+    >
+      <div className="flex max-w-240 flex-col gap-8">
+        <BackButton href="/tugas" />
+        <GradientTaskTitle>Foster Siblings</GradientTaskTitle>
+
+        <TaskSectionCard>
+          <h2 className="font-subheading text-s3 font-semibold">
+            Deskripsi Tugas
+          </h2>
+          <p className="text-b1 max-md:text-b3 leading-snug">
+            Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque
+            faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi
+            pretium tellus duis convallis. Tempus leo eu aenean sed diam urna
+            tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas.
+          </p>
+
+          <FosterSiblingsForm />
+        </TaskSectionCard>
+      </div>
+    </TaskPageShell>
   );
 }
