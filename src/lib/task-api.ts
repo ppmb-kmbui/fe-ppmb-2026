@@ -62,6 +62,13 @@ export interface MentoringSubmissionData {
   vlog?: MentoringSubmission | null;
 }
 
+export interface FosterSiblingsSubmission {
+  id: number;
+  userId: number;
+  photo_url: string;
+  file_url: string;
+}
+
 export interface CommitteeVideo {
   id: number;
   title: string;
@@ -161,6 +168,21 @@ export async function submitMentoring(gdriveUrl: string) {
   const response = await apiFetch<MentoringSubmissionData>("tasks/mentoring", {
     method: "POST",
     body: JSON.stringify({ gdrive_url: gdriveUrl }),
+  });
+  invalidateTaskSummaryCache();
+  return response.data;
+}
+
+export async function getFosterSiblingsSubmission() {
+  const response =
+    await apiFetch<FosterSiblingsSubmission | null>("tasks/fossib");
+  return response.data ?? null;
+}
+
+export async function submitFosterSiblings(photoUrl: string, fileUrl: string) {
+  const response = await apiFetch<FosterSiblingsSubmission>("tasks/fossib", {
+    method: "POST",
+    body: JSON.stringify({ photo_url: photoUrl, file_url: fileUrl }),
   });
   invalidateTaskSummaryCache();
   return response.data;
