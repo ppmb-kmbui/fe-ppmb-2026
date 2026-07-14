@@ -18,14 +18,16 @@ export default function FosterSiblingsTaskPage() {
     </div>
   );
   return (
-    <DashboardPageLayout activeItem="tasks" rightRail={networkingProgress}>
+    <DashboardPageLayout activeItem="tasks">
       <main className="">
         <section id="timeline" className="flex flex-col gap-6">
           <Link href={"/tugas"} className="w-fit">
             <Button className="rounded-full">
               <span className="flex gap-3 max-md:gap-1 font-body max-md:font-xs font-extralight md:px-5">
                 <LuCornerUpLeft />
-                Back
+                <span className="max-md:hidden">
+                  Back
+                  </span>
               </span>
             </Button>
           </Link>
@@ -34,10 +36,11 @@ export default function FosterSiblingsTaskPage() {
               Foster Siblings
             </span>
           </h1>
-          <TaskSubmissionPanel>
-            <Textarea placeholder="Jelaskan apa saja yang didapatkan saat kegiatan..." />
-          </TaskSubmissionPanel>
-          <TaskSubmissionPanel>
+          <TaskSubmissionPanel title="Deskripsi Tugas">
+            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Magni beatae, aliquid repudiandae incidunt distinctio magnam blanditiis dolore natus perspiciatis quam.</p>
+            <h3 className="font-subheading text-s5">Upload Dokumentasi</h3>
+            <TaskFileUpload fileType="image"  />
+            <h3 className="font-subheading text-s5 mt-3">Upload Hasil Foster Siblings</h3>
             <TaskFileUpload fileType="pdf" maxSizeMb={10} />
           </TaskSubmissionPanel>
         </section>
