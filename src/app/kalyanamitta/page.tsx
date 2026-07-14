@@ -14,9 +14,11 @@ import {
   getFriends,
   getConnectionRequests,
   sendConnectionRequest,
+  getMyConnections,
+  acceptConnectionRequest,
+  rejectConnectionRequest,
   type FriendUser,
   type ConnectionRequestItem,
-  getMyConnections,
 } from "@/lib/friend-api";
 import { LuCornerUpLeft, LuUser, LuUserPlus } from "react-icons/lu";
 
@@ -39,7 +41,7 @@ export default function KalyanamittaPage() {
           getConnectionRequests(),
         ]);
         setAllFriends(friends);
-        setMyConnection(connections)
+        setMyConnection(connections);
         setFriendRequests(connectionRequests?.received ?? []);
       } catch {
         // silently fail — data stays as empty arrays
@@ -70,6 +72,22 @@ export default function KalyanamittaPage() {
             key={`fr-${req.id}`}
             name={req.from?.fullname ?? "Unknown"}
             batch={req.from?.batch ?? "—"}
+            onAccept={async () => {
+              try {
+                await acceptConnectionRequest(req.id);
+                setFriendRequests((prev) => prev.filter((r) => r.id !== req.id));
+              } catch {
+                // silently fail
+              }
+            }}
+            onReject={async () => {
+              try {
+                await rejectConnectionRequest(req.id);
+                setFriendRequests((prev) => prev.filter((r) => r.id !== req.id));
+              } catch {
+                // silently fail
+              }
+            }}
           />
         ))
       )}

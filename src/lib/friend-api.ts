@@ -59,3 +59,17 @@ export async function sendConnectionRequest(toId: number) {
   });
   return response;
 }
+
+export async function acceptConnectionRequest(toId: number) {
+  const response = await apiFetch<unknown>(`connect/${toId}`, {
+    method: "PUT",
+  });
+  return response;
+}
+
+export async function rejectConnectionRequest(toId: number) {
+  const response = await apiFetch<unknown>(`connect/${toId}`, {
+    method: "DELETE",
+  });
+  return response;
+}
