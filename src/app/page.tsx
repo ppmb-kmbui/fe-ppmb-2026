@@ -1,12 +1,11 @@
+import Image from "next/image";
 import {
   DashboardPageLayout,
   Dropdown,
-  MaterialCard,
   SponsorMarquee,
   TimelineItem,
   type TimelineItemProps,
 } from "@/components";
-import Image from "next/image";
 
 const TimelineData: TimelineItemProps[] = [
   {
@@ -14,9 +13,11 @@ const TimelineData: TimelineItemProps[] = [
     title: "Main",
     description: "main",
     media: (
-      <img
-        src="assets/timeline-img.jpg"
+      <Image
+        src="/assets/timeline-img.jpg"
         alt=""
+        width={800}
+        height={600}
         className="object-cover w-full h-full"
       />
     ),
@@ -28,9 +29,11 @@ const TimelineData: TimelineItemProps[] = [
     title: "Main",
     description: "main",
     media: (
-      <img
-        src="assets/timeline-img.jpg"
+      <Image
+        src="/assets/timeline-img.jpg"
         alt=""
+        width={800}
+        height={600}
         className="object-cover w-full h-full"
       />
     ),
@@ -42,9 +45,11 @@ const TimelineData: TimelineItemProps[] = [
     title: "Main",
     description: "main",
     media: (
-      <img
-        src="assets/timeline-img.jpg"
+      <Image
+        src="/assets/timeline-img.jpg"
         alt=""
+        width={800}
+        height={600}
         className="object-cover w-full h-full"
       />
     ),
@@ -56,9 +61,11 @@ const TimelineData: TimelineItemProps[] = [
     title: "Main",
     description: "main",
     media: (
-      <img
-        src="assets/timeline-img.jpg"
+      <Image
+        src="/assets/timeline-img.jpg"
         alt=""
+        width={800}
+        height={600}
         className="object-cover w-full h-full"
       />
     ),
@@ -153,10 +160,12 @@ export default function HomePage() {
           </h1>
           <div className="w-full flex items-center justify-center gap-12 max-lg:hidden">
             {SponsorData.map((sponsor) => (
-              <img
+              <Image
                 key={`${sponsor.src}-${sponsor.alt}`}
-                src={sponsor.src}
+                src={`/${sponsor.src}`}
                 alt={sponsor.alt}
+                width={136}
+                height={136}
                 className="w-auto h-34"
               />
             ))}

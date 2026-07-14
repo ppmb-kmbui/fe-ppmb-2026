@@ -9,7 +9,7 @@ import {
 } from "@/components";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FaArrowLeft } from "react-icons/fa6";
+import Image from "next/image";
 import {
   getFriends,
   getConnectionRequests,
@@ -186,9 +186,13 @@ export default function KalyanamittaPage() {
                   displayedFriends.map((friend) => {
                     const isSent = sentRequestIds.has(friend.id);
                     const avatar = friend.imgUrl ? (
-                      <img
+                      <Image
                         src={friend.imgUrl}
                         alt={`${friend.fullname}'s Picture`}
+                        width={132}
+                        height={132}
+                        unoptimized
+                        className="h-full w-full object-cover"
                       />
                     ) : (
                       <LuUser />

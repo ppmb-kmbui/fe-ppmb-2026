@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { cn } from "@/lib/cn";
 
 interface SponsorMarqueeProps {
@@ -18,18 +19,22 @@ export function SponsorMarquee({
         style={{ "--marquee-speed": `${speed}s` } as React.CSSProperties}
       >
         {items.map((item) => (
-          <img
+          <Image
             key={`a-${item.src}-${item.alt}`}
-            src={item.src}
+            src={`/${item.src}`}
             alt={item.alt}
+            width={200}
+            height={200}
             className="h-50 w-auto shrink-0 object-contain"
           />
         ))}
         {items.map((item) => (
-          <img
+          <Image
             key={`b-${item.src}-${item.alt}`}
-            src={item.src}
+            src={`/${item.src}`}
             alt={item.alt}
+            width={200}
+            height={200}
             className="h-50 w-auto shrink-0 object-contain"
           />
         ))}
