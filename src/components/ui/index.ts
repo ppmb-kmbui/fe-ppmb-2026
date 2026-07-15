@@ -1,5 +1,6 @@
 export { Button, type ButtonProps } from "./Button";
 export { BackButton, type BackButtonProps } from "./BackButton";
+export { FacultySelect, type FacultySelectProps } from "./FacultySelect";
 export { BrandLogo, type BrandLogoProps } from "./BrandLogo";
 export { Chip, type ChipProps } from "./Chip";
 export { Dropdown, type DropdownProps } from "./Dropdown";

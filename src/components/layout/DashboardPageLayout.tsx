@@ -17,6 +17,7 @@ export interface DashboardPageLayoutProps
   mainClassName?: string;
   rightRailClassName?: string;
   rightRailLabel?: string;
+  sidebarContainerClassName?: string;
   sidebarClassName?: string;
 }
 
@@ -27,11 +28,12 @@ export function DashboardPageLayout({
   rightRail,
   background,
   logoSrc,
-  profileHref,
+  profileHref = "/profil",
   mainId = "main-content",
   mainClassName,
   rightRailClassName,
   rightRailLabel = "Informasi pendukung",
+  sidebarContainerClassName,
   sidebarClassName,
   className,
   ...props
@@ -39,7 +41,7 @@ export function DashboardPageLayout({
   return (
     <div
       className={cn(
-        "relative isolate min-h-screen overflow-x-clip bg-[image:var(--gradient-dashboard)] bg-cover text-foreground",
+        "relative isolate min-h-screen overflow-x-clip bg-[image:var(--gradient-dashboard)] bg-cover text-foreground md:min-h-[982px]",
         className,
       )}
       {...props}
@@ -57,13 +59,19 @@ export function DashboardPageLayout({
         </div>
       )}
 
-      <div className="absolute inset-y-0 left-0 z-20 hidden min-h-[982px] w-[103px] md:block">
+      <div
+        className={cn(
+          "absolute left-0 top-0 z-20 hidden w-[103px] md:block",
+          sidebarContainerClassName ?? "h-[982px]",
+        )}
+      >
         <Sidebar
           activeItem={activeItem}
-          className={cn("min-h-full", sidebarClassName)}
+          className={cn("h-full", sidebarClassName)}
         />
       </div>
       <Header
+        activeItem={activeItem}
         user={user}
         logoSrc={logoSrc}
         profileHref={profileHref}

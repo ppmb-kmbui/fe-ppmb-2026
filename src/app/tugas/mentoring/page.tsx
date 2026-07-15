@@ -1,8 +1,9 @@
 import { BackButton } from "@/components";
 
 import { MentoringIsianForm } from "../_components/MentoringIsianForm";
+import { mentoringAgendaItems } from "../_components/task-page-data";
 import { TaskPageShell } from "../_components/TaskPageShell";
-import { TaskRightRail } from "../_components/TaskRightRail";
+import { TaskProgressRightRail } from "../_components/TaskProgressRightRail";
 import {
   GradientTaskTitle,
   TaskDescription,
@@ -13,21 +14,12 @@ export default function MentoringTaskPage() {
   return (
     <TaskPageShell
       rightRail={
-        <TaskRightRail
+        <TaskProgressRightRail
+          progressKey="mentoring"
+          progressLabel="Tugas Diperlukan : 1"
           title="Tugas Mentoring"
           showCalendar={false}
-          progress={{
-            label: "Tugas Diperlukan : 2",
-            completed: 0,
-            total: 2,
-          }}
-          agenda={[
-            {
-              category: "Mentoring",
-              title: "Tugas Vlog",
-              date: "13 Juni",
-            },
-          ]}
+          agenda={mentoringAgendaItems}
         />
       }
       withConstellation
@@ -37,7 +29,12 @@ export default function MentoringTaskPage() {
         <GradientTaskTitle>Mentoring</GradientTaskTitle>
 
         <TaskSectionCard>
-          <TaskDescription />
+          <TaskDescription>
+            Tugas Mentoring merupakan rangkaian tugas yang dikerjakan secara
+            berkelompok selama periode mentoring. Tugas ini terdiri dari A
+            Series of Memories (Vlog Mentoring 1–3) dan Unlock the Pieces
+            (tugas yang akan dipecahkan pada sesi Mentoring 2).
+          </TaskDescription>
           <MentoringIsianForm />
         </TaskSectionCard>
       </div>

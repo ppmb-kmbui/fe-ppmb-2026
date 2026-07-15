@@ -1,8 +1,9 @@
 import { BackButton } from "@/components";
 
 import { FosterSiblingsForm } from "../_components/FosterSiblingsForm";
+import { fosterSiblingsAgendaItems } from "../_components/task-page-data";
 import { TaskPageShell } from "../_components/TaskPageShell";
-import { TaskRightRail } from "../_components/TaskRightRail";
+import { TaskProgressRightRail } from "../_components/TaskProgressRightRail";
 import {
   GradientTaskTitle,
   TaskSectionCard,
@@ -12,14 +13,14 @@ export default function FosterSiblingsTaskPage() {
   return (
     <TaskPageShell
       rightRail={
-        <TaskRightRail
+        <TaskProgressRightRail
+          progressKey="fosterSiblings"
+          progressLabel="Tugas Diperlukan : 1"
           title="Foster Siblings"
           showCalendar={false}
-          progress={{
-            label: "Tugas Diperlukan : 1",
-            completed: 0,
-            total: 1,
-          }}
+          agendaHeading="Kegiatan Terdekat"
+          showAgendaSubtitle={false}
+          agenda={fosterSiblingsAgendaItems}
         />
       }
       withConstellation

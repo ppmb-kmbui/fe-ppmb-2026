@@ -19,9 +19,9 @@ const cardBackground: CSSProperties = {
  */
 export function MobileAuthHeader({ className }: MobileAuthHeaderProps) {
   return (
-    <div className={cn("px-4 pt-4", className)}>
+    <div className={cn("w-full", className)}>
       <div
-        className="flex items-center justify-between gap-4 overflow-hidden rounded-2xl px-4 pb-4 pt-5"
+        className="flex min-h-[86px] w-full items-center justify-between gap-4 overflow-hidden px-4 py-4"
         style={cardBackground}
       >
         <BrandLogo size={64} priority className="size-16" />

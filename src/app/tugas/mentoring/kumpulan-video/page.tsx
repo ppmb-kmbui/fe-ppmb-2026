@@ -1,6 +1,6 @@
 import { BackButton } from "@/components";
 
-import { committeeVideos } from "../../_components/task-page-data";
+import { mentoringAgendaItems } from "../../_components/task-page-data";
 import { CommitteeVideosClient } from "../../_components/CommitteeVideosClient";
 import { TaskPageShell } from "../../_components/TaskPageShell";
 import { TaskRightRail } from "../../_components/TaskRightRail";
@@ -17,18 +17,7 @@ export default function CommitteeVideoCollectionPage() {
         <TaskRightRail
           title="Video Panitia"
           showCalendar={false}
-          progress={{
-            label: "Video Ditonton : 0",
-            completed: 0,
-            total: committeeVideos.length,
-          }}
-          agenda={[
-            {
-              category: "Mentoring",
-              title: "Tugas Vlog",
-              date: "13 Juni",
-            },
-          ]}
+          agenda={mentoringAgendaItems}
         />
       }
       withConstellation
@@ -38,7 +27,12 @@ export default function CommitteeVideoCollectionPage() {
         <GradientTaskTitle>Kumpulan Video dari Panitia</GradientTaskTitle>
 
         <TaskSectionCard>
-          <TaskDescription />
+          <TaskDescription>
+            Tugas Mentoring merupakan rangkaian tugas yang dikerjakan secara
+            berkelompok selama periode mentoring. Tugas ini terdiri dari A
+            Series of Memories (Vlog Mentoring 1–3) dan Unlock the Pieces
+            (tugas yang akan dipecahkan pada sesi Mentoring 2).
+          </TaskDescription>
           <CommitteeVideosClient />
         </TaskSectionCard>
       </div>

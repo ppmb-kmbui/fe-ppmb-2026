@@ -30,6 +30,7 @@ import {
   TimelineItem,
   WeekCalendar,
 } from "@/components";
+import { getTaskIcon } from "@/app/tugas/_components/task-icons";
 
 const palettes = [
   {
@@ -276,10 +277,26 @@ export function DesignSystemPreview() {
 
         <PreviewSection title="Task overview">
           <div className="grid gap-5 md:grid-cols-2">
-            <TaskCard title="Networking" progress={70} />
-            <TaskCard title="KMBUI Explorer" progress={55} />
-            <TaskCard title="Mentoring" progress={35} />
-            <TaskCard title="Foster Siblings" progress={0} />
+            <TaskCard
+              title="Networking"
+              progress={70}
+              icon={getTaskIcon("networking", "size-36 md:size-[180px]")}
+            />
+            <TaskCard
+              title="KMBUI Explorer"
+              progress={55}
+              icon={getTaskIcon("explorer", "size-36 md:size-[180px]")}
+            />
+            <TaskCard
+              title="Mentoring"
+              progress={35}
+              icon={getTaskIcon("mentoring", "size-36 md:size-[180px]")}
+            />
+            <TaskCard
+              title="Foster Siblings"
+              progress={0}
+              icon={getTaskIcon("foster", "size-36 md:size-[180px]")}
+            />
           </div>
           <div className="mt-8 grid gap-5 xl:grid-cols-[1fr_344px]">
             <div className="grid gap-4 sm:grid-cols-2">
@@ -287,11 +304,13 @@ export function DesignSystemPreview() {
                 category="Networking"
                 title="Deadline Angkatan"
                 date="13 Juni"
+                icon={getTaskIcon("networking", "size-5")}
               />
               <AgendaCard
                 category="KMBUI Explorer"
                 title="Puja Rutin"
                 date="15 Juni"
+                icon={getTaskIcon("explorer", "size-5")}
               />
             </div>
             <WeekCalendar

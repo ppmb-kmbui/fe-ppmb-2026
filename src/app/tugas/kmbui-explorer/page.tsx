@@ -1,8 +1,9 @@
 import { BackButton } from "@/components";
 
 import { KmbuiExplorerForm } from "../_components/KmbuiExplorerForm";
+import { explorerAgendaItems } from "../_components/task-page-data";
 import { TaskPageShell } from "../_components/TaskPageShell";
-import { TaskRightRail } from "../_components/TaskRightRail";
+import { TaskProgressRightRail } from "../_components/TaskProgressRightRail";
 import {
   GradientTaskTitle,
   TaskDescription,
@@ -13,22 +14,14 @@ export default function KmbuiExplorerTaskPage() {
   return (
     <TaskPageShell
       rightRail={
-        <TaskRightRail
+        <TaskProgressRightRail
+          progressKey="explorer"
+          progressLabel="Kegiatan Dibutuhkan : 1"
           title="Progres Exploration"
           showCalendar={false}
-          progress={{
-            label: "Kegiatan Dibutuhkan : 1",
-            completed: 0,
-            total: 1,
-          }}
           agendaHeading="Kegiatan Terdekat"
-          agenda={[
-            {
-              category: "KMBUI Explorer",
-              title: "Puja Rutin",
-              date: "15 Juni",
-            },
-          ]}
+          showAgendaSubtitle={false}
+          agenda={explorerAgendaItems}
         />
       }
       withConstellation

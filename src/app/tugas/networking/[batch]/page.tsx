@@ -6,7 +6,7 @@ import { NetworkingSubmissionForm } from "../../_components/NetworkingSubmission
 import { NetworkingSubmissionRightRail } from "../../_components/NetworkingSubmissionRightRail";
 import {
   getNetworkingRequirement,
-  isNetworkingBatch,
+  resolveNetworkingSegment,
 } from "../../_components/networking-requirements";
 import { TaskPageShell } from "../../_components/TaskPageShell";
 import {
@@ -21,25 +21,33 @@ export default async function NetworkingSubmissionPage({
   params: Promise<{ batch: string }>;
 }) {
   const { batch } = await params;
+  const segment = resolveNetworkingSegment(batch);
 
-  if (!isNetworkingBatch(batch)) {
+  if (!segment) {
     notFound();
   }
 
-  const requirement = getNetworkingRequirement(batch);
+  const requirement = getNetworkingRequirement(segment);
 
   return (
     <TaskPageShell
-      rightRail={<NetworkingSubmissionRightRail batch={batch} />}
+      rightRail={<NetworkingSubmissionRightRail segment={segment} />}
       withConstellation
     >
       <div className="flex max-w-[958px] flex-col gap-8">
         <BackButton href="/tugas/networking" />
-        <GradientTaskTitle>{requirement.title}</GradientTaskTitle>
+        <div className="flex flex-col gap-1">
+          <p className="font-heading text-h4 text-yellow-500">Networking</p>
+          <GradientTaskTitle>{requirement.title}</GradientTaskTitle>
+        </div>
 
         <TaskSectionCard>
-          <TaskDescription />
-          <NetworkingSubmissionForm batch={batch} />
+          <TaskDescription>
+            Tugas Networking adalah tugas yang bertujuan untuk membangun dan
+            memperluas relasi mahasiswa baru angkatan 2026 dengan teman
+            seangkatan maupun kakak tingkat.
+          </TaskDescription>
+          <NetworkingSubmissionForm segment={segment} />
         </TaskSectionCard>
       </div>
     </TaskPageShell>

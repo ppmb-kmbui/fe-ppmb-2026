@@ -1,94 +1,58 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { FaCirclePlay } from "react-icons/fa6";
+import { FaBookOpen } from "react-icons/fa6";
 
 import { MaterialCard } from "@/components";
-import { getMaterials, type MaterialCategory } from "@/lib/material-api";
+
+const canvaMaterialPublishAt = new Date("2026-08-08T00:00:00+07:00");
+const canvaMaterialUrl = "https://canva.link/nuefu6dbmlumfg7";
+
+function isCanvaMaterialPublished() {
+  return Date.now() >= canvaMaterialPublishAt.getTime();
+}
 
 export function MaterialsClient() {
-  const [categories, setCategories] = useState<MaterialCategory[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    let active = true;
-
-    getMaterials()
-      .then((data) => {
-        if (active) setCategories(data);
-      })
-      .catch(() => {
-        if (active) setCategories([]);
-      })
-      .finally(() => {
-        if (active) setIsLoading(false);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  const hasMaterials = categories.some((category) => category.materials.length > 0);
-
-  if (isLoading) {
-    return (
-      <p className="rounded-2xl border border-white/10 bg-blue-200/20 px-4 py-3 text-b2 text-foreground/85">
-        Memuat materi...
-      </p>
-    );
-  }
-
-  if (!hasMaterials) {
-    return (
-      <section className="rounded-3xl border border-white/10 bg-blue-200/25 p-8">
-        <h2 className="font-subheading text-s3 font-semibold">
-          Materi belum tersedia
-        </h2>
-        <p className="mt-3 text-b2 text-foreground/80">
-          Materi dari panitia akan muncul di halaman ini setelah dipublikasikan.
-        </p>
-      </section>
-    );
-  }
+  const canvaPublished = isCanvaMaterialPublished();
 
   return (
-    <div className="flex flex-col gap-8">
-      {categories.map((category) =>
-        category.materials.length ? (
-          <section key={category.id} className="flex flex-col gap-5">
-            <h2 className="font-heading text-h3 text-yellow-500">
-              {category.name}
-            </h2>
-            <div className="grid gap-5 lg:grid-cols-2">
-              {category.materials.map((material) => (
-                <MaterialCard
-                  key={material.id}
-                  title={material.title}
-                  description={material.description ?? "Materi PPMB KMBUI 2026"}
-                  href={material.videoUrl ?? undefined}
-                  thumbnail={
-                    material.thumbnailUrl ? (
-                      <span
-                        aria-hidden="true"
-                        className="block size-full bg-cover bg-center"
-                        style={{ backgroundImage: `url(${material.thumbnailUrl})` }}
-                      />
-                    ) : (
-                      <span className="grid size-full place-items-center bg-background">
-                        <FaCirclePlay
-                          aria-hidden="true"
-                          className="size-16 text-yellow-400"
-                        />
-                      </span>
-                    )
-                  }
-                />
-              ))}
-            </div>
-          </section>
-        ) : null,
-      )}
-    </div>
+    <section className="flex flex-col gap-5">
+      <div className="grid gap-5 lg:grid-cols-2">
+        <MaterialCard
+          title="Materi Mentoring"
+          description={
+            canvaPublished
+              ? "Materi ini sudah tersedia. Klik kartu ini untuk membuka materi."
+              : "Materi ini akan di publikasikan pada 8 Agustus"
+          }
+          descriptionClassName={
+            canvaPublished
+              ? "text-green-200"
+              : "rounded-xl border border-yellow-400/35 bg-yellow-400/15 px-3 py-2 font-subheading text-yellow-200"
+          }
+          href={canvaPublished ? canvaMaterialUrl : undefined}
+          icon={<FaBookOpen className="size-4" />}
+          thumbnail={
+            <span
+              aria-hidden="true"
+              className="relative flex size-full overflow-hidden bg-[radial-gradient(circle_at_20%_15%,rgba(255,226,122,0.95),transparent_26%),radial-gradient(circle_at_82%_22%,rgba(126,68,255,0.75),transparent_30%),linear-gradient(135deg,#223f75_0%,#4a2b8c_52%,#16072d_100%)] p-6"
+            >
+              <span className="absolute -left-8 top-10 size-32 rounded-full border border-white/25" />
+              <span className="absolute -right-10 bottom-5 size-40 rounded-full bg-white/10 blur-sm" />
+              <span className="relative mt-auto flex flex-col">
+                <span className="font-heading text-h3 leading-none text-yellow-500">
+                  Materi
+                </span>
+                <span className="font-heading text-h3 leading-none text-white">
+                  Mentoring
+                </span>
+                <span className="mt-3 w-fit rounded-full bg-white/15 px-4 py-1 font-subheading text-b3 text-white/90">
+                  Canva Material
+                </span>
+              </span>
+            </span>
+          }
+        />
+      </div>
+    </section>
   );
 }

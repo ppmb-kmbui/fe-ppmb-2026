@@ -5,6 +5,10 @@ import { FormEvent, useEffect, useState } from "react";
 import { Button, Input, TaskFileUpload } from "@/components";
 import { uploadImage } from "@/lib/image-upload";
 import {
+  getClosedSubmissionMessage,
+  isTaskSubmissionClosed,
+} from "@/lib/task-deadlines";
+import {
   getExplorerSubmission,
   getTaskApiErrorMessage,
   submitExplorer,
@@ -18,6 +22,7 @@ export function KmbuiExplorerForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string>();
   const [error, setError] = useState<string>();
+  const isSubmissionClosed = isTaskSubmissionClosed("explorer");
 
   useEffect(() => {
     let active = true;
@@ -25,6 +30,7 @@ export function KmbuiExplorerForm() {
     getExplorerSubmission()
       .then((submission) => {
         if (!active) return;
+        setActivityName(submission?.activity_name ?? "");
         setExistingPhotoUrl(submission?.img_url ?? "");
       })
       .catch((loadError: unknown) => {
@@ -46,15 +52,25 @@ export function KmbuiExplorerForm() {
     setError(undefined);
     setMessage(undefined);
 
-    if (!file) {
+    if (isSubmissionClosed) {
+      setError(getClosedSubmissionMessage());
+      return;
+    }
+
+    if (!activityName.trim()) {
+      setError("Nama kegiatan wajib diisi.");
+      return;
+    }
+
+    if (!file && !existingPhotoUrl) {
       setError("Foto kegiatan wajib dipilih sebelum submit.");
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const photoUrl = await uploadImage(file);
-      const submission = await submitExplorer(photoUrl);
+      const photoUrl = file ? await uploadImage(file) : existingPhotoUrl;
+      const submission = await submitExplorer(activityName.trim(), photoUrl);
       setExistingPhotoUrl(submission?.img_url ?? photoUrl);
       setMessage("Submission KMBUI Explorer berhasil disimpan.");
     } catch (submitError) {
@@ -68,10 +84,9 @@ export function KmbuiExplorerForm() {
     <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
       <Input
         label="Nama Kegiatan"
-        hint="Saat ini backend belum menyimpan nama kegiatan; field ini hanya sebagai catatan saat mengisi."
         placeholder="Tulis nama kegiatan yang sudah kamu ikuti!"
         value={activityName}
-        disabled={isLoading || isSubmitting}
+        disabled={isLoading || isSubmitting || isSubmissionClosed}
         onChange={(event) => setActivityName(event.target.value)}
         className="bg-[rgba(41,0,75,0.25)] placeholder:text-white/50"
       />
@@ -81,22 +96,24 @@ export function KmbuiExplorerForm() {
           Upload Hasil KMBUI Explorer
         </h2>
         {existingPhotoUrl && (
-          <a
-            href={existingPhotoUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="text-b2 text-yellow-100 underline underline-offset-4"
-          >
-            Lihat foto yang sudah tersimpan
-          </a>
+          <p className="rounded-2xl border border-green-300/30 bg-green-400/10 px-4 py-3 text-b2 text-green-100">
+            Kamu sudah submit foto KMBUI Explorer. Jika submit ulang, foto lama
+            akan diganti dengan foto terbaru.
+          </p>
         )}
         <TaskFileUpload
           fileType="image"
           maxSizeMb={5}
-          disabled={isLoading || isSubmitting}
+          disabled={isLoading || isSubmitting || isSubmissionClosed}
           onFileChange={setFile}
         />
       </div>
+
+      {isSubmissionClosed && (
+        <p className="rounded-2xl border border-yellow-300/30 bg-yellow-400/10 px-4 py-3 text-b2 text-yellow-100">
+          {getClosedSubmissionMessage()}
+        </p>
+      )}
 
       {message && (
         <p className="rounded-2xl border border-green-300/30 bg-green-400/10 px-4 py-3 text-b2 text-green-100">
@@ -112,7 +129,7 @@ export function KmbuiExplorerForm() {
       <Button
         type="submit"
         isLoading={isSubmitting}
-        disabled={isLoading}
+        disabled={isLoading || isSubmissionClosed}
         className="h-[50px] rounded-2xl"
       >
         Submit

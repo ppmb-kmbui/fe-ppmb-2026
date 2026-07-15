@@ -72,6 +72,10 @@ export function getCachedProfileSnapshot(): AuthUser | null {
   return cachedProfile;
 }
 
+export function setCachedProfileSnapshot(profile: AuthUser | null) {
+  cachedProfile = profile;
+}
+
 export async function getProfile(): Promise<AuthUser> {
   const response = await apiFetch<AuthUser>("auth/profile");
 

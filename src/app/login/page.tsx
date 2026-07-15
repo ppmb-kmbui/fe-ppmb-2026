@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import { LoginFormContainer, MobileAuthFooter, MobileAuthHeader } from "@/components/auth";
+import { LoginFormContainer, MobileAuthHeader } from "@/components/auth";
 import { Header } from "@/components/layout";
 
 interface LoginPageProps {
@@ -35,7 +35,6 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           </div>
         </div>
       </main>
-      <MobileAuthFooter className="lg:hidden" />
     </div>
   );
 }

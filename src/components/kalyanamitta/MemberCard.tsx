@@ -8,6 +8,8 @@ export interface MemberCardProps extends HTMLAttributes<HTMLElement> {
   avatar?: ReactNode;
   actionLabel?: string;
   onAction?: () => void;
+  isActionLoading?: boolean;
+  isActionDisabled?: boolean;
 }
 
 export function MemberCard({
@@ -16,6 +18,8 @@ export function MemberCard({
   avatar,
   actionLabel = "Kenalan",
   onAction,
+  isActionLoading = false,
+  isActionDisabled = false,
   className,
   ...props
 }: MemberCardProps) {
@@ -27,20 +31,23 @@ export function MemberCard({
       )}
       {...props}
     >
-      <div className="h-[132px] min-w-0 flex-1 overflow-hidden rounded-xl bg-background">
+      <div className="grid h-[132px] w-[42%] shrink-0 place-items-center overflow-hidden rounded-xl bg-background">
         {avatar}
       </div>
       <div className="flex min-w-0 flex-1 flex-col items-start justify-center gap-6">
-        <div className="min-w-0">
-          <h3 className="truncate font-subheading text-s3">{name}</h3>
+        <div className="min-w-0 max-w-full">
+          <h3 className="break-words font-subheading text-s4 leading-tight sm:text-s3">
+            {name}
+          </h3>
           <p className="mt-2 text-b3">Angkatan {batch}</p>
         </div>
         <button
           type="button"
           onClick={onAction}
-          className="min-h-[45px] w-[139px] rounded-2xl bg-purple-600 px-6 py-2.5 text-b2 hover:bg-purple-700"
+          disabled={isActionLoading || isActionDisabled || !onAction}
+          className="min-h-[45px] w-[139px] rounded-2xl bg-purple-600 px-6 py-2.5 text-b2 hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {actionLabel}
+          {isActionLoading ? "Memproses..." : actionLabel}
         </button>
       </div>
     </article>
