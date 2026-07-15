@@ -8,25 +8,36 @@ function decodeBase64Url(value: string): string {
   return atob(padded);
 }
 
-function hasLikelyValidSession(token: string): boolean {
+interface TokenPayload {
+  exp?: number;
+  is_admin?: boolean;
+}
+
+function getTokenPayload(token: string): TokenPayload | null {
   const parts = token.split(".");
-  if (parts.length !== 3) return false;
+  if (parts.length !== 3) return null;
 
   try {
-    const payload = JSON.parse(decodeBase64Url(parts[1])) as { exp?: number };
-    return typeof payload.exp === "number" && payload.exp * 1000 > Date.now();
+    return JSON.parse(decodeBase64Url(parts[1])) as TokenPayload;
   } catch {
-    return false;
+    return null;
   }
 }
 
 export function proxy(req: NextRequest) {
   const token = req.cookies.get(AUTH_COOKIE_NAME)?.value;
   const pathname = req.nextUrl.pathname;
-  const hasSession = !!token && hasLikelyValidSession(token);
+  const payload = token ? getTokenPayload(token) : null;
+  const hasSession =
+    !!payload && typeof payload.exp === "number" && payload.exp * 1000 > Date.now();
+  const isAdmin = payload?.is_admin === true;
 
   if ((pathname === "/login" || pathname === "/signup") && hasSession) {
-    return NextResponse.redirect(new URL("/", req.url));
+    return NextResponse.redirect(new URL(isAdmin ? "/admin" : "/", req.url));
+  }
+
+  if (pathname === "/" && isAdmin) {
+    return NextResponse.redirect(new URL("/admin", req.url));
   }
 
   const protectedPrefixes = [
@@ -46,6 +57,19 @@ export function proxy(req: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
+  if (
+    isAdmin &&
+    isProtectedRoute &&
+    pathname !== "/admin" &&
+    !pathname.startsWith("/admin/")
+  ) {
+    return NextResponse.redirect(new URL("/admin", req.url));
+  }
+
+  if ((pathname === "/admin" || pathname.startsWith("/admin/")) && !isAdmin) {
+    return NextResponse.redirect(new URL("/", req.url));
+  }
+
   return NextResponse.next();
 }
 
@@ -53,6 +77,7 @@ export const config = {
   matcher: [
     "/login",
     "/signup",
+    "/",
     "/admin/:path*",
     "/kalyanamitta/:path*",
     "/materi/:path*",

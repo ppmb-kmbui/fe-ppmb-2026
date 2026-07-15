@@ -145,14 +145,14 @@ export function TaskFileUpload({
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
         className={cn(
-          "flex min-h-[322px] w-full flex-col items-center justify-center gap-3 rounded-2xl border border-transparent bg-yellow-50/10 px-10 py-5 text-center",
+          "flex min-h-[220px] w-full flex-col items-center justify-center gap-3 rounded-2xl border border-transparent bg-yellow-50/10 px-5 py-5 text-center md:min-h-[322px] md:px-10",
           isDragging && "border-blue-400 bg-yellow-50/15",
           displayedError && "border-red-300",
           disabled && "cursor-not-allowed opacity-50",
           className,
         )}
       >
-        <Icon aria-hidden="true" className="size-[88px] text-blue-500 md:size-[136px]" />
+        <Icon aria-hidden="true" className="size-20 text-blue-500 md:size-[136px]" />
         <p className={cn("text-b1 text-blue-50", displayedName && "underline")}>
           {displayedName ?? config.dragLabel}
         </p>
@@ -161,7 +161,7 @@ export function TaskFileUpload({
           type="button"
           disabled={disabled}
           onClick={() => inputRef.current?.click()}
-          className="w-full rounded-md bg-blue-600 px-6 py-2.5 text-b1 text-yellow-50 hover:bg-blue-700 disabled:cursor-not-allowed"
+          className="w-full rounded-md bg-blue-600 px-4 py-2.5 text-b2 text-yellow-50 hover:bg-blue-700 disabled:cursor-not-allowed md:px-6 md:text-b1"
         >
           {config.browseLabel}
         </button>

@@ -39,7 +39,7 @@ export interface SidebarProps extends HTMLAttributes<HTMLElement> {
   onPinnedChange?: (pinned: boolean) => void;
 }
 
-const defaultItems: readonly SidebarItem[] = [
+export const dashboardSidebarItems: readonly SidebarItem[] = [
   {
     key: "home",
     label: "Beranda",
@@ -72,7 +72,7 @@ export function Sidebar({
   activeItem = "home",
   defaultPinned = false,
   pinned,
-  items = defaultItems,
+  items = dashboardSidebarItems,
   panelClassName,
   onPinnedChange,
   className,

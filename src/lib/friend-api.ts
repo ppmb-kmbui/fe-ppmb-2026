@@ -8,10 +8,18 @@ export interface FriendUser {
   imgUrl: string | null;
   batch: number;
   status: string;
+  lineId?: string | null;
+  whatsappNumber?: string | null;
 }
 
 export interface FriendListResponse {
   friends: FriendUser[];
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }
 
 export interface ConnectionRequestUser {
@@ -37,6 +45,50 @@ export interface ConnectionRequestsResponse {
   sent: ConnectionRequestItem[];
 }
 
+export interface ConnectionItem {
+  id: number;
+  fromId: number;
+  toId: number;
+  status: string;
+  from?: FriendUser;
+  to?: FriendUser;
+}
+
+export interface GetFriendsParams {
+  name?: string;
+  page?: number;
+  limit?: number;
+}
+
+export async function getFriendsPage({
+  name,
+  page = 1,
+  limit = 12,
+}: GetFriendsParams = {}) {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+  });
+
+  if (name?.trim()) {
+    params.set("name", name.trim());
+  }
+
+  const response = await apiFetch<FriendListResponse>(
+    `friends?${params.toString()}`,
+  );
+
+  return {
+    friends: response.data?.friends ?? [],
+    pagination: response.data?.pagination ?? {
+      page,
+      limit,
+      total: response.data?.friends.length ?? 0,
+      totalPages: 1,
+    },
+  };
+}
+
 export async function getFriends(name?: string) {
   const path = name ? `friends?name=${encodeURIComponent(name)}` : "friends";
   const response = await apiFetch<FriendListResponse>(path);
@@ -44,8 +96,14 @@ export async function getFriends(name?: string) {
 }
 
 export async function getMyConnections() {
-  const response = await apiFetch<FriendListResponse>("connect");
-  return response.data?.friends ?? [];
+  const response = await apiFetch<ConnectionItem[] | FriendListResponse>("connect");
+  const data = response.data;
+
+  if (Array.isArray(data)) {
+    return data.map((connection) => connection.to).filter(Boolean) as FriendUser[];
+  }
+
+  return data?.friends ?? [];
 }
 
 export async function getConnectionRequests() {

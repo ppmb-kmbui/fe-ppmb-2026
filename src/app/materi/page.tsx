@@ -7,7 +7,6 @@ export default function MaterialsPage() {
   return (
     <DashboardPageLayout
       activeItem="materials"
-      user={{ fullName: "Nama Lengkap", batch: "20XX" }}
       mainClassName="md:pt-9"
     >
       <div className="flex max-w-[958px] flex-col gap-8">

@@ -1,19 +1,16 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 
-import {
-  getCachedTaskSummarySnapshot,
-  getTaskApiErrorMessage,
-  getTaskSummaryCached,
-  type TaskSummary,
-} from "@/lib/task-api";
+import type { TaskSummary } from "@/lib/task-api";
 
 import { ActionQuotaCard } from "./ActionQuotaCard";
 import {
-  networkingRequirements,
-  type NetworkingBatch,
+  getNetworkingRequirement,
+  networkingSegments,
+  type NetworkingSegment,
 } from "./networking-requirements";
+import { useTaskSummary } from "./useTaskSummary";
 
 interface NetworkingQuota {
   label: string;
@@ -23,49 +20,27 @@ interface NetworkingQuota {
 }
 
 function buildNetworkingQuotas(summary?: TaskSummary): NetworkingQuota[] {
-  return (Object.keys(networkingRequirements) as NetworkingBatch[]).map((batch) => {
-    const requirement = networkingRequirements[batch];
-    const progress =
-      batch === "2026"
-        ? summary?.networkingAngkatan.byBatch[batch]
-        : summary?.networkingKating.progress[batch];
+  return (Object.keys(networkingSegments) as NetworkingSegment[]).map((segment) => {
+    const requirement = getNetworkingRequirement(segment);
+    const submission = summary?.networkingSubmission;
+    const submitted = Boolean(
+      submission?.[requirement.field] ||
+        submission?.[requirement.summaryField],
+    );
 
     return {
       label: requirement.label,
-      completed: progress?.progress ?? 0,
+      completed: submitted ? 1 : 0,
       total: requirement.total,
-      href: `/tugas/networking/${batch}`,
+      href: `/tugas/networking/${segment}`,
     };
   });
 }
 
 export function NetworkingProgressClient() {
-  const [summary, setSummary] = useState<TaskSummary | undefined>(() =>
-    getCachedTaskSummarySnapshot() ?? undefined,
+  const { summary, statusMessage } = useTaskSummary(
+    "Memuat progres networking...",
   );
-  const [statusMessage, setStatusMessage] = useState(() =>
-    getCachedTaskSummarySnapshot() ? "" : "Memuat progres networking...",
-  );
-
-  useEffect(() => {
-    let active = true;
-
-    getTaskSummaryCached()
-      .then((data) => {
-        if (!active) return;
-        setSummary(data);
-        setStatusMessage("");
-      })
-      .catch((error: unknown) => {
-        if (!active) return;
-        setStatusMessage(getTaskApiErrorMessage(error));
-      });
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
   const quotas = useMemo(() => buildNetworkingQuotas(summary), [summary]);
 
   return (
@@ -75,8 +50,7 @@ export function NetworkingProgressClient() {
           Progres Networking
         </h2>
         <p className="text-b2 text-foreground/80">
-          Data progres diambil dari backend. Tombol Kerjakan mengarah ke halaman
-          submission sesuai angkatan.
+          Setiap kategori networking membutuhkan satu link Google Docs.
         </p>
       </div>
 

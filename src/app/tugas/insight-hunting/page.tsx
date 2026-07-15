@@ -1,8 +1,9 @@
 import { BackButton } from "@/components";
 
 import { InsightHuntingForm } from "../_components/InsightHuntingForm";
+import { insightAgendaItems } from "../_components/task-page-data";
 import { TaskPageShell } from "../_components/TaskPageShell";
-import { TaskRightRail } from "../_components/TaskRightRail";
+import { TaskProgressRightRail } from "../_components/TaskProgressRightRail";
 import {
   GradientTaskTitle,
   TaskDescription,
@@ -13,22 +14,14 @@ export default function InsightHuntingTaskPage() {
   return (
     <TaskPageShell
       rightRail={
-        <TaskRightRail
+        <TaskProgressRightRail
+          progressKey="insightHunting"
+          progressLabel="Tugas Diperlukan : 1"
           title="Insight Hunting"
           showCalendar={false}
-          progress={{
-            label: "Tugas Diperlukan : 1",
-            completed: 0,
-            total: 1,
-          }}
           agendaHeading="Kegiatan Terdekat"
-          agenda={[
-            {
-              category: "Insight Hunting",
-              title: "Puja Rutin",
-              date: "15 Juni",
-            },
-          ]}
+          showAgendaSubtitle={false}
+          agenda={insightAgendaItems}
         />
       }
       withConstellation

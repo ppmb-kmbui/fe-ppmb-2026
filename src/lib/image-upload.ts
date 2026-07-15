@@ -10,6 +10,8 @@ interface CloudinaryUploadResponse {
   error?: { message?: unknown };
 }
 
+const uploadTimeoutMs = 30_000;
+
 function getCloudinaryConfig(): { cloudName: string; uploadPreset: string } {
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
   const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
@@ -41,6 +43,9 @@ async function uploadToCloudinary(
   formData.append("file", file);
   formData.append("upload_preset", uploadPreset);
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), uploadTimeoutMs);
+
   let response: Response;
   try {
     response = await fetch(
@@ -48,10 +53,19 @@ async function uploadToCloudinary(
       {
         method: "POST",
         body: formData,
+        signal: controller.signal,
       },
     );
-  } catch {
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw new ImageUploadError(
+        "Upload file terlalu lama. Coba kompres file atau periksa koneksi internet kamu.",
+      );
+    }
+
     throw new ImageUploadError("Tidak dapat mengunggah file. Periksa koneksi internet kamu.");
+  } finally {
+    clearTimeout(timeout);
   }
 
   const payload = (await response.json().catch(() => undefined)) as

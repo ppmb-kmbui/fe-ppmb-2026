@@ -1,44 +1,56 @@
-export const networkingRequirements = {
-  "2026": {
-    title: "Networking Angkatan 26",
-    label: "Teman Seangkatan 2026",
-    total: 10,
+import type { NetworkingSubmissionField } from "@/lib/task-api";
+
+export const networkingSegments = {
+  "26": {
+    title: "Angkatan 26",
+    label: "Angkatan 26",
+    total: 1,
+    field: "first_docs_url",
+    summaryField: "firstDocsUrl",
     category: "Networking",
     deadlineTitle: "Deadline Angkatan",
-    deadlineDate: "13 Juni",
+    deadlineDate: "31 Agustus",
+    templateUrl:
+      "https://docs.google.com/document/d/1SLkh-GfLt-_IIHWUxXDHG4hHprm4gscwhLMJnXPH_TE/edit?usp=drive_link",
   },
-  "2025": {
-    title: "Networking Angkatan 25",
-    label: "Kating Angkatan 2025",
-    total: 4,
+  "23-25": {
+    title: "Angkatan 23-25",
+    label: "Angkatan 23-25",
+    total: 1,
+    field: "second_docs_url",
+    summaryField: "secondDocsUrl",
     category: "Networking",
-    deadlineTitle: "Deadline Kating",
-    deadlineDate: "15 Juni",
-  },
-  "2024": {
-    title: "Networking Angkatan 24",
-    label: "Kating Angkatan 2024",
-    total: 2,
-    category: "Networking",
-    deadlineTitle: "Deadline Kating",
-    deadlineDate: "15 Juni",
-  },
-  "2023": {
-    title: "Networking Angkatan 23",
-    label: "Kating Angkatan 2023",
-    total: 2,
-    category: "Networking",
-    deadlineTitle: "Deadline Kating",
-    deadlineDate: "15 Juni",
+    deadlineTitle: "Deadline Angkatan",
+    deadlineDate: "31 Agustus",
+    templateUrl:
+      "https://docs.google.com/document/d/1Jb48QX1sV48pFZ4Kis8XEeq8kfxeD0bIv3hR9QifPgs/edit?usp=drive_link",
   },
 } as const;
 
-export type NetworkingBatch = keyof typeof networkingRequirements;
+export type NetworkingSegment = keyof typeof networkingSegments;
+export type NetworkingRequirement = (typeof networkingSegments)[NetworkingSegment] & {
+  field: NetworkingSubmissionField;
+  summaryField: "firstDocsUrl" | "secondDocsUrl";
+};
 
-export function isNetworkingBatch(batch: string): batch is NetworkingBatch {
-  return batch in networkingRequirements;
+const aliases: Record<string, NetworkingSegment> = {
+  "2026": "26",
+  "26": "26",
+  "2025": "23-25",
+  "2024": "23-25",
+  "2023": "23-25",
+  "24-25": "23-25",
+  "23-25": "23-25",
+};
+
+export function resolveNetworkingSegment(slug: string): NetworkingSegment | null {
+  return aliases[slug] ?? null;
 }
 
-export function getNetworkingRequirement(batch: NetworkingBatch) {
-  return networkingRequirements[batch];
+export function isNetworkingSegment(slug: string): slug is NetworkingSegment {
+  return slug in networkingSegments;
+}
+
+export function getNetworkingRequirement(segment: NetworkingSegment) {
+  return networkingSegments[segment] as NetworkingRequirement;
 }

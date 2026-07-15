@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useState, type SubmitEvent } from "react";
 
-import { Button, FileUpload, Input } from "@/components/ui";
+import { Button, FacultySelect, FileUpload, Input } from "@/components/ui";
+import { isFaculty } from "@/lib/faculty";
 
 export interface SignupFormValues {
   fullName: string;
@@ -81,8 +82,8 @@ export function SignupForm({ onSubmit, formError, serverErrors }: SignupFormProp
     }
     if (!faculty) {
       nextErrors.faculty = "Fakultas wajib diisi";
-    } else if (faculty.trim().length < 2) {
-      nextErrors.faculty = "Fakultas minimal 2 karakter";
+    } else if (!isFaculty(faculty)) {
+      nextErrors.faculty = "Pilih salah satu fakultas yang tersedia";
     }
     if (!batch) {
       nextErrors.batch = "Angkatan wajib diisi";
@@ -190,11 +191,9 @@ export function SignupForm({ onSubmit, formError, serverErrors }: SignupFormProp
             onChange={(event) => setEmail(event.target.value)}
             error={displayedErrors.email}
           />
-          <Input
-            type="text"
+          <FacultySelect
             name="faculty"
             label="Fakultas"
-            placeholder="Masukkan fakultas kamu!"
             value={faculty}
             onChange={(event) => setFaculty(event.target.value)}
             error={displayedErrors.faculty}

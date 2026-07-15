@@ -1,5 +1,4 @@
 import {
-  MobileAuthFooter,
   MobileAuthHeader,
   SignupFormContainer,
 } from "@/components/auth";
@@ -17,7 +16,6 @@ export default function SignupPage() {
           <SignupFormContainer />
         </div>
       </main>
-      <MobileAuthFooter className="lg:hidden" />
     </div>
   );
 }

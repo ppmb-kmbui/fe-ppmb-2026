@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { login, translateAuthError } from "@/lib/auth-api";
+import { getProfileCached, login, translateAuthError } from "@/lib/auth-api";
 
 import { LoginForm, type LoginFieldErrors, type LoginFormValues } from "./LoginForm";
 
@@ -22,7 +22,8 @@ export function LoginFormContainer({ successMessage }: LoginFormContainerProps) 
 
     try {
       await login(values);
-      router.replace("/");
+      const profile = await getProfileCached();
+      router.replace(profile.isAdmin ? "/admin" : "/");
       router.refresh();
     } catch (error) {
       const translated = translateAuthError(error);

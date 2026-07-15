@@ -8,7 +8,6 @@ import {
   type CommitteeVideo,
 } from "@/lib/task-api";
 
-import { committeeVideos } from "./task-page-data";
 import { VideoLessonCard } from "./VideoLessonCard";
 
 export function CommitteeVideosClient() {
@@ -26,7 +25,9 @@ export function CommitteeVideosClient() {
       })
       .catch((error: unknown) => {
         if (!active) return;
-        setStatusMessage(getTaskApiErrorMessage(error));
+        setStatusMessage(
+          getTaskApiErrorMessage(error) || "Gagal memuat video panitia.",
+        );
       });
 
     return () => {
@@ -34,7 +35,6 @@ export function CommitteeVideosClient() {
     };
   }, []);
 
-  const fallbackVideos = statusMessage ? committeeVideos : [];
   const displayedVideos = videos.length
     ? videos.map((video) => ({
         title: video.title,
@@ -43,7 +43,7 @@ export function CommitteeVideosClient() {
         videoUrl: video.videoUrl ?? undefined,
         thumbnailUrl: video.thumbnailUrl ?? undefined,
       }))
-    : fallbackVideos;
+    : [];
 
   return (
     <div className="flex flex-col gap-4">

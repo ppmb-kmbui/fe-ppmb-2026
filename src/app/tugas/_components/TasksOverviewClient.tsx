@@ -1,23 +1,20 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 
 import { TaskCard } from "@/components";
-import {
-  getCachedTaskSummarySnapshot,
-  getTaskApiErrorMessage,
-  getTaskSummaryCached,
-  type TaskSummary,
-} from "@/lib/task-api";
+import type { TaskSummary } from "@/lib/task-api";
 
 import { taskCards } from "./task-page-data";
+import { getTaskIcon, type TaskIconKey } from "./task-icons";
+import { useTaskSummary } from "./useTaskSummary";
 
 function getProgressByTitle(summary?: TaskSummary) {
   if (!summary) return new Map<string, number>();
 
   return new Map([
     ["Networking", summary.cards.networking.percentage],
-    ["Insight Hunting", summary.insightHuntingDone ? 100 : 0],
+    ["Insight Hunting", summary.cards.insightHunting?.percentage ?? (summary.insightHuntingDone ? 100 : 0)],
     ["KMBUI Explorer", summary.cards.explorer.percentage],
     ["Mentoring", summary.cards.mentoring.percentage],
     ["Foster Siblings", summary.cards.fosterSiblings.percentage],
@@ -25,32 +22,7 @@ function getProgressByTitle(summary?: TaskSummary) {
 }
 
 export function TasksOverviewClient() {
-  const [summary, setSummary] = useState<TaskSummary | undefined>(() =>
-    getCachedTaskSummarySnapshot() ?? undefined,
-  );
-  const [statusMessage, setStatusMessage] = useState(() =>
-    getCachedTaskSummarySnapshot() ? "" : "Memuat progres tugas...",
-  );
-
-  useEffect(() => {
-    let active = true;
-
-    getTaskSummaryCached()
-      .then((data) => {
-        if (!active) return;
-        setSummary(data);
-        setStatusMessage("");
-      })
-      .catch((error: unknown) => {
-        if (!active) return;
-        setStatusMessage(getTaskApiErrorMessage(error));
-      });
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
+  const { summary, statusMessage } = useTaskSummary("Memuat progres tugas...");
   const progressByTitle = useMemo(() => getProgressByTitle(summary), [summary]);
 
   return (
@@ -66,8 +38,12 @@ export function TasksOverviewClient() {
           <TaskCard
             key={task.title}
             title={task.title}
-            progress={progressByTitle.get(task.title) ?? task.progress}
+            progress={progressByTitle.get(task.title) ?? 0}
             href={task.href}
+            icon={getTaskIcon(
+              task.icon as TaskIconKey | undefined,
+              "size-20 md:size-[180px]",
+            )}
           />
         ))}
       </div>

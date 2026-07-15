@@ -1,26 +1,36 @@
 "use client";
 
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { LuCornerUpLeft, LuUser, LuUserPlus } from "react-icons/lu";
+
 import {
+  Button,
   DashboardPageLayout,
   FriendRequestCard,
   MemberCard,
   SearchInput,
-  Button,
 } from "@/components";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
 import {
-  getFriends,
-  getConnectionRequests,
-  sendConnectionRequest,
-  getMyConnections,
   acceptConnectionRequest,
+  getConnectionRequests,
+  getFriendsPage,
+  getMyConnections,
   rejectConnectionRequest,
-  type FriendUser,
+  sendConnectionRequest,
   type ConnectionRequestItem,
+  type FriendUser,
 } from "@/lib/friend-api";
-import { LuCornerUpLeft, LuUser, LuUserPlus } from "react-icons/lu";
+
+function getFriendActionErrorMessage(error: unknown) {
+  if (error instanceof Error && error.message) return error.message;
+
+  return "Aksi Kalyanamitta gagal. Coba lagi beberapa saat lagi.";
+}
+
+const toastDurationMs = 3000;
+const friendsPerPage = 8;
 
 export default function KalyanamittaPage() {
   const router = useRouter();
@@ -30,81 +40,245 @@ export default function KalyanamittaPage() {
     [],
   );
   const [sentRequestIds, setSentRequestIds] = useState<Set<number>>(new Set());
+  const [processingRequestIds, setProcessingRequestIds] = useState<Set<number>>(
+    new Set(),
+  );
+  const [processingFriendIds, setProcessingFriendIds] = useState<Set<number>>(
+    new Set(),
+  );
   const [loading, setLoading] = useState(true);
+  const [statusMessage, setStatusMessage] = useState("");
+  const [actionError, setActionError] = useState("");
+  const [requestOpen, setRequestOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"connected" | "not-connected">(
+    "connected",
+  );
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+  const [friendsPage, setFriendsPage] = useState(1);
+  const [friendsTotalPages, setFriendsTotalPages] = useState(1);
+  const [friendsTotal, setFriendsTotal] = useState(0);
+  const [isFriendsLoading, setIsFriendsLoading] = useState(false);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const [friends, connections, connectionRequests] = await Promise.all([
-          getFriends(),
-          getMyConnections(),
-          getConnectionRequests(),
-        ]);
-        setAllFriends(friends);
-        setMyConnection(connections);
-        setFriendRequests(connectionRequests?.received ?? []);
-      } catch {
-        // silently fail — data stays as empty arrays
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
+  const refreshKalyanamittaData = useCallback(async () => {
+    const [connections, connectionRequests] = await Promise.all([
+      getMyConnections(),
+      getConnectionRequests(),
+    ]);
+    const pendingReceived = (connectionRequests?.received ?? []).filter(
+      (request) => request.status === "pending",
+    );
+    const pendingSentIds = new Set(
+      (connectionRequests?.sent ?? [])
+        .filter((request) => request.status === "pending")
+        .map((request) => request.toId),
+    );
+
+    setMyConnection(connections);
+    setFriendRequests(pendingReceived);
+    setSentRequestIds(pendingSentIds);
   }, []);
 
-  const notConnectedFriends = allFriends.filter(
-    (f) => f.status === "not_connected",
+  const loadFriendCandidates = useCallback(async () => {
+    setIsFriendsLoading(true);
+    setActionError("");
+
+    try {
+      const { friends, pagination } = await getFriendsPage({
+        name: debouncedSearchQuery,
+        page: friendsPage,
+        limit: friendsPerPage,
+      });
+
+      setAllFriends(friends);
+      setFriendsTotalPages(Math.max(1, pagination.totalPages));
+      setFriendsTotal(pagination.total);
+    } catch (error) {
+      setActionError(getFriendActionErrorMessage(error));
+    } finally {
+      setIsFriendsLoading(false);
+    }
+  }, [debouncedSearchQuery, friendsPage]);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadData() {
+      setLoading(true);
+      setActionError("");
+
+      try {
+        await refreshKalyanamittaData();
+      } catch (error) {
+        if (active) setActionError(getFriendActionErrorMessage(error));
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    loadData();
+
+    return () => {
+      active = false;
+    };
+  }, [refreshKalyanamittaData]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+      setFriendsPage(1);
+    }, 350);
+
+    return () => clearTimeout(timeout);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    if (activeTab !== "not-connected") return;
+
+    const timeout = setTimeout(() => {
+      void loadFriendCandidates();
+    }, 0);
+
+    return () => clearTimeout(timeout);
+  }, [activeTab, loadFriendCandidates]);
+
+  useEffect(() => {
+    if (!statusMessage && !actionError) return;
+
+    const timeout = setTimeout(() => {
+      setStatusMessage("");
+      setActionError("");
+    }, toastDurationMs);
+
+    return () => clearTimeout(timeout);
+  }, [statusMessage, actionError]);
+
+  const notConnectedFriends = useMemo(
+    () =>
+      allFriends.filter(
+        (friend) =>
+          friend.status === "not_connected" ||
+          friend.status === "menunggu_konfirmasi",
+      ),
+    [allFriends],
   );
-  const connectedFriends = myConnections;
+  const displayedFriends = useMemo(
+    () =>
+      (activeTab === "connected" ? myConnections : notConnectedFriends).filter(
+        (friend) =>
+          friend.fullname?.toLowerCase().includes(searchQuery.toLowerCase()),
+      ),
+    [activeTab, myConnections, notConnectedFriends, searchQuery],
+  );
+
+  async function handleSendRequest(friendId: number) {
+    setProcessingFriendIds((prev) => new Set(prev).add(friendId));
+    setActionError("");
+    setStatusMessage("");
+
+    try {
+      await sendConnectionRequest(friendId);
+      setSentRequestIds((prev) => new Set(prev).add(friendId));
+      await refreshKalyanamittaData();
+      if (activeTab === "not-connected") await loadFriendCandidates();
+      setStatusMessage("Permintaan pertemanan berhasil dikirim.");
+    } catch (error) {
+      setActionError(getFriendActionErrorMessage(error));
+    } finally {
+      setProcessingFriendIds((prev) => {
+        const next = new Set(prev);
+        next.delete(friendId);
+        return next;
+      });
+    }
+  }
+
+  async function handleAcceptRequest(request: ConnectionRequestItem) {
+    setProcessingRequestIds((prev) => new Set(prev).add(request.id));
+    setActionError("");
+    setStatusMessage("");
+
+    try {
+      await acceptConnectionRequest(request.fromId);
+      await refreshKalyanamittaData();
+      if (activeTab === "not-connected") await loadFriendCandidates();
+      setStatusMessage("Permintaan pertemanan berhasil diterima.");
+    } catch (error) {
+      setActionError(getFriendActionErrorMessage(error));
+    } finally {
+      setProcessingRequestIds((prev) => {
+        const next = new Set(prev);
+        next.delete(request.id);
+        return next;
+      });
+    }
+  }
+
+  async function handleRejectRequest(request: ConnectionRequestItem) {
+    setProcessingRequestIds((prev) => new Set(prev).add(request.id));
+    setActionError("");
+    setStatusMessage("");
+
+    try {
+      await rejectConnectionRequest(request.fromId);
+      await refreshKalyanamittaData();
+      if (activeTab === "not-connected") await loadFriendCandidates();
+      setStatusMessage("Permintaan pertemanan berhasil ditolak.");
+    } catch (error) {
+      setActionError(getFriendActionErrorMessage(error));
+    } finally {
+      setProcessingRequestIds((prev) => {
+        const next = new Set(prev);
+        next.delete(request.id);
+        return next;
+      });
+    }
+  }
 
   const friendRequest = (
-    <div className="space-y-2">
-      <h1 className="text-h3 font-heading text-yellow-600">
-        Permintaan Pertemanan
-      </h1>
+    <div className="space-y-3">
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-h3 font-heading text-yellow-600">
+          Permintaan Pertemanan
+        </h1>
+        {friendRequests.length > 0 && (
+          <span className="rounded-full bg-purple-600 px-3 py-1 text-b3 text-yellow-50">
+            {friendRequests.length}
+          </span>
+        )}
+      </div>
+
       {friendRequests.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-10 text-center">
           <p className="text-b3">Belum ada permintaan pertemanan</p>
         </div>
       ) : (
-        friendRequests.map((req) => (
+        friendRequests.map((request) => (
           <FriendRequestCard
-            key={`fr-${req.id}`}
-            name={req.from?.fullname ?? "Unknown"}
-            batch={req.from?.batch ?? "—"}
-            onAccept={async () => {
-              try {
-                await acceptConnectionRequest(req.id);
-                setFriendRequests((prev) => prev.filter((r) => r.id !== req.id));
-              } catch {
-                // silently fail
-              }
-            }}
-            onReject={async () => {
-              try {
-                await rejectConnectionRequest(req.id);
-                setFriendRequests((prev) => prev.filter((r) => r.id !== req.id));
-              } catch {
-                // silently fail
-              }
-            }}
+            key={`request-${request.id}`}
+            name={request.from?.fullname ?? "Unknown"}
+            avatar={
+              request.from?.imgUrl ? (
+                <Image
+                  src={request.from.imgUrl}
+                  alt={`${request.from.fullname ?? "User"}'s Picture`}
+                  width={134}
+                  height={91}
+                  unoptimized
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <LuUser aria-hidden="true" className="size-10" />
+              )
+            }
+            batch={request.from?.batch ?? "-"}
+            isLoading={processingRequestIds.has(request.id)}
+            onAccept={() => handleAcceptRequest(request)}
+            onReject={() => handleRejectRequest(request)}
           />
         ))
       )}
     </div>
-  );
-
-  const [requestOpen, setRequestOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<"connected" | "not-connected">(
-    "connected",
-  );
-
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const displayedFriends = (
-    activeTab === "connected" ? connectedFriends : notConnectedFriends
-  ).filter((f) =>
-    f.fullname?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (
@@ -113,29 +287,53 @@ export default function KalyanamittaPage() {
       rightRail={friendRequest}
       rightRailClassName="max-lg:hidden"
     >
+      {(statusMessage || actionError) && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed left-1/2 top-6 z-50 w-[min(calc(100vw-2rem),420px)] -translate-x-1/2 md:top-8"
+        >
+          <p
+            className={`rounded-2xl border px-5 py-4 text-b2 shadow-modal backdrop-blur-glass ${
+              actionError
+                ? "border-red-300/40 bg-red-500/20 text-red-50"
+                : "border-green-300/40 bg-green-500/20 text-green-50"
+            }`}
+          >
+            {actionError || statusMessage}
+          </p>
+        </div>
+      )}
+
       <main className="min-h-screen">
         <section id="timeline" className="flex flex-col gap-6">
-          <div className="flex flex-wrap w-full justify-between items-center">
-            <h1 className="text-6xl max-lg:text-4xl max-md:text-3xl font-heading">
+          <div className="flex w-full flex-wrap items-center justify-between">
+            <h1 className="text-6xl font-heading max-lg:text-4xl max-md:text-3xl">
               {requestOpen ? (
                 <Button onClick={() => setRequestOpen(false)}>
                   <LuCornerUpLeft />
                 </Button>
               ) : (
-                <span className="bg-linear-to-br from-yellow-600 to-purple-600 text-transparent bg-clip-text">
+                <span className="bg-linear-to-br from-yellow-600 to-purple-600 bg-clip-text text-transparent">
                   Kalyanamitta
                 </span>
               )}
             </h1>
             {!requestOpen && (
               <Button
-                className="lg:hidden flex-0"
+                className="flex-0 relative lg:hidden"
                 onClick={() => setRequestOpen(true)}
               >
                 <LuUserPlus />
+                {friendRequests.length > 0 && (
+                  <span className="absolute -right-2 -top-2 grid size-6 place-items-center rounded-full bg-red-500 text-b3 text-white">
+                    {friendRequests.length}
+                  </span>
+                )}
               </Button>
             )}
           </div>
+
           {loading ? (
             <div className="flex items-center justify-center py-20">
               <span className="text-b3">Memuat data...</span>
@@ -143,11 +341,14 @@ export default function KalyanamittaPage() {
           ) : requestOpen ? (
             friendRequest
           ) : (
-            <div className="">
+            <div>
               <div className="mb-6 flex gap-3 max-md:justify-center">
                 <button
                   type="button"
-                  onClick={() => setActiveTab("not-connected")}
+                  onClick={() => {
+                    setActiveTab("not-connected");
+                    setFriendsPage(1);
+                  }}
                   className={`inline-flex h-11 min-w-35 items-center justify-center rounded-2xl px-6 text-b2 transition-colors ${
                     activeTab === "not-connected"
                       ? "bg-purple-300/50"
@@ -168,13 +369,19 @@ export default function KalyanamittaPage() {
                   Kenali Teman
                 </button>
               </div>
+
               <SearchInput
                 placeholder="Cari Kalyanamitta"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(event) => setSearchQuery(event.target.value)}
               />
+
               <div className="mt-6 grid gap-5 lg:grid-cols-2">
-                {displayedFriends.length === 0 ? (
+                {activeTab === "not-connected" && isFriendsLoading ? (
+                  <div className="col-span-full flex flex-col items-center justify-center py-10 text-center">
+                    <p className="text-b3">Memuat kandidat teman...</p>
+                  </div>
+                ) : displayedFriends.length === 0 ? (
                   <div className="col-span-full flex flex-col items-center justify-center py-10 text-center">
                     <p className="text-b3">
                       {activeTab === "connected"
@@ -184,19 +391,23 @@ export default function KalyanamittaPage() {
                   </div>
                 ) : (
                   displayedFriends.map((friend) => {
-                    const isSent = sentRequestIds.has(friend.id);
+                    const isSent =
+                      sentRequestIds.has(friend.id) ||
+                      friend.status === "menunggu_konfirmasi";
+                    const isProcessing = processingFriendIds.has(friend.id);
                     const avatar = friend.imgUrl ? (
                       <Image
                         src={friend.imgUrl}
-                        alt={`${friend.fullname}'s Picture`}
+                        alt={`${friend.fullname ?? "User"}'s Picture`}
                         width={132}
                         height={132}
                         unoptimized
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <LuUser />
+                      <LuUser aria-hidden="true" className="size-10" />
                     );
+
                     return (
                       <MemberCard
                         key={`${activeTab}-${friend.id}`}
@@ -210,23 +421,57 @@ export default function KalyanamittaPage() {
                               ? "Terkirim"
                               : undefined
                         }
+                        isActionLoading={isProcessing}
+                        isActionDisabled={activeTab !== "connected" && isSent}
                         onAction={
                           activeTab === "connected"
                             ? () => router.push(`/profil/${friend.id}`)
                             : isSent
                               ? undefined
-                              : async () => {
-                                  await sendConnectionRequest(friend.id);
-                                  setSentRequestIds((prev) =>
-                                    new Set(prev).add(friend.id),
-                                  );
-                                }
+                              : () => handleSendRequest(friend.id)
                         }
                       />
                     );
                   })
                 )}
               </div>
+
+              {activeTab === "not-connected" &&
+                !isFriendsLoading &&
+                displayedFriends.length > 0 && (
+                  <div className="mt-6 flex flex-col items-center justify-between gap-4 rounded-2xl bg-purple-900/20 px-4 py-3 text-b3 sm:flex-row">
+                    <p>
+                      Menampilkan {displayedFriends.length} dari {friendsTotal} kandidat
+                    </p>
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        disabled={friendsPage <= 1}
+                        onClick={() =>
+                          setFriendsPage((current) => Math.max(1, current - 1))
+                        }
+                        className="rounded-xl bg-purple-300/40 px-4 py-2 transition-colors hover:bg-purple-300/60 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        Sebelumnya
+                      </button>
+                      <span>
+                        {friendsPage} / {friendsTotalPages}
+                      </span>
+                      <button
+                        type="button"
+                        disabled={friendsPage >= friendsTotalPages}
+                        onClick={() =>
+                          setFriendsPage((current) =>
+                            Math.min(friendsTotalPages, current + 1),
+                          )
+                        }
+                        className="rounded-xl bg-purple-300/40 px-4 py-2 transition-colors hover:bg-purple-300/60 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        Berikutnya
+                      </button>
+                    </div>
+                  </div>
+                )}
             </div>
           )}
         </section>

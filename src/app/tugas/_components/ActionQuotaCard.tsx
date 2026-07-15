@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { HTMLAttributes } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 
 import { ProgressBar } from "@/components";
 import { cn } from "@/lib/cn";
@@ -9,6 +9,7 @@ export interface ActionQuotaCardProps extends HTMLAttributes<HTMLElement> {
   completed: number;
   total: number;
   href: string;
+  icon?: ReactNode;
 }
 
 export function ActionQuotaCard({
@@ -16,6 +17,7 @@ export function ActionQuotaCard({
   completed,
   total,
   href,
+  icon,
   className,
   ...props
 }: ActionQuotaCardProps) {
@@ -32,7 +34,14 @@ export function ActionQuotaCard({
       {...props}
     >
       <div className="min-w-0 flex-1">
-        <h2 className="font-subheading text-s3 font-semibold">{label}</h2>
+        <div className="flex items-center gap-3">
+          {icon && (
+            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-yellow-500 text-purple-900">
+              {icon}
+            </span>
+          )}
+          <h2 className="font-subheading text-s3 font-semibold">{label}</h2>
+        </div>
         <ProgressBar
           value={safeCompleted}
           max={safeTotal}
@@ -49,7 +58,7 @@ export function ActionQuotaCard({
       </div>
       <Link
         href={href}
-        className="inline-flex h-[50px] items-center justify-center rounded-2xl bg-primary px-6 text-b1 text-yellow-50 transition-colors hover:bg-primary-hover sm:w-32"
+        className="inline-flex h-[50px] w-full items-center justify-center rounded-2xl bg-primary px-6 text-b1 text-yellow-50 transition-colors hover:bg-primary-hover sm:w-32"
       >
         Kerjakan
       </Link>

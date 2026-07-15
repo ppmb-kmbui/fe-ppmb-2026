@@ -12,6 +12,7 @@ export interface NetworkingProgressItem {
 }
 
 export interface TaskSummary {
+  networkingSubmission?: NetworkingSubmission | null;
   networkingAngkatan: {
     progress: Record<string, NetworkingProgressItem>;
     byBatch: Record<string, NetworkingProgressItem>;
@@ -33,13 +34,34 @@ export interface TaskSummary {
     explorer: ProgressStat;
     mentoring: ProgressStat;
     fosterSiblings: ProgressStat;
+    insightHunting?: ProgressStat;
   };
+}
+
+export type NetworkingSubmissionField = "first_docs_url" | "second_docs_url";
+
+export interface NetworkingSubmission {
+  id: number;
+  userId: number;
+  first_docs_url: string | null;
+  second_docs_url: string | null;
+  firstDocsUrl?: string | null;
+  secondDocsUrl?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface NetworkingSubmissionData {
+  submission: NetworkingSubmission | null;
+  progress: ProgressStat;
 }
 
 export interface ExplorerSubmission {
   id: number;
   userId: number;
+  activity_name: string;
   img_url: string;
+  photo_url?: string;
 }
 
 export interface InsightHuntingSubmission {
@@ -51,7 +73,8 @@ export interface InsightHuntingSubmission {
 export interface MentoringSubmission {
   id: number;
   userId: number;
-  file_url: string;
+  gdrive_url?: string | null;
+  file_url?: string;
   description?: string | null;
 }
 
@@ -87,6 +110,7 @@ export interface CommitteeVideoCategory {
 
 let cachedTaskSummary: TaskSummary | null = null;
 let taskSummaryRequest: Promise<TaskSummary | undefined> | null = null;
+export const TASK_SUMMARY_INVALIDATED_EVENT = "ppmb:task-summary-invalidated";
 
 export async function getTaskSummary() {
   const response = await apiFetch<TaskSummary>("tasks");
@@ -111,6 +135,28 @@ export async function getTaskSummaryCached() {
 export function invalidateTaskSummaryCache() {
   cachedTaskSummary = null;
   taskSummaryRequest = null;
+
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(TASK_SUMMARY_INVALIDATED_EVENT));
+  }
+}
+
+export async function getNetworkingSubmission() {
+  const response =
+    await apiFetch<NetworkingSubmissionData>("tasks/networking");
+  return response.data;
+}
+
+export async function submitNetworkingDocs(
+  field: NetworkingSubmissionField,
+  docsUrl: string,
+) {
+  const response = await apiFetch<NetworkingSubmissionData>("tasks/networking", {
+    method: "POST",
+    body: JSON.stringify({ [field]: docsUrl }),
+  });
+  invalidateTaskSummaryCache();
+  return response.data;
 }
 
 export async function getExplorerSubmission() {
@@ -118,10 +164,10 @@ export async function getExplorerSubmission() {
   return response.data ?? null;
 }
 
-export async function submitExplorer(photoUrl: string) {
+export async function submitExplorer(activityName: string, photoUrl: string) {
   const response = await apiFetch<ExplorerSubmission>("tasks/explorer", {
     method: "POST",
-    body: JSON.stringify({ photo_url: photoUrl }),
+    body: JSON.stringify({ activity_name: activityName, photo_url: photoUrl }),
   });
   invalidateTaskSummaryCache();
   return response.data;
@@ -212,7 +258,7 @@ export function getTaskApiErrorMessage(error: unknown) {
   }
 
   if (error instanceof Error) {
-    return "";
+    return error.message;
   }
 
   return "";
