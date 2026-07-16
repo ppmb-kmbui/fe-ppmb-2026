@@ -15,72 +15,68 @@ const AUTH_COOKIE_NAME = "ppmb_access_token";
 
 const TimelineData: TimelineItemProps[] = [
   {
-    date: "12 Juni 2026",
-    title: "Opening PPMB",
+    date: "22 Juli 2026",
+    title: "Welcoming Maba",
     description:
-      "Rangkaian awal untuk mengenal PPMB KMBUI 2026, alur kegiatan, dan sistem pertugasan.",
+      "Rangkaian awal untuk menyambut mahasiswa baru dan memperkenalkan perjalanan PPMB KMBUI 2026.",
     media: (
       <Image
-        src="/assets/timeline-img.jpg"
-        alt=""
+        src="/assets/welcoming-maba.webp"
+        alt="Welcoming Maba PPMB KMBUI 2026"
+        width={800}
+        height={600}
+        className="object-cover w-full h-full"
+      />
+    ),
+    location: "Zoom",
+  },
+  {
+    date: "25 Juli 2026",
+    title: "Pre Event: Keliling UI",
+    description:
+      "Peserta diajak mengenal lingkungan Universitas Indonesia secara langsung melalui kegiatan keliling UI.",
+    media: (
+      <Image
+        src="/assets/keliling-ui.webp"
+        alt="Pre Event Keliling UI PPMB KMBUI 2026"
         width={800}
         height={600}
         className="object-cover w-full h-full"
       />
     ),
     location: "Universitas Indonesia",
-    locationHref: "https://maps.google.com",
   },
   {
-    date: "13 Juni 2026",
-    title: "Networking dan Mentoring",
+    date: "1–31 Agustus 2026",
+    title: "Main Event",
     description:
-      "Peserta mulai membangun relasi dengan sesama maba, kakak tingkat, dan mentor.",
+      "Puncak rangkaian PPMB yang berisi berbagai kegiatan utama untuk mengenal KMBUI, membangun relasi, dan berkembang bersama.",
     media: (
       <Image
-        src="/assets/timeline-img.jpg"
-        alt=""
+        src="/assets/mentoring.webp"
+        alt="Main Event PPMB KMBUI 2026"
         width={800}
         height={600}
         className="object-cover w-full h-full"
       />
     ),
-    location: "Universitas Indonesia",
-    locationHref: "https://maps.google.com",
+    location: "Online dan Offline",
   },
   {
-    date: "15 Juni 2026",
-    title: "Insight Hunting dan KMBUI Explorer",
-    description:
-      "Peserta menggali pengalaman, mengikuti kegiatan, dan mengenal KMBUI lebih dekat.",
-    media: (
-      <Image
-        src="/assets/timeline-img.jpg"
-        alt=""
-        width={800}
-        height={600}
-        className="object-cover w-full h-full"
-      />
-    ),
-    location: "Universitas Indonesia",
-    locationHref: "https://maps.google.com",
-  },
-  {
-    date: "Juli 2026",
+    date: "19 September 2026",
     title: "Closing PPMB",
     description:
       "Penutup rangkaian PPMB dan momen refleksi perjalanan awal bersama KMBUI.",
     media: (
       <Image
-        src="/assets/timeline-img.jpg"
-        alt=""
+        src="/assets/closing-ppmb.webp"
+        alt="Closing PPMB KMBUI 2026"
         width={800}
         height={600}
         className="object-cover w-full h-full"
       />
     ),
-    location: "Universitas Indonesia",
-    locationHref: "https://maps.google.com",
+    location: "TBA",
   },
 ];
 
@@ -255,7 +251,7 @@ export default async function HomePage() {
       <DashboardPageLayout
         activeItem="home"
         mainClassName="pb-0 md:pb-0 md:pt-9"
-        sidebarContainerClassName="bottom-[261px] min-h-[982px]"
+        sidebarContainerClassName="bottom-[225px]"
       >
         <HomeContent isDashboard />
       </DashboardPageLayout>

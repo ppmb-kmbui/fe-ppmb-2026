@@ -6,6 +6,7 @@ import { TaskPageShell } from "../_components/TaskPageShell";
 import { TaskProgressRightRail } from "../_components/TaskProgressRightRail";
 import {
   GradientTaskTitle,
+  TaskDescription,
   TaskSectionCard,
 } from "../_components/TaskTypography";
 
@@ -30,15 +31,13 @@ export default function FosterSiblingsTaskPage() {
         <GradientTaskTitle>Foster Siblings</GradientTaskTitle>
 
         <TaskSectionCard>
-          <h2 className="font-subheading text-s3 font-semibold">
-            Deskripsi Tugas
-          </h2>
-          <p className="text-b1 max-md:text-b3 leading-snug">
-            Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque
-            faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi
-            pretium tellus duis convallis. Tempus leo eu aenean sed diam urna
-            tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas.
-          </p>
+          <TaskDescription>
+            Tugas Foster Sibling adalah tugas yang bertujuan untuk membangun
+            kedekatan dengan kakak asuhmu melalui sesi perkenalan yang hangat
+            dan bermakna. Kenali cerita, pengalaman, serta berbagai hal menarik
+            tentang kakak asuh sebagai awal dari hubungan yang saling mendukung
+            selama perjalananmu di KMBUI.
+          </TaskDescription>
 
           <FosterSiblingsForm />
         </TaskSectionCard>

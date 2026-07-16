@@ -8,8 +8,10 @@ import {
   Button,
   DashboardPageLayout,
   FacultySelect,
+  FileUpload,
   Input,
 } from "@/components";
+import { ImageUploadError, uploadImage } from "@/lib/image-upload";
 import {
   getOwnProfile,
   updateOwnProfile,
@@ -65,6 +67,7 @@ export function ProfileClient() {
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [photo, setPhoto] = useState<File | null>(null);
   const [message, setMessage] = useState<string>();
   const [error, setError] = useState<string>();
 
@@ -100,17 +103,24 @@ export function ProfileClient() {
     setIsSaving(true);
 
     try {
+      const imgUrl = photo ? await uploadImage(photo) : undefined;
       const updated = await updateOwnProfile({
         fullname: form.fullname.trim(),
         lineId: form.lineId.trim(),
         whatsappNumber: form.whatsappNumber.trim(),
         faculty: form.faculty.trim(),
+        ...(imgUrl ? { imgUrl } : {}),
       });
       setProfile(updated);
+      setPhoto(null);
       setIsEditing(false);
       setMessage("Profil berhasil diperbarui.");
-    } catch {
-      setError("Profil gagal diperbarui. Periksa kembali format datanya.");
+    } catch (saveError) {
+      setError(
+        saveError instanceof ImageUploadError
+          ? saveError.message
+          : "Profil gagal diperbarui. Periksa kembali format datanya.",
+      );
     } finally {
       setIsSaving(false);
     }
@@ -132,6 +142,7 @@ export function ProfileClient() {
       });
     }
 
+    setPhoto(null);
     setError(undefined);
     setMessage(undefined);
     setIsEditing(false);
@@ -226,6 +237,15 @@ export function ProfileClient() {
             <section className="grid gap-x-5 gap-y-4 px-2 sm:px-8 md:grid-cols-2">
               {isEditing ? (
                 <>
+                  <FileUpload
+                    label="Foto Profil"
+                    hint="Lampirkan foto dengan format .png/.jpg/.jpeg, maksimal 5 MB."
+                    accept="image/png,image/jpeg"
+                    maxSizeMb={5}
+                    disabled={isSaving}
+                    onFileChange={setPhoto}
+                    wrapperClassName="md:col-span-2"
+                  />
                   <Input
                     label="ID Line"
                     value={form.lineId}

@@ -76,7 +76,7 @@ export function PublicProfileClient({ id }: { id: number }) {
   return (
     <DashboardPageLayout activeItem="friends" mainClassName="md:pt-6" rightRail={null}>
       <div className="flex w-full max-w-[1345px] flex-col gap-8">
-        <BackButton href="/" />
+        <BackButton href="/kalyanamitta?tab=connected" />
 
         {isLoading ? (
           <p className="rounded-2xl bg-blue-200/20 px-4 py-3 text-b2">

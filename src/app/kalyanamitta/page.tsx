@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { LuCornerUpLeft, LuUser, LuUserPlus } from "react-icons/lu";
 
 import {
@@ -32,8 +32,9 @@ function getFriendActionErrorMessage(error: unknown) {
 const toastDurationMs = 3000;
 const friendsPerPage = 8;
 
-export default function KalyanamittaPage() {
+function KalyanamittaContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [myConnections, setMyConnection] = useState<FriendUser[]>([]);
   const [allFriends, setAllFriends] = useState<FriendUser[]>([]);
   const [friendRequests, setFriendRequests] = useState<ConnectionRequestItem[]>(
@@ -51,7 +52,7 @@ export default function KalyanamittaPage() {
   const [actionError, setActionError] = useState("");
   const [requestOpen, setRequestOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"connected" | "not-connected">(
-    "connected",
+    searchParams.get("tab") === "connected" ? "connected" : "not-connected",
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
@@ -78,6 +79,10 @@ export default function KalyanamittaPage() {
     setFriendRequests(pendingReceived);
     setSentRequestIds(pendingSentIds);
   }, []);
+
+  const refreshKalyanamittaDataSilently = useCallback(() => {
+    void refreshKalyanamittaData().catch(() => undefined);
+  }, [refreshKalyanamittaData]);
 
   const loadFriendCandidates = useCallback(async () => {
     setIsFriendsLoading(true);
@@ -179,9 +184,15 @@ export default function KalyanamittaPage() {
     try {
       await sendConnectionRequest(friendId);
       setSentRequestIds((prev) => new Set(prev).add(friendId));
-      await refreshKalyanamittaData();
-      if (activeTab === "not-connected") await loadFriendCandidates();
+      setAllFriends((prev) =>
+        prev.map((friend) =>
+          friend.id === friendId
+            ? { ...friend, status: "menunggu_konfirmasi" }
+            : friend,
+        ),
+      );
       setStatusMessage("Permintaan pertemanan berhasil dikirim.");
+      refreshKalyanamittaDataSilently();
     } catch (error) {
       setActionError(getFriendActionErrorMessage(error));
     } finally {
@@ -200,9 +211,19 @@ export default function KalyanamittaPage() {
 
     try {
       await acceptConnectionRequest(request.fromId);
-      await refreshKalyanamittaData();
-      if (activeTab === "not-connected") await loadFriendCandidates();
+      setFriendRequests((prev) =>
+        prev.filter((item) => item.id !== request.id),
+      );
+      const requester = request.from;
+      if (requester) {
+        setMyConnection((prev) =>
+          prev.some((friend) => friend.id === requester.id)
+            ? prev
+            : [{ ...requester, status: "connected" }, ...prev],
+        );
+      }
       setStatusMessage("Permintaan pertemanan berhasil diterima.");
+      refreshKalyanamittaDataSilently();
     } catch (error) {
       setActionError(getFriendActionErrorMessage(error));
     } finally {
@@ -221,9 +242,11 @@ export default function KalyanamittaPage() {
 
     try {
       await rejectConnectionRequest(request.fromId);
-      await refreshKalyanamittaData();
-      if (activeTab === "not-connected") await loadFriendCandidates();
+      setFriendRequests((prev) =>
+        prev.filter((item) => item.id !== request.id),
+      );
       setStatusMessage("Permintaan pertemanan berhasil ditolak.");
+      refreshKalyanamittaDataSilently();
     } catch (error) {
       setActionError(getFriendActionErrorMessage(error));
     } finally {
@@ -291,7 +314,7 @@ export default function KalyanamittaPage() {
         <div
           role="status"
           aria-live="polite"
-          className="fixed left-1/2 top-6 z-50 w-[min(calc(100vw-2rem),420px)] -translate-x-1/2 md:top-8"
+          className="fixed bottom-6 left-1/2 z-[100] w-[min(calc(100vw-2rem),420px)] -translate-x-1/2 md:bottom-auto md:left-auto md:right-6 md:top-6 md:translate-x-0"
         >
           <p
             className={`rounded-2xl border px-5 py-4 text-b2 shadow-modal backdrop-blur-glass ${
@@ -477,5 +500,21 @@ export default function KalyanamittaPage() {
         </section>
       </main>
     </DashboardPageLayout>
+  );
+}
+
+export default function KalyanamittaPage() {
+  return (
+    <Suspense
+      fallback={
+        <DashboardPageLayout activeItem="friends" rightRail={null}>
+          <div className="flex min-h-screen items-center justify-center">
+            <p className="text-b3">Memuat Kalyanamitta...</p>
+          </div>
+        </DashboardPageLayout>
+      }
+    >
+      <KalyanamittaContent />
+    </Suspense>
   );
 }

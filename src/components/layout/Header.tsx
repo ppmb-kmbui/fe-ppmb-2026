@@ -164,9 +164,11 @@ export function Header({
   );
 
   const brand = (
-    <div
+    <Link
+      href="/"
+      aria-label="Ke homepage"
       className={cn(
-        "min-w-0 items-center gap-3 md:gap-8",
+        "min-w-0 items-center gap-3 rounded-2xl transition-opacity hover:opacity-85 md:gap-8",
         isDashboardHeader ? "hidden md:flex" : "flex",
       )}
     >
@@ -177,7 +179,7 @@ export function Header({
           <p className="truncate text-b2">Begin your journey, build your story</p>
         </div>
       )}
-    </div>
+    </Link>
   );
 
   return (

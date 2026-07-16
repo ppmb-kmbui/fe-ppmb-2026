@@ -31,7 +31,14 @@ export default function KmbuiExplorerTaskPage() {
         <GradientTaskTitle>KMBUI Explorer</GradientTaskTitle>
 
         <TaskSectionCard>
-          <TaskDescription />
+          <TaskDescription>
+            Saatnya mengenal KMBUI lebih dekat! Tugas KMBUI Explorer adalah
+            tugas untuk mengunjungi dan menjelajahi berbagai program kerja dan
+            kegiatan KMBUI secara langsung. Melalui setiap kunjungan, kamu akan
+            mengenal lebih dekat budaya organisasi, berinteraksi dengan para
+            anggota, serta merasakan pengalaman menjadi bagian dari keluarga
+            KMBUI.
+          </TaskDescription>
 
           <KmbuiExplorerForm />
         </TaskSectionCard>

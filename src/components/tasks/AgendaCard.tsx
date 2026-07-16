@@ -34,7 +34,9 @@ export function AgendaCard({
       </span>
       <div className="flex min-w-0 flex-col">
         <p className="truncate text-b4 md:text-b3">{category}</p>
-        <h3 className="truncate font-subheading text-s5 md:text-s3">{title}</h3>
+        <h3 className="line-clamp-2 pb-1 font-subheading text-s5 leading-[1.2] md:text-s4">
+          {title}
+        </h3>
         <p className="mt-1 flex items-center gap-2 text-b4 md:text-b3">
           <FaCalendarDays aria-hidden="true" className="size-3.5 md:size-4" />
           {date}

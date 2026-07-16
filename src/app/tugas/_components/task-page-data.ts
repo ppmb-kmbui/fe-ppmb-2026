@@ -10,6 +10,12 @@ export const networkingAgendaItems = [
 export const insightAgendaItems = [
   {
     category: "Insight Hunting",
+    title: "Tik Talks w/ Ferdinand Sumichael Sunan",
+    date: "1 Agustus",
+    icon: "insight",
+  },
+  {
+    category: "Insight Hunting",
     title: "Deadline Tugas",
     date: "14 Agustus",
     icon: "insight",
