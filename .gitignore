@@ -37,6 +37,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# downloaded archives (e.g. backend repo zips used for local reference)
+*.zip
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

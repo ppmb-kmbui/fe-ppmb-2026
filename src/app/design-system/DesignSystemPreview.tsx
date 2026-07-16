@@ -3,16 +3,34 @@
 import { useState } from "react";
 
 import {
+  AgendaCard,
+  BackButton,
   Button,
   Chip,
+  DashboardPageLayout,
   Dropdown,
   FileUpload,
   Footer,
+  FriendRequestCard,
   Header,
   Input,
+  MaterialCard,
+  MemberCard,
+  ParticipantCard,
+  ProgressBar,
+  QuotaCard,
+  SearchInput,
   Sidebar,
   StatusBadge,
+  SubmissionReviewCard,
+  TaskCard,
+  TaskFileUpload,
+  TaskSubmissionPanel,
+  Textarea,
+  TimelineItem,
+  WeekCalendar,
 } from "@/components";
+import { getTaskIcon } from "@/app/tugas/_components/task-icons";
 
 const palettes = [
   {
@@ -123,11 +141,15 @@ const typography = [
 ] as const;
 
 function PreviewSection({
+  id,
   title,
   children,
-}: Readonly<{ title: string; children: React.ReactNode }>) {
+}: Readonly<{ id?: string; title: string; children: React.ReactNode }>) {
   return (
-    <section className="rounded-2xl border border-white/10 bg-purple-900/40 p-5 shadow-modal md:p-8">
+    <section
+      id={id}
+      className="scroll-mt-6 rounded-2xl border border-white/10 bg-purple-900/40 p-5 shadow-modal md:p-8"
+    >
       <h2 className="mb-6 font-heading text-h3 text-yellow-100">{title}</h2>
       {children}
     </section>
@@ -136,9 +158,10 @@ function PreviewSection({
 
 export function DesignSystemPreview() {
   const [selectedChip, setSelectedChip] = useState("Semua");
+  const [calendarDate, setCalendarDate] = useState(new Date(2026, 5, 12));
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="mx-auto flex max-w-page flex-col gap-8 px-4 py-10 md:px-page-x">
         <header>
           <p className="mb-2 font-subheading text-s5 font-semibold uppercase tracking-wider text-yellow-300">
@@ -242,12 +265,176 @@ export function DesignSystemPreview() {
           </div>
         </PreviewSection>
 
+        <PreviewSection title="Progress and navigation">
+          <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
+            <div className="flex flex-col gap-3">
+              <ProgressBar value={70} label="Contoh progress" />
+              <ProgressBar value={50} label="Contoh progress glow" glow />
+            </div>
+            <BackButton href="/design-system" />
+          </div>
+        </PreviewSection>
+
+        <PreviewSection title="Task overview">
+          <div className="grid gap-5 md:grid-cols-2">
+            <TaskCard
+              title="Networking"
+              progress={70}
+              icon={getTaskIcon("networking", "size-36 md:size-[180px]")}
+            />
+            <TaskCard
+              title="KMBUI Explorer"
+              progress={55}
+              icon={getTaskIcon("explorer", "size-36 md:size-[180px]")}
+            />
+            <TaskCard
+              title="Mentoring"
+              progress={35}
+              icon={getTaskIcon("mentoring", "size-36 md:size-[180px]")}
+            />
+            <TaskCard
+              title="Foster Siblings"
+              progress={0}
+              icon={getTaskIcon("foster", "size-36 md:size-[180px]")}
+            />
+          </div>
+          <div className="mt-8 grid gap-5 xl:grid-cols-[1fr_344px]">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <AgendaCard
+                category="Networking"
+                title="Deadline Angkatan"
+                date="13 Juni"
+                icon={getTaskIcon("networking", "size-5")}
+              />
+              <AgendaCard
+                category="KMBUI Explorer"
+                title="Puja Rutin"
+                date="15 Juni"
+                icon={getTaskIcon("explorer", "size-5")}
+              />
+            </div>
+            <WeekCalendar
+              selectedDate={calendarDate}
+              eventDates={["2026-06-13", "2026-06-15"]}
+              onDateChange={setCalendarDate}
+            />
+          </div>
+        </PreviewSection>
+
+        <PreviewSection title="Task submission">
+          <TaskSubmissionPanel>
+            <div className="grid gap-4 lg:grid-cols-3">
+              <TaskFileUpload fileType="image" maxSizeMb={5} />
+              <TaskFileUpload fileType="video" maxSizeMb={50} />
+              <TaskFileUpload fileType="pdf" maxSizeMb={10} />
+            </div>
+            <Textarea placeholder="Jelaskan apa saja yang didapatkan saat kegiatan..." />
+          </TaskSubmissionPanel>
+        </PreviewSection>
+
+        <PreviewSection title="Task quota">
+          <div className="grid gap-4 md:grid-cols-3">
+            <QuotaCard label="Angkatan 26" completed={5} total={10} />
+            <QuotaCard label="Angkatan 25" completed={8} total={10} />
+            <QuotaCard label="Angkatan 24" completed={10} total={10} />
+          </div>
+        </PreviewSection>
+
+        <PreviewSection title="Kalyanamitta and participants">
+          <SearchInput placeholder="Cari Kalyanamitta" />
+          <div className="mt-6 grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
+            <MemberCard name="Jaysen Lestari" batch={2024} />
+            <FriendRequestCard name="Jaysen Lestari" batch={2024} />
+            <ParticipantCard name="Jaysen Lestari" batch={2024} progress={70} />
+          </div>
+        </PreviewSection>
+
+        <PreviewSection title="Material and timeline cards">
+          <div className="grid gap-8 lg:grid-cols-2">
+            <MaterialCard
+              title="Judul materi"
+              description="Deskripsi singkat materi."
+            />
+            <TimelineItem
+              date="26 Juli 2026"
+              title="Welcoming Mahasiswa Baru"
+              description="Deskripsi kegiatan dan informasi yang diperlukan peserta."
+              location="Zoom"
+            />
+          </div>
+        </PreviewSection>
+
+        <PreviewSection title="Admin submission review">
+          <div className="grid gap-5">
+            <SubmissionReviewCard
+              title="Networking"
+              status="submitted"
+              media={<div className="h-full bg-background" />}
+              answer="Jawaban networking peserta"
+            />
+            <SubmissionReviewCard
+              title="Mentoring"
+              status="submitted"
+              answer="Jawaban esai peserta"
+              media={<div className="h-full bg-background" />}
+              answerFirst
+            />
+            <SubmissionReviewCard
+              title="Foster Siblings"
+              status="submitted"
+              file={{ href: "#", label: "Link download PDF" }}
+            />
+            <SubmissionReviewCard title="KMBUI Explorer" status="not-submitted" />
+          </div>
+        </PreviewSection>
+
         <PreviewSection title="Header variants">
           <div className="overflow-hidden rounded-2xl">
             <Header />
           </div>
           <div className="mt-5 overflow-hidden rounded-2xl">
             <Header user={{ fullName: "Nama Peserta", batch: 2026 }} />
+          </div>
+        </PreviewSection>
+
+        <PreviewSection
+          id="shared-dashboard-layout"
+          title="Shared dashboard page layout"
+        >
+          <p className="mb-5 text-b3 text-purple-100">
+            Layout responsif untuk Tugas, Networking, KMBUI Explorer, Fossib,
+            dan Kalyanamitta. Area kanan dapat diisi kalender, kuota, atau daftar
+            permintaan pertemanan sesuai kebutuhan halaman.
+          </p>
+          <div className="h-[760px] overflow-auto rounded-2xl border border-white/10">
+            <DashboardPageLayout
+              activeItem="tasks"
+              user={{ fullName: "Nama Peserta", batch: 2026 }}
+              className="min-h-[760px]"
+              rightRail={
+                <div className="flex flex-col gap-5">
+                  <h2 className="font-heading text-h4">Agenda</h2>
+                  <WeekCalendar
+                    selectedDate={calendarDate}
+                    eventDates={["2026-06-13", "2026-06-15"]}
+                    onDateChange={setCalendarDate}
+                  />
+                  <QuotaCard label="Angkatan 26" completed={5} total={10} />
+                </div>
+              }
+            >
+              <div className="flex max-w-2xl flex-col gap-6">
+                <BackButton onClick={() => undefined} />
+                <div>
+                  <p className="mb-2 text-b3 text-yellow-300">Tugas</p>
+                  <h2 className="font-heading text-h2">Networking</h2>
+                </div>
+                <TaskSubmissionPanel>
+                  <Textarea placeholder="Tuliskan jawaban tugas..." />
+                  <TaskFileUpload fileType="image" maxSizeMb={5} />
+                </TaskSubmissionPanel>
+              </div>
+            </DashboardPageLayout>
           </div>
         </PreviewSection>
 
@@ -284,6 +471,6 @@ export function DesignSystemPreview() {
           </div>
         </PreviewSection>
       </div>
-    </main>
+    </div>
   );
 }

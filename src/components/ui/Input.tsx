@@ -40,7 +40,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     <div className={cn("flex w-full flex-col gap-3", wrapperClassName)}>
       <label
         htmlFor={inputId}
-        className="font-subheading text-s3 font-semibold text-foreground"
+        className="font-subheading text-s5 font-semibold text-foreground sm:text-s3"
       >
         {label}
       </label>
@@ -57,7 +57,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy}
         className={cn(
-          "h-[50px] w-full rounded-2xl border border-transparent bg-[rgba(140,88,183,0.3)] px-6 font-body text-b1 text-purple-50 outline-none placeholder:text-purple-200 hover:bg-[rgba(140,88,183,0.4)] focus:border-purple-200 focus:bg-[rgba(140,88,183,0.6)] disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-red-300",
+          "h-[50px] w-full rounded-2xl border border-transparent bg-[rgba(140,88,183,0.3)] px-6 font-body text-b3 text-purple-50 outline-none placeholder:text-purple-200 hover:bg-[rgba(140,88,183,0.4)] focus:border-purple-200 focus:bg-[rgba(140,88,183,0.6)] disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-red-300 sm:text-b1",
           className,
         )}
         {...props}
