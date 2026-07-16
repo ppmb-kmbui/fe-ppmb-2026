@@ -61,8 +61,8 @@ export function DashboardPageLayout({
 
       <div
         className={cn(
-          "absolute left-0 top-0 z-20 hidden w-[103px] md:block",
-          sidebarContainerClassName ?? "h-[982px]",
+          "absolute bottom-0 left-0 top-0 z-20 hidden min-h-screen w-[103px] md:block",
+          sidebarContainerClassName,
         )}
       >
         <Sidebar

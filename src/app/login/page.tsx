@@ -13,12 +13,12 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     registered === "1" ? "Akun berhasil dibuat, silakan masuk." : undefined;
 
   return (
-    <div className="flex min-h-svh flex-col bg-background bg-[linear-gradient(to_bottom,#210736,#4d1e74)] lg:h-svh lg:overflow-hidden lg:bg-none">
+    <div className="flex min-h-svh flex-col bg-background bg-[linear-gradient(to_bottom,#210736,#4d1e74)] lg:h-svh lg:bg-none">
       <div className="hidden lg:block">
         <Header />
       </div>
       <MobileAuthHeader className="lg:hidden" />
-      <main className="flex flex-1 items-center justify-center px-4 py-8 sm:px-6 lg:overflow-hidden lg:px-[60px] lg:py-6">
+      <main className="flex flex-1 items-center justify-center px-4 pb-14 pt-8 sm:px-6 sm:pb-16 lg:overflow-y-auto lg:px-[60px] lg:pb-14 lg:pt-6">
         <div className="flex w-full items-center justify-between">
           <div className="w-full lg:w-[47.4%]">
             <LoginFormContainer successMessage={successMessage} />

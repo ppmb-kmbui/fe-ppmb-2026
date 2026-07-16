@@ -31,7 +31,14 @@ export default function InsightHuntingTaskPage() {
         <GradientTaskTitle>Insight Hunting</GradientTaskTitle>
 
         <TaskSectionCard>
-          <TaskDescription />
+          <TaskDescription>
+            Tugas Insight Hunting mengajakmu menggali insight, pelajaran, dan
+            tips berharga yang dapat menjadi bekal dalam menjalani kehidupan
+            sebagai mahasiswa UI. Dengarkan cerita dan pengalaman dari kakak
+            tingkat yang telah melewati berbagai dinamika perkuliahan,
+            organisasi, maupun pengembangan diri melalui rangkaian talkshow
+            inspiratif.
+          </TaskDescription>
 
           <InsightHuntingForm />
         </TaskSectionCard>
