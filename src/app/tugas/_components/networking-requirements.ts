@@ -1,6 +1,3 @@
-export const NETWORKING_TEMPLATE_URL =
-  "https://docs.google.com/document/d/1SLkh-GfLt-_IIHWUxXDHG4hHprm4gscwhLMJnXPH_TE/edit?usp=drive_link";
-
 export const NETWORKING_FIXED_QUESTIONS = [
   {
     code: "study_path_choice",

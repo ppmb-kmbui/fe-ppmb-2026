@@ -16,10 +16,7 @@ import {
   type NetworkingQuestion,
 } from "@/lib/task-api";
 
-import {
-  NETWORKING_FIXED_QUESTIONS,
-  NETWORKING_TEMPLATE_URL,
-} from "./networking-requirements";
+import { NETWORKING_FIXED_QUESTIONS } from "./networking-requirements";
 
 const fallbackQuestions: NetworkingQuestion[] = NETWORKING_FIXED_QUESTIONS.map(
   (question, index) => ({
@@ -183,30 +180,6 @@ export function NetworkingSubmissionForm({ friendId }: { friendId: number }) {
 
   return (
     <form className="flex flex-col gap-7" onSubmit={handleSubmit}>
-      <div className="rounded-2xl border border-white/10 bg-blue-200/20 px-5 py-4 text-b2 text-foreground/85">
-        <p className="font-subheading text-s3 font-semibold text-yellow-500">
-          {friend ? `Bersama ${friend.fullname ?? "Teman"}` : "Sesi Networking"}
-        </p>
-        {friend && (
-          <p className="mt-2">
-            Angkatan {friend.batch}
-            {friend.faculty ? ` — ${friend.faculty}` : ""}
-          </p>
-        )}
-        <p className="mt-3">
-          Wawancarai temanmu, isi jawaban sesuai percakapan, lalu unggah foto
-          dokumentasi bersama.
-        </p>
-        <a
-          href={NETWORKING_TEMPLATE_URL}
-          target="_blank"
-          rel="noreferrer"
-          className="mt-4 inline-flex w-fit items-center justify-center rounded-2xl border border-yellow-100/60 px-5 py-2.5 text-b2 text-yellow-50 transition-colors hover:bg-yellow-100/10"
-        >
-          Lihat Templat Pertanyaan
-        </a>
-      </div>
-
       {fixedQuestions.map((question, index) => (
         <Textarea
           key={question.code || question.id}
