@@ -429,7 +429,7 @@ function KalyanamittaContent() {
                         width={132}
                         height={132}
                         unoptimized
-                        className="h-full w-full object-cover"
+                        className="h-full w-full object-contain lg:object-cover"
                       />
                     ) : (
                       <LuUser aria-hidden="true" className="size-10" />
