@@ -13,6 +13,7 @@ export const FACULTIES = [
   "FF",
   "FIK",
   "FEB",
+  "FIB",
   "Sastra Mesin",
 ] as const;
 

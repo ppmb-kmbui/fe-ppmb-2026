@@ -63,7 +63,7 @@ export function KmbuiExplorerForm() {
     }
 
     if (!file && !existingPhotoUrl) {
-      setError("Foto kegiatan wajib dipilih sebelum submit.");
+      setError("Foto kegiatan wajib dipilih sebelum dikumpulkan.");
       return;
     }
 
@@ -72,7 +72,7 @@ export function KmbuiExplorerForm() {
       const photoUrl = file ? await uploadImage(file) : existingPhotoUrl;
       const submission = await submitExplorer(activityName.trim(), photoUrl);
       setExistingPhotoUrl(submission?.img_url ?? photoUrl);
-      setMessage("Submission KMBUI Explorer berhasil disimpan.");
+      setMessage("Pengumpulan KMBUI Explorer berhasil disimpan.");
     } catch (submitError) {
       setError(getTaskApiErrorMessage(submitError));
     } finally {
@@ -93,12 +93,12 @@ export function KmbuiExplorerForm() {
 
       <div className="flex flex-col gap-3">
         <h2 className="font-subheading text-s3 font-semibold">
-          Upload Hasil KMBUI Explorer
+          Unggah Hasil KMBUI Explorer
         </h2>
         {existingPhotoUrl && (
           <p className="rounded-2xl border border-green-300/30 bg-green-400/10 px-4 py-3 text-b2 text-green-100">
-            Kamu sudah submit foto KMBUI Explorer. Jika submit ulang, foto lama
-            akan diganti dengan foto terbaru.
+            Kamu sudah mengumpulkan foto KMBUI Explorer. Jika mengumpulkan ulang,
+            foto lama akan diganti dengan foto terbaru.
           </p>
         )}
         <TaskFileUpload
@@ -132,7 +132,7 @@ export function KmbuiExplorerForm() {
         disabled={isLoading || isSubmissionClosed}
         className="h-[50px] rounded-2xl"
       >
-        Submit
+        Kumpulkan
       </Button>
     </form>
   );

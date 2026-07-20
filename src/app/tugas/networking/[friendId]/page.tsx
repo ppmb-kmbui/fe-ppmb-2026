@@ -4,10 +4,6 @@ import { BackButton } from "@/components";
 
 import { NetworkingSubmissionForm } from "../../_components/NetworkingSubmissionForm";
 import { NetworkingSubmissionRightRail } from "../../_components/NetworkingSubmissionRightRail";
-import {
-  getNetworkingRequirement,
-  resolveNetworkingSegment,
-} from "../../_components/networking-requirements";
 import { TaskPageShell } from "../../_components/TaskPageShell";
 import {
   GradientTaskTitle,
@@ -15,39 +11,37 @@ import {
   TaskSectionCard,
 } from "../../_components/TaskTypography";
 
-export default async function NetworkingSubmissionPage({
+export default async function NetworkingFriendPage({
   params,
 }: {
-  params: Promise<{ batch: string }>;
+  params: Promise<{ friendId: string }>;
 }) {
-  const { batch } = await params;
-  const segment = resolveNetworkingSegment(batch);
+  const { friendId: friendIdParam } = await params;
+  const friendId = Number(friendIdParam);
 
-  if (!segment) {
+  if (!Number.isSafeInteger(friendId) || friendId < 1) {
     notFound();
   }
 
-  const requirement = getNetworkingRequirement(segment);
-
   return (
     <TaskPageShell
-      rightRail={<NetworkingSubmissionRightRail segment={segment} />}
+      rightRail={<NetworkingSubmissionRightRail />}
+      mobileRailLabel="Progres"
       withConstellation
     >
       <div className="flex max-w-[958px] flex-col gap-8">
-        <BackButton href="/tugas/networking" />
+        <BackButton href="/kalyanamitta?tab=connected" />
         <div className="flex flex-col gap-1">
           <p className="font-heading text-h4 text-yellow-500">Networking</p>
-          <GradientTaskTitle>{requirement.title}</GradientTaskTitle>
+          <GradientTaskTitle>Kenali Temanmu</GradientTaskTitle>
         </div>
 
         <TaskSectionCard>
           <TaskDescription>
-            Tugas Networking adalah tugas yang bertujuan untuk membangun dan
-            memperluas relasi mahasiswa baru angkatan 2026 dengan teman
-            seangkatan maupun kakak tingkat.
+            Isi satu formulir untuk setiap teman yang sudah terhubung. Jawaban
+            dapat diperbarui sampai batas waktu pengumpulan.
           </TaskDescription>
-          <NetworkingSubmissionForm segment={segment} />
+          <NetworkingSubmissionForm friendId={friendId} />
         </TaskSectionCard>
       </div>
     </TaskPageShell>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { getProfileCached, login, translateAuthError } from "@/lib/auth-api";
 
@@ -11,10 +11,37 @@ export interface LoginFormContainerProps {
   successMessage?: string;
 }
 
+export const registrationToastDurationMs = 4000;
+
 export function LoginFormContainer({ successMessage }: LoginFormContainerProps) {
-  const router = useRouter();
+  const { replace, refresh } = useRouter();
   const [formError, setFormError] = useState<string>();
   const [serverErrors, setServerErrors] = useState<LoginFieldErrors>({});
+  const [visibleSuccessMessage, setVisibleSuccessMessage] = useState(successMessage);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const dismissSuccessMessage = useCallback(() => {
+    if (toastTimer.current) {
+      clearTimeout(toastTimer.current);
+      toastTimer.current = null;
+    }
+
+    setVisibleSuccessMessage(undefined);
+    replace("/login", { scroll: false });
+  }, [replace]);
+
+  useEffect(() => {
+    if (!visibleSuccessMessage) return;
+
+    toastTimer.current = setTimeout(
+      dismissSuccessMessage,
+      registrationToastDurationMs,
+    );
+
+    return () => {
+      if (toastTimer.current) clearTimeout(toastTimer.current);
+    };
+  }, [dismissSuccessMessage, visibleSuccessMessage]);
 
   async function handleSubmit(values: LoginFormValues) {
     setServerErrors({});
@@ -23,8 +50,8 @@ export function LoginFormContainer({ successMessage }: LoginFormContainerProps) 
     try {
       await login(values);
       const profile = await getProfileCached();
-      router.replace(profile.isAdmin ? "/admin" : "/");
-      router.refresh();
+      replace(profile.isAdmin ? "/admin" : "/");
+      refresh();
     } catch (error) {
       const translated = translateAuthError(error);
       setServerErrors(translated.fieldErrors);
@@ -33,20 +60,32 @@ export function LoginFormContainer({ successMessage }: LoginFormContainerProps) 
   }
 
   return (
-    <div className="flex w-full flex-col gap-4">
-      {successMessage && (
-        <p
+    <>
+      {visibleSuccessMessage && (
+        <div
           role="status"
-          className="w-full rounded-2xl border border-green-400 bg-green-200/50 px-6 py-3 text-b2 text-foreground"
+          aria-live="polite"
+          className="fixed bottom-6 left-1/2 z-[100] flex w-[min(calc(100vw-2rem),430px)] -translate-x-1/2 items-start gap-3 rounded-2xl border border-green-300/40 bg-green-700/90 px-5 py-4 text-b2 text-green-50 shadow-modal backdrop-blur-glass"
         >
-          {successMessage}
-        </p>
+          <p className="min-w-0 flex-1">{visibleSuccessMessage}</p>
+          <button
+            type="button"
+            aria-label="Tutup notifikasi"
+            onClick={dismissSuccessMessage}
+            className="grid size-6 shrink-0 place-items-center rounded-full text-lg leading-none text-green-50 transition-colors hover:bg-white/15"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
       )}
-      <LoginForm
-        onSubmit={handleSubmit}
-        formError={formError}
-        serverErrors={serverErrors}
-      />
-    </div>
+
+      <div className="flex w-full flex-col gap-4">
+        <LoginForm
+          onSubmit={handleSubmit}
+          formError={formError}
+          serverErrors={serverErrors}
+        />
+      </div>
+    </>
   );
 }

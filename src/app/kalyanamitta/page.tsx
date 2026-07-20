@@ -22,6 +22,7 @@ import {
   type ConnectionRequestItem,
   type FriendUser,
 } from "@/lib/friend-api";
+import { isNetworkingTargetBatch } from "@/app/tugas/_components/networking-requirements";
 
 function getFriendActionErrorMessage(error: unknown) {
   if (error instanceof Error && error.message) return error.message;
@@ -279,12 +280,12 @@ function KalyanamittaContent() {
         friendRequests.map((request) => (
           <FriendRequestCard
             key={`request-${request.id}`}
-            name={request.from?.fullname ?? "Unknown"}
+            name={request.from?.fullname ?? "Nama tidak diketahui"}
             avatar={
               request.from?.imgUrl ? (
                 <Image
                   src={request.from.imgUrl}
-                  alt={`${request.from.fullname ?? "User"}'s Picture`}
+                  alt={`Foto ${request.from.fullname ?? "pengguna"}`}
                   width={134}
                   height={91}
                   unoptimized
@@ -389,7 +390,7 @@ function KalyanamittaContent() {
                       : "bg-[#683592]/25 hover:bg-purple-300/30"
                   }`}
                 >
-                  Kenali Teman
+                  Teman Saya
                 </button>
               </div>
 
@@ -418,10 +419,13 @@ function KalyanamittaContent() {
                       sentRequestIds.has(friend.id) ||
                       friend.status === "menunggu_konfirmasi";
                     const isProcessing = processingFriendIds.has(friend.id);
+                    const canDoNetworking =
+                      activeTab === "connected" &&
+                      isNetworkingTargetBatch(friend.batch);
                     const avatar = friend.imgUrl ? (
                       <Image
                         src={friend.imgUrl}
-                        alt={`${friend.fullname ?? "User"}'s Picture`}
+                        alt={`Foto ${friend.fullname ?? "pengguna"}`}
                         width={132}
                         height={132}
                         unoptimized
@@ -435,7 +439,7 @@ function KalyanamittaContent() {
                       <MemberCard
                         key={`${activeTab}-${friend.id}`}
                         avatar={avatar}
-                        name={friend.fullname ?? "Unknown"}
+                        name={friend.fullname ?? "Nama tidak diketahui"}
                         batch={friend.batch}
                         actionLabel={
                           activeTab === "connected"
@@ -452,6 +456,14 @@ function KalyanamittaContent() {
                             : isSent
                               ? undefined
                               : () => handleSendRequest(friend.id)
+                        }
+                        secondaryActionLabel={
+                          canDoNetworking ? "Networking" : undefined
+                        }
+                        onSecondaryAction={
+                          canDoNetworking
+                            ? () => router.push(`/tugas/networking/${friend.id}`)
+                            : undefined
                         }
                       />
                     );

@@ -1,56 +1,48 @@
-import type { NetworkingSubmissionField } from "@/lib/task-api";
+export const NETWORKING_TEMPLATE_URL =
+  "https://docs.google.com/document/d/1SLkh-GfLt-_IIHWUxXDHG4hHprm4gscwhLMJnXPH_TE/edit?usp=drive_link";
 
-export const networkingSegments = {
-  "26": {
-    title: "Angkatan 26",
-    label: "Angkatan 26",
-    total: 1,
-    field: "first_docs_url",
-    summaryField: "firstDocsUrl",
-    category: "Networking",
-    deadlineTitle: "Deadline Angkatan",
-    deadlineDate: "31 Agustus",
-    templateUrl:
-      "https://docs.google.com/document/d/1SLkh-GfLt-_IIHWUxXDHG4hHprm4gscwhLMJnXPH_TE/edit?usp=drive_link",
+export const NETWORKING_FIXED_QUESTIONS = [
+  {
+    code: "study_path_choice",
+    prompt:
+      "Dari banyaknya pilihan yang ada, apa yang akhirnya membuat kamu memilih jalan yang membawa kamu sampai ke jurusan dan universitas ini?",
   },
-  "23-25": {
-    title: "Angkatan 23-25",
-    label: "Angkatan 23-25",
-    total: 1,
-    field: "second_docs_url",
-    summaryField: "secondDocsUrl",
-    category: "Networking",
-    deadlineTitle: "Deadline Angkatan",
-    deadlineDate: "31 Agustus",
-    templateUrl:
-      "https://docs.google.com/document/d/1Jb48QX1sV48pFZ4Kis8XEeq8kfxeD0bIv3hR9QifPgs/edit?usp=drive_link",
+  {
+    code: "formative_experience",
+    prompt:
+      "Dari perjalanan kamu sampai saat ini, pengalaman apa yang paling berpengaruh dalam membentuk dirimu yang sekarang?",
   },
-} as const;
+  {
+    code: "first_year_goal",
+    prompt: "Apa target yang ingin kamu capai di tahun pertama kuliah ini?",
+  },
+] as const;
 
-export type NetworkingSegment = keyof typeof networkingSegments;
-export type NetworkingRequirement = (typeof networkingSegments)[NetworkingSegment] & {
-  field: NetworkingSubmissionField;
-  summaryField: "firstDocsUrl" | "secondDocsUrl";
-};
+export const NETWORKING_BATCH_REQUIREMENTS = [
+  { batch: 2026, required: 10, label: "Teman Angkatan 2026" },
+  { batch: 2025, required: 4, label: "Teman Angkatan 2025" },
+  { batch: 2024, required: 2, label: "Teman Angkatan 2024" },
+  { batch: 2023, required: 2, label: "Teman Angkatan 2023" },
+] as const;
 
-const aliases: Record<string, NetworkingSegment> = {
-  "2026": "26",
-  "26": "26",
-  "2025": "23-25",
-  "2024": "23-25",
-  "2023": "23-25",
-  "24-25": "23-25",
-  "23-25": "23-25",
-};
+export type NetworkingTargetBatch =
+  (typeof NETWORKING_BATCH_REQUIREMENTS)[number]["batch"];
 
-export function resolveNetworkingSegment(slug: string): NetworkingSegment | null {
-  return aliases[slug] ?? null;
+export const NETWORKING_TOTAL_REQUIRED = NETWORKING_BATCH_REQUIREMENTS.reduce(
+  (total, requirement) => total + requirement.required,
+  0,
+);
+
+export function isNetworkingTargetBatch(
+  batch: number,
+): batch is NetworkingTargetBatch {
+  return NETWORKING_BATCH_REQUIREMENTS.some(
+    (requirement) => requirement.batch === batch,
+  );
 }
 
-export function isNetworkingSegment(slug: string): slug is NetworkingSegment {
-  return slug in networkingSegments;
-}
-
-export function getNetworkingRequirement(segment: NetworkingSegment) {
-  return networkingSegments[segment] as NetworkingRequirement;
+export function getNetworkingBatchRequirement(batch: number) {
+  return NETWORKING_BATCH_REQUIREMENTS.find(
+    (requirement) => requirement.batch === batch,
+  );
 }

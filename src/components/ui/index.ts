@@ -7,6 +7,10 @@ export { Dropdown, type DropdownProps } from "./Dropdown";
 export { FileUpload, type FileUploadProps } from "./FileUpload";
 export { Input, type InputProps } from "./Input";
 export { ProgressBar, type ProgressBarProps } from "./ProgressBar";
+export {
+  ProfilePhotoUpload,
+  type ProfilePhotoUploadProps,
+} from "./ProfilePhotoUpload";
 export { SearchInput, type SearchInputProps } from "./SearchInput";
 export {
   StatusBadge,

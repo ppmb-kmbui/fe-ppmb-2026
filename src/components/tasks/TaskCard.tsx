@@ -33,9 +33,9 @@ function TaskCardContent({
         <h3 className="truncate font-subheading text-s5 text-foreground md:text-s3">
           {title}
         </h3>
-        <ProgressBar value={percentage} label={`Progress ${title}`} />
+        <ProgressBar value={percentage} label={`Progres ${title}`} />
         <div className="flex items-center justify-between text-b4 text-foreground md:text-b2">
-          <span className="hidden md:inline">Progress Kamu</span>
+          <span className="hidden md:inline">Progres Kamu</span>
           <span>{percentage}%</span>
         </div>
       </div>

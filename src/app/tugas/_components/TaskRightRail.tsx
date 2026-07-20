@@ -22,6 +22,11 @@ export interface TaskRightRailProps {
     completed: number;
     total: number;
   };
+  progressItems?: Array<{
+    label: string;
+    completed: number;
+    total: number;
+  }>;
   agenda?: TaskAgendaItem[];
   agendaHeading?: string;
   agendaSubtitle?: string;
@@ -99,6 +104,7 @@ export function TaskRightRail({
   showDateHeader = true,
   showCalendar = true,
   progress,
+  progressItems,
   agenda = agendaItems,
   agendaHeading,
   agendaSubtitle,
@@ -113,6 +119,7 @@ export function TaskRightRail({
   const displayedSubtitle = subtitle ?? dateFormatter.format(date);
   const displayedAgendaSubtitle = agendaSubtitle ?? displayedSubtitle;
   const sortedAgenda = [...agenda].sort(compareAgendaItems);
+  const displayedProgressItems = progressItems ?? (progress ? [progress] : []);
 
   function getAgendaIconKey(item: TaskAgendaItem): TaskIconKey | undefined {
     if (item.icon) return item.icon as TaskIconKey;
@@ -129,16 +136,19 @@ export function TaskRightRail({
 
   return (
     <div className="flex flex-col gap-4">
-      {progress ? (
+      {displayedProgressItems.length > 0 ? (
         <>
           <h2 className="font-heading text-h3 text-yellow-500">
             {displayedTitle}
           </h2>
-          <QuotaCard
-            label={progress.label}
-            completed={progress.completed}
-            total={progress.total}
-          />
+          {displayedProgressItems.map((item) => (
+            <QuotaCard
+              key={item.label}
+              label={item.label}
+              completed={item.completed}
+              total={item.total}
+            />
+          ))}
         </>
       ) : showDateHeader ? (
         <div className="flex flex-col gap-0.5 text-yellow-500">

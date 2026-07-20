@@ -55,7 +55,7 @@ export function MentoringIsianForm() {
     }
 
     if (!trimmedUrl) {
-      setError("Link Google Drive wajib diisi.");
+      setError("Tautan Google Drive wajib diisi.");
       return;
     }
 
@@ -63,7 +63,7 @@ export function MentoringIsianForm() {
     try {
       const data = await submitMentoring(trimmedUrl);
       setGdriveUrl(data?.gdrive_url ?? trimmedUrl);
-      setMessage("Submission mentoring berhasil disimpan.");
+      setMessage("Pengumpulan Mentoring berhasil disimpan.");
     } catch (submitError) {
       setError(getTaskApiErrorMessage(submitError));
     } finally {
@@ -74,8 +74,8 @@ export function MentoringIsianForm() {
   return (
     <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
       <Input
-        label="Upload Hasil Tugas Mentoring"
-        hint="Masukkan link Google Drive berisi hasil tugas mentoring yang sudah bisa diakses panitia."
+        label="Unggah Hasil Tugas Mentoring"
+        hint="Masukkan tautan Google Drive berisi hasil tugas Mentoring yang sudah bisa diakses panitia."
         placeholder="https://drive.google.com/drive/folders/..."
         type="url"
         value={gdriveUrl}
@@ -92,8 +92,8 @@ export function MentoringIsianForm() {
 
       {gdriveUrl && !message && (
         <p className="rounded-2xl border border-green-300/30 bg-green-400/10 px-4 py-3 text-b2 text-green-100">
-          Kamu sudah submit link Mentoring. Jika submit ulang, link lama akan
-          diganti dengan link terbaru.
+          Kamu sudah mengumpulkan tautan Mentoring. Jika mengumpulkan ulang,
+          tautan lama akan diganti dengan tautan terbaru.
         </p>
       )}
 
@@ -114,7 +114,7 @@ export function MentoringIsianForm() {
         disabled={isLoading || isSubmissionClosed}
         className="h-[50px] rounded-2xl"
       >
-        Submit
+        Kumpulkan
       </Button>
     </form>
   );

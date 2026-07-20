@@ -1,7 +1,7 @@
 export const networkingAgendaItems = [
   {
     category: "Networking",
-    title: "Deadline Angkatan",
+    title: "Batas Waktu Angkatan",
     date: "31 Agustus",
     icon: "networking",
   },
@@ -16,7 +16,7 @@ export const insightAgendaItems = [
   },
   {
     category: "Insight Hunting",
-    title: "Deadline Tugas",
+    title: "Batas Waktu Tugas",
     date: "14 Agustus",
     icon: "insight",
   },
@@ -25,7 +25,7 @@ export const insightAgendaItems = [
 export const explorerAgendaItems = [
   {
     category: "KMBUI Explorer",
-    title: "Deadline Tugas",
+    title: "Batas Waktu Tugas",
     date: "7 September",
     icon: "explorer",
   },
@@ -40,7 +40,7 @@ export const mentoringAgendaItems = [
   },
   {
     category: "Mentoring",
-    title: "Deadline Mentoring",
+    title: "Batas Waktu Mentoring",
     date: "31 Agustus",
     icon: "mentoring",
   },
@@ -49,7 +49,7 @@ export const mentoringAgendaItems = [
 export const fosterSiblingsAgendaItems = [
   {
     category: "Foster Siblings",
-    title: "Deadline Tugas",
+    title: "Batas Waktu Tugas",
     date: "7 September",
     icon: "foster",
   },

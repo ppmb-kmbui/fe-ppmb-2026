@@ -12,7 +12,7 @@ export interface WeekCalendarProps extends HTMLAttributes<HTMLDivElement> {
   onDateChange?: (date: Date) => void;
 }
 
-const weekdayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const weekdayLabels = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
 
 function toLocalDate(value: CalendarDate) {
   if (value instanceof Date) {

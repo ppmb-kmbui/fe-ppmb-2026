@@ -12,7 +12,7 @@ export interface ProgressBarProps extends HTMLAttributes<HTMLDivElement> {
 export function ProgressBar({
   value,
   max = 100,
-  label = "Progress",
+  label = "Progres",
   glow = false,
   className,
   ...props

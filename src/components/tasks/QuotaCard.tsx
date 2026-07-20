@@ -32,7 +32,7 @@ export function QuotaCard({
       <ProgressBar value={safeCompleted} max={safeTotal || 1} label={`Kuota ${label}`} glow />
       <div className="flex items-center justify-between text-b3">
         <span>
-          {safeCompleted}/{safeTotal} Completed
+          {safeCompleted}/{safeTotal} Selesai
         </span>
         <span>{percentage}%</span>
       </div>

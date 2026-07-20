@@ -60,7 +60,7 @@ const TimelineData: TimelineItemProps[] = [
         className="object-cover w-full h-full"
       />
     ),
-    location: "Online dan Offline",
+    location: "Daring dan Luring",
   },
   {
     date: "19 September 2026",
@@ -76,7 +76,7 @@ const TimelineData: TimelineItemProps[] = [
         className="object-cover w-full h-full"
       />
     ),
-    location: "TBA",
+    location: "Akan diumumkan",
   },
 ];
 
@@ -94,7 +94,7 @@ const FAQData: { question: string; answer: string }[] = [
   {
     question: "Di mana saya bisa mengumpulkan tugas?",
     answer:
-      "Tugas dapat dilihat dan dikumpulkan melalui dashboard setelah login menggunakan akun PPMB.",
+      "Tugas dapat dilihat dan dikumpulkan melalui dasbor setelah masuk menggunakan akun PPMB.",
   },
 ];
 
@@ -193,7 +193,7 @@ function HomeContent({ isDashboard = false }: { isDashboard?: boolean }) {
         <section id="faq" className="flex flex-col gap-8 md:gap-16">
           <h1 className="text-6xl max-lg:text-4xl max-md:text-3xl font-heading ">
             <span className="bg-linear-to-br from-yellow-600 to-purple-600 text-transparent bg-clip-text max-md:hidden">
-              Frequently Asked Question (FAQ)
+              Pertanyaan yang Sering Diajukan (FAQ)
             </span>
             <span className="bg-linear-to-br from-yellow-600 to-purple-600 text-transparent bg-clip-text md:hidden">
               FAQ
@@ -283,13 +283,13 @@ export default async function HomePage() {
               href="/login"
               className="inline-flex h-11 items-center justify-center rounded-2xl border border-yellow-500 px-5 text-b2 text-yellow-100 transition-colors hover:bg-yellow-500/10"
             >
-              Login
+              Masuk
             </Link>
             <Link
               href="/signup"
               className="inline-flex h-11 items-center justify-center rounded-2xl bg-primary px-5 text-b2 text-yellow-50 transition-colors hover:bg-primary-hover"
             >
-              Sign Up
+              Daftar
             </Link>
           </nav>
         </div>
