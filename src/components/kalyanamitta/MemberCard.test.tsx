@@ -5,6 +5,16 @@ import { describe, expect, it, vi } from "vitest";
 import { MemberCard } from "./MemberCard";
 
 describe("MemberCard", () => {
+  it("uses a square avatar below the desktop breakpoint", () => {
+    render(<MemberCard name="Budi" batch={2025} avatar={<span>Foto</span>} />);
+
+    expect(screen.getByTestId("member-avatar")).toHaveClass("size-28");
+    expect(screen.getByTestId("member-avatar")).toHaveClass(
+      "lg:h-[132px]",
+      "lg:w-[42%]",
+    );
+  });
+
   it("supports independent profile and Networking actions", async () => {
     const user = userEvent.setup();
     const onProfile = vi.fn();

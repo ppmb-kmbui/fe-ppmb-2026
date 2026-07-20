@@ -32,15 +32,18 @@ export function MemberCard({
   return (
     <article
       className={cn(
-        "flex min-h-[164px] w-full items-center gap-4 rounded-3xl border border-white/10 bg-blue-200/25 p-4",
+        "flex min-h-[144px] w-full items-center gap-3 rounded-3xl border border-white/10 bg-blue-200/25 p-4 lg:min-h-[164px] lg:gap-4",
         className,
       )}
       {...props}
     >
-      <div className="grid h-[132px] w-[42%] shrink-0 place-items-center overflow-hidden rounded-xl bg-background">
+      <div
+        data-testid="member-avatar"
+        className="grid size-28 shrink-0 place-items-center overflow-hidden rounded-2xl bg-background lg:h-[132px] lg:w-[42%] lg:rounded-xl"
+      >
         {avatar}
       </div>
-      <div className="flex min-w-0 flex-1 flex-col items-start justify-center gap-5">
+      <div className="flex min-w-0 flex-1 flex-col items-start justify-center gap-3 lg:gap-5">
         <div className="min-w-0 max-w-full">
           <h3 className="break-words font-subheading text-s4 leading-tight sm:text-s3">
             {name}
