@@ -180,22 +180,6 @@ export function NetworkingSubmissionForm({ friendId }: { friendId: number }) {
 
   return (
     <form className="flex flex-col gap-7" onSubmit={handleSubmit}>
-      <div className="rounded-2xl border border-white/10 bg-blue-200/20 px-5 py-4 text-b2 text-foreground/85">
-        <p className="font-subheading text-s3 font-semibold text-yellow-500">
-          {friend ? `Bersama ${friend.fullname ?? "Teman"}` : "Sesi Networking"}
-        </p>
-        {friend && (
-          <p className="mt-2">
-            Angkatan {friend.batch}
-            {friend.faculty ? ` — ${friend.faculty}` : ""}
-          </p>
-        )}
-        <p className="mt-3">
-          Wawancarai temanmu, isi jawaban sesuai percakapan, lalu unggah foto
-          dokumentasi bersama.
-        </p>
-      </div>
-
       {fixedQuestions.map((question, index) => (
         <Textarea
           key={question.code || question.id}

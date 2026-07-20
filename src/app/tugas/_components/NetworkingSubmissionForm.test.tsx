@@ -82,7 +82,10 @@ describe("NetworkingSubmissionForm", () => {
     const user = userEvent.setup();
     render(<NetworkingSubmissionForm friendId={42} />);
 
-    expect(await screen.findByText("Bersama Budi")).toBeInTheDocument();
+    expect(
+      await screen.findByLabelText(`1. ${questions[0].prompt}`),
+    ).toBeEnabled();
+    expect(screen.queryByText("Bersama Budi")).not.toBeInTheDocument();
     expect(
       screen.queryByRole("link", { name: "Lihat Templat Pertanyaan" }),
     ).not.toBeInTheDocument();
@@ -179,7 +182,9 @@ describe("NetworkingSubmissionForm", () => {
     const user = userEvent.setup();
     render(<NetworkingSubmissionForm friendId={42} />);
 
-    expect(await screen.findByText("Bersama Budi")).toBeInTheDocument();
+    expect(
+      await screen.findByLabelText(`1. ${questions[0].prompt}`),
+    ).toBeEnabled();
     for (const [index, question] of questions.entries()) {
       await user.type(
         screen.getByLabelText(`${index + 1}. ${question.prompt}`),
