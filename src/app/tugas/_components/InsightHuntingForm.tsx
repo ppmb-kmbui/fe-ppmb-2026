@@ -59,7 +59,7 @@ export function InsightHuntingForm() {
     }
 
     if (!file) {
-      setError("File PDF Insight Hunting wajib dipilih.");
+      setError("Berkas PDF Insight Hunting wajib dipilih.");
       return;
     }
 
@@ -68,7 +68,7 @@ export function InsightHuntingForm() {
       const fileUrl = await uploadRawFile(file);
       const submission = await submitInsightHuntingFile(fileUrl);
       setExistingFileUrl(submission?.file_url ?? fileUrl);
-      setMessage("Submission Insight Hunting berhasil disimpan.");
+      setMessage("Pengumpulan Insight Hunting berhasil disimpan.");
     } catch (submitError) {
       setError(getTaskApiErrorMessage(submitError));
     } finally {
@@ -80,27 +80,27 @@ export function InsightHuntingForm() {
     <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
       <div className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-blue-200/20 px-5 py-4 text-b2 text-foreground/85">
         <p className="font-subheading text-s3 font-semibold text-yellow-500">
-          Template Tugas
+          Templat Tugas
         </p>
-        <p>Gunakan template berikut untuk mengerjakan Insight Hunting.</p>
+        <p>Gunakan templat berikut untuk mengerjakan Insight Hunting.</p>
         <a
           href={insightHuntingTemplateUrl}
           target="_blank"
           rel="noreferrer"
           className="inline-flex w-fit items-center justify-center rounded-2xl bg-primary px-5 py-3 text-b1 text-yellow-50 transition-colors hover:bg-primary-hover"
         >
-          Link Template
+          Tautan Templat
         </a>
       </div>
 
       <div className="flex flex-col gap-3">
         <h2 className="font-subheading text-s3 font-semibold">
-          Upload Hasil Insight Hunting
+          Unggah Hasil Insight Hunting
         </h2>
         {existingFileUrl && (
           <p className="rounded-2xl border border-green-300/30 bg-green-400/10 px-4 py-3 text-b2 text-green-100">
-            Kamu sudah submit file Insight Hunting. Jika submit ulang, file lama
-            akan diganti dengan file terbaru.
+            Kamu sudah mengumpulkan berkas Insight Hunting. Jika mengumpulkan
+            ulang, berkas lama akan diganti dengan berkas terbaru.
           </p>
         )}
         <TaskFileUpload
@@ -134,7 +134,7 @@ export function InsightHuntingForm() {
         disabled={isLoading || isSubmissionClosed}
         className="h-[50px] rounded-2xl"
       >
-        Submit
+        Kumpulkan
       </Button>
     </form>
   );

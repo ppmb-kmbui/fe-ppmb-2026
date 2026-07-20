@@ -300,7 +300,7 @@ export function Header({
                 >
                   <FaArrowRightFromBracket />
                 </span>
-                <span>{isLoggingOut ? "Keluar..." : "Logout"}</span>
+                <span>{isLoggingOut ? "Keluar..." : "Keluar"}</span>
               </button>
             </div>
           </nav>

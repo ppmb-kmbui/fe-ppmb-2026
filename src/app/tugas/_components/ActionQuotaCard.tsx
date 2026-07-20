@@ -45,13 +45,13 @@ export function ActionQuotaCard({
         <ProgressBar
           value={safeCompleted}
           max={safeTotal}
-          label={`Progress ${label}`}
+          label={`Progres ${label}`}
           glow
           className="mt-3"
         />
         <div className="mt-2 flex items-center justify-between text-b3">
           <span>
-            {safeCompleted}/{safeTotal} Completed
+            {safeCompleted}/{safeTotal} Selesai
           </span>
           <span>{percentage}%</span>
         </div>

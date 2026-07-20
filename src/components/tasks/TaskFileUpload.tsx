@@ -28,20 +28,23 @@ export interface TaskFileUploadProps
 const fileTypeConfig = {
   image: {
     accept: "image/jpeg,image/png,image/webp",
+    ariaLabel: "Unggah foto",
     dragLabel: "Tarik dan lepaskan foto di sini",
     browseLabel: "+ Cari Foto",
     Icon: FaCamera,
   },
   video: {
     accept: "video/mp4,video/webm,video/quicktime",
+    ariaLabel: "Unggah video",
     dragLabel: "Tarik dan lepaskan video di sini",
     browseLabel: "+ Cari Video",
     Icon: FaVideo,
   },
   pdf: {
     accept: "application/pdf",
+    ariaLabel: "Unggah berkas PDF",
     dragLabel: "Tarik dan lepaskan PDF di sini",
-    browseLabel: "+ Cari File",
+    browseLabel: "+ Cari Berkas",
     Icon: FaFilePdf,
   },
 } as const;
@@ -95,14 +98,14 @@ export function TaskFileUpload({
 
     if (!isAcceptedFile(file)) {
       setSelectedName(undefined);
-      setValidationError("Tipe file tidak sesuai.");
+      setValidationError("Jenis berkas tidak sesuai.");
       onFileChange?.(null);
       return;
     }
 
     if (maxSizeMb && file.size > maxSizeMb * 1024 * 1024) {
       setSelectedName(undefined);
-      setValidationError(`Ukuran file maksimal ${maxSizeMb} MB.`);
+      setValidationError(`Ukuran berkas maksimal ${maxSizeMb} MB.`);
       onFileChange?.(null);
       return;
     }
@@ -129,7 +132,7 @@ export function TaskFileUpload({
         accept={acceptedTypes}
         disabled={disabled}
         className="sr-only"
-        aria-label={`Unggah file ${fileType}`}
+        aria-label={config.ariaLabel}
         aria-invalid={displayedError ? true : undefined}
         aria-describedby={errorId}
         onChange={(event) => selectFile(event.target.files?.item(0) ?? null)}

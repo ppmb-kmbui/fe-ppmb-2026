@@ -11,9 +11,9 @@ export interface TaskSubmissionPanelProps extends HTMLAttributes<HTMLElement> {
 }
 
 export function TaskSubmissionPanel({
-  title = "Upload Tugas",
+  title = "Unggah Tugas",
   children,
-  submitLabel = "Submit",
+  submitLabel = "Kumpulkan",
   isSubmitting = false,
   className,
   ...props

@@ -46,7 +46,7 @@ export function MaterialsClient() {
                   Mentoring
                 </span>
                 <span className="mt-3 w-fit rounded-full bg-white/15 px-4 py-1 font-subheading text-b3 text-white/90">
-                  Canva Material
+                  Materi Canva
                 </span>
               </span>
             </span>

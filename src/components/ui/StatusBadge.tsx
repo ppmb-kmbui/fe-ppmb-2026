@@ -27,7 +27,7 @@ export function StatusBadge({
       )}
       {...props}
     >
-      {isSubmitted ? "Submitted" : "Not Submitted"}
+      {isSubmitted ? "Sudah Dikumpulkan" : "Belum Dikumpulkan"}
     </span>
   );
 }

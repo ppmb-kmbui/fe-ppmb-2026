@@ -8,8 +8,11 @@ export interface MemberCardProps extends HTMLAttributes<HTMLElement> {
   avatar?: ReactNode;
   actionLabel?: string;
   onAction?: () => void;
+  secondaryActionLabel?: string;
+  onSecondaryAction?: () => void;
   isActionLoading?: boolean;
   isActionDisabled?: boolean;
+  isSecondaryActionDisabled?: boolean;
 }
 
 export function MemberCard({
@@ -18,8 +21,11 @@ export function MemberCard({
   avatar,
   actionLabel = "Kenalan",
   onAction,
+  secondaryActionLabel,
+  onSecondaryAction,
   isActionLoading = false,
   isActionDisabled = false,
+  isSecondaryActionDisabled = false,
   className,
   ...props
 }: MemberCardProps) {
@@ -34,21 +40,33 @@ export function MemberCard({
       <div className="grid h-[132px] w-[42%] shrink-0 place-items-center overflow-hidden rounded-xl bg-background">
         {avatar}
       </div>
-      <div className="flex min-w-0 flex-1 flex-col items-start justify-center gap-6">
+      <div className="flex min-w-0 flex-1 flex-col items-start justify-center gap-5">
         <div className="min-w-0 max-w-full">
           <h3 className="break-words font-subheading text-s4 leading-tight sm:text-s3">
             {name}
           </h3>
           <p className="mt-2 text-b3">Angkatan {batch}</p>
         </div>
-        <button
-          type="button"
-          onClick={onAction}
-          disabled={isActionLoading || isActionDisabled || !onAction}
-          className="min-h-[45px] w-[139px] rounded-2xl bg-purple-600 px-6 py-2.5 text-b2 hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {isActionLoading ? "Memproses..." : actionLabel}
-        </button>
+        <div className="flex w-full flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={onAction}
+            disabled={isActionLoading || isActionDisabled || !onAction}
+            className="min-h-[43px] min-w-[116px] flex-1 rounded-2xl bg-purple-600 px-4 py-2.5 text-b3 hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isActionLoading ? "Memproses..." : actionLabel}
+          </button>
+          {secondaryActionLabel && (
+            <button
+              type="button"
+              onClick={onSecondaryAction}
+              disabled={isSecondaryActionDisabled || !onSecondaryAction}
+              className="min-h-[43px] min-w-[116px] flex-1 rounded-2xl border border-yellow-100/60 bg-yellow-100/10 px-4 py-2.5 text-b3 text-yellow-50 transition-colors hover:bg-yellow-100/20 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {secondaryActionLabel}
+            </button>
+          )}
+        </div>
       </div>
     </article>
   );

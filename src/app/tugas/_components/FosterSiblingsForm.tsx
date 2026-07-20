@@ -67,7 +67,7 @@ export function FosterSiblingsForm() {
     }
 
     if (!pdfFile) {
-      setError("File PDF hasil foster siblings wajib dipilih.");
+      setError("Berkas PDF hasil Foster Siblings wajib dipilih.");
       return;
     }
 
@@ -80,7 +80,7 @@ export function FosterSiblingsForm() {
       const submission = await submitFosterSiblings(imageUrl, fileUrl);
       setExistingImageUrl(submission?.photo_url ?? imageUrl);
       setExistingFileUrl(submission?.file_url ?? fileUrl);
-      setMessage("Submission Foster Siblings berhasil disimpan.");
+      setMessage("Pengumpulan Foster Siblings berhasil disimpan.");
     } catch (submitError) {
       setError(getTaskApiErrorMessage(submitError));
     } finally {
@@ -92,27 +92,27 @@ export function FosterSiblingsForm() {
     <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
       <div className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-blue-200/20 px-5 py-4 text-b2 text-foreground/85">
         <p className="font-subheading text-s3 font-semibold text-yellow-500">
-          Template Tugas
+          Templat Tugas
         </p>
-        <p>Gunakan template berikut untuk mengerjakan Foster Siblings.</p>
+        <p>Gunakan templat berikut untuk mengerjakan Foster Siblings.</p>
         <a
           href={fosterSiblingsTemplateUrl}
           target="_blank"
           rel="noreferrer"
           className="inline-flex w-fit items-center justify-center rounded-2xl bg-primary px-5 py-3 text-b1 text-yellow-50 transition-colors hover:bg-primary-hover"
         >
-          Link Template
+          Tautan Templat
         </a>
       </div>
 
       <div className="flex flex-col gap-3">
         <h2 className="font-subheading text-s3 max-md:text-s5 font-semibold">
-          Upload Dokumentasi
+          Unggah Dokumentasi
         </h2>
         {existingImageUrl && (
           <p className="rounded-2xl border border-green-300/30 bg-green-400/10 px-4 py-3 text-b2 text-green-100">
-            Kamu sudah submit foto dokumentasi. Jika submit ulang, foto lama
-            akan diganti dengan foto terbaru.
+            Kamu sudah mengumpulkan foto dokumentasi. Jika mengumpulkan ulang,
+            foto lama akan diganti dengan foto terbaru.
           </p>
         )}
         <TaskFileUpload
@@ -124,12 +124,12 @@ export function FosterSiblingsForm() {
 
       <div className="flex flex-col gap-3">
         <h2 className="font-subheading text-s3 max-md:text-s5 font-semibold">
-          Upload Hasil Foster Siblings
+          Unggah Hasil Foster Siblings
         </h2>
         {existingFileUrl && (
           <p className="rounded-2xl border border-green-300/30 bg-green-400/10 px-4 py-3 text-b2 text-green-100">
-            Kamu sudah submit file Foster Siblings. Jika submit ulang, file lama
-            akan diganti dengan file terbaru.
+            Kamu sudah mengumpulkan berkas Foster Siblings. Jika mengumpulkan
+            ulang, berkas lama akan diganti dengan berkas terbaru.
           </p>
         )}
         <TaskFileUpload
@@ -163,7 +163,7 @@ export function FosterSiblingsForm() {
         disabled={isLoading || isSubmissionClosed}
         className="h-13 rounded-2xl"
       >
-        Submit
+        Kumpulkan
       </Button>
     </form>
   );

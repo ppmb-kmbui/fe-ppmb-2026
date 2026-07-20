@@ -1,6 +1,33 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { SIGNUP_DRAFT_STORAGE_KEY } from "@/lib/signup-draft";
+
+vi.mock("@/components/ui", async () => {
+  const actual = await vi.importActual<typeof import("@/components/ui")>(
+    "@/components/ui",
+  );
+
+  return {
+    ...actual,
+    ProfilePhotoUpload: ({
+      onChange,
+      error,
+    }: import("@/components/ui").ProfilePhotoUploadProps) => (
+      <div>
+        <label htmlFor="test-profile-photo">Foto Profil</label>
+        <input
+          id="test-profile-photo"
+          type="file"
+          accept="image/png,image/jpeg"
+          onChange={(event) => onChange(event.target.files?.[0] ?? null)}
+        />
+        {error && <p>{error}</p>}
+      </div>
+    ),
+  };
+});
 
 import { SignupForm } from "./SignupForm";
 
@@ -9,7 +36,7 @@ async function fillValidForm(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText("ID Line"), "danniel26");
   await user.type(screen.getByLabelText("Nomor Whatsapp"), "081234567890");
   await user.type(screen.getByLabelText("Email"), "danniel@email.com");
-  await user.type(screen.getByLabelText("Fakultas"), "Ilmu Komputer");
+  await user.selectOptions(screen.getByLabelText("Fakultas"), "FIB");
   await user.type(screen.getByLabelText("Angkatan"), "2026");
   await user.type(screen.getByLabelText("Kata Sandi (Min. 8 Karakter)"), "password123");
   await user.type(screen.getByLabelText("Konfirmasi Kata Sandi"), "password123");
@@ -20,6 +47,10 @@ function makePhoto(): File {
 }
 
 describe("SignupForm", () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+  });
+
   it("shows required-field errors and does not call onSubmit when the form is empty", async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
@@ -77,7 +108,7 @@ describe("SignupForm", () => {
       lineId: "danniel26",
       whatsapp: "081234567890",
       email: "danniel@email.com",
-      faculty: "Ilmu Komputer",
+      faculty: "FIB",
       batch: 2026,
       password: "password123",
       confirmPassword: "password123",
@@ -89,5 +120,40 @@ describe("SignupForm", () => {
     render(<SignupForm serverErrors={{ email: "Email sudah digunakan" }} />);
 
     expect(screen.getByText("Email sudah digunakan")).toBeInTheDocument();
+  });
+
+  it("restores non-sensitive registration fields after the form is remounted", async () => {
+    const user = userEvent.setup();
+    const firstRender = render(<SignupForm onSubmit={vi.fn()} />);
+
+    await user.type(screen.getByLabelText("Nama Lengkap (sesuai SIAK)"), "Made Peserta");
+    await user.type(screen.getByLabelText("Email"), "made@example.com");
+    await user.selectOptions(screen.getByLabelText("Fakultas"), "FIB");
+    await user.type(screen.getByLabelText("Angkatan"), "2026");
+    await user.type(
+      screen.getByLabelText("Kata Sandi (Min. 8 Karakter)"),
+      "password123",
+    );
+
+    await waitFor(() =>
+      expect(sessionStorage.getItem(SIGNUP_DRAFT_STORAGE_KEY)).toContain(
+        '"fullName":"Made Peserta"',
+      ),
+    );
+    firstRender.unmount();
+
+    render(<SignupForm onSubmit={vi.fn()} />);
+
+    await waitFor(() =>
+      expect(screen.getByLabelText("Nama Lengkap (sesuai SIAK)")).toHaveValue(
+        "Made Peserta",
+      ),
+    );
+    expect(screen.getByLabelText("Email")).toHaveValue("made@example.com");
+    expect(screen.getByLabelText("Fakultas")).toHaveValue("FIB");
+    expect(screen.getByLabelText("Angkatan")).toHaveValue("2026");
+    expect(screen.getByLabelText("Kata Sandi (Min. 8 Karakter)")).toHaveValue("");
+    expect(screen.getByLabelText("Konfirmasi Kata Sandi")).toHaveValue("");
+    expect(screen.getByRole("status")).toHaveTextContent("Draft dipulihkan");
   });
 });

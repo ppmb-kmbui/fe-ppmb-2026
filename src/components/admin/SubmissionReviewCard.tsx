@@ -89,7 +89,7 @@ export function SubmissionReviewCard({
         className="m-auto flex flex-col items-center gap-4 text-center underline hover:text-yellow-100"
       >
         <FaFilePdf aria-hidden="true" className="size-[88px] text-blue-500" />
-        <span>{file.label ?? "Link download PDF"}</span>
+        <span>{file.label ?? "Tautan unduhan PDF"}</span>
       </a>
     </ContentPanel>
   ) : null;

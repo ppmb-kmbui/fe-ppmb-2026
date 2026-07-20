@@ -4,6 +4,31 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ApiError } from "@/lib/api";
 
+vi.mock("@/components/ui", async () => {
+  const actual = await vi.importActual<typeof import("@/components/ui")>(
+    "@/components/ui",
+  );
+
+  return {
+    ...actual,
+    ProfilePhotoUpload: ({
+      onChange,
+      error,
+    }: import("@/components/ui").ProfilePhotoUploadProps) => (
+      <div>
+        <label htmlFor="test-profile-photo">Foto Profil</label>
+        <input
+          id="test-profile-photo"
+          type="file"
+          accept="image/png,image/jpeg"
+          onChange={(event) => onChange(event.target.files?.[0] ?? null)}
+        />
+        {error && <p>{error}</p>}
+      </div>
+    ),
+  };
+});
+
 const { pushMock, registerMock, uploadImageMock } = vi.hoisted(() => ({
   pushMock: vi.fn(),
   registerMock: vi.fn(),
@@ -35,7 +60,7 @@ async function fillValidForm(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText("ID Line"), "danniel26");
   await user.type(screen.getByLabelText("Nomor Whatsapp"), "081234567890");
   await user.type(screen.getByLabelText("Email"), "danniel@email.com");
-  await user.type(screen.getByLabelText("Fakultas"), "Ilmu Komputer");
+  await user.selectOptions(screen.getByLabelText("Fakultas"), "FIB");
   await user.type(screen.getByLabelText("Angkatan"), "2026");
   await user.type(screen.getByLabelText("Kata Sandi (Min. 8 Karakter)"), "password123");
   await user.type(screen.getByLabelText("Konfirmasi Kata Sandi"), "password123");
@@ -44,6 +69,7 @@ async function fillValidForm(user: ReturnType<typeof userEvent.setup>) {
 
 describe("SignupFormContainer", () => {
   beforeEach(() => {
+    sessionStorage.clear();
     pushMock.mockReset();
     registerMock.mockReset();
     uploadImageMock.mockReset();

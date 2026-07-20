@@ -6,22 +6,7 @@ export interface ProgressStat {
   percentage: number;
 }
 
-export interface NetworkingProgressItem {
-  progress: number;
-  min: number;
-}
-
 export interface TaskSummary {
-  networkingSubmission?: NetworkingSubmission | null;
-  networkingAngkatan: {
-    progress: Record<string, NetworkingProgressItem>;
-    byBatch: Record<string, NetworkingProgressItem>;
-    min: number;
-  };
-  networkingKating: {
-    progress: Record<string, NetworkingProgressItem>;
-    min: number;
-  };
   kmbuiExplorerDone: boolean;
   firstFossibDone: boolean;
   secondFossibDone: boolean;
@@ -38,22 +23,69 @@ export interface TaskSummary {
   };
 }
 
-export type NetworkingSubmissionField = "first_docs_url" | "second_docs_url";
+export interface NetworkingQuestion {
+  id: number;
+  code: string;
+  prompt: string;
+  position: number;
+  isCustom: boolean;
+}
+
+export interface NetworkingProgressByBatch {
+  completed: number;
+  required: number;
+}
+
+export interface NetworkingProgress extends ProgressStat {
+  byBatch: Record<string, NetworkingProgressByBatch>;
+}
+
+export interface NetworkingFriend {
+  id: number;
+  fullname: string | null;
+  imgUrl: string | null;
+  faculty: string | null;
+  batch: number;
+  completed?: boolean;
+  updatedAt?: string | null;
+}
+
+export interface NetworkingAnswer {
+  id?: number;
+  questionId: number | null;
+  answer: string;
+  customQuestion?: string | null;
+}
 
 export interface NetworkingSubmission {
   id: number;
-  userId: number;
-  first_docs_url: string | null;
-  second_docs_url: string | null;
-  firstDocsUrl?: string | null;
-  secondDocsUrl?: string | null;
+  friendId?: number;
+  friend?: NetworkingFriend;
+  photoUrl: string;
+  answers: NetworkingAnswer[];
   createdAt: string;
   updatedAt: string;
 }
 
-export interface NetworkingSubmissionData {
+export interface NetworkingOverviewData {
+  friends: NetworkingFriend[];
+  submissions: NetworkingSubmission[];
+  questions: NetworkingQuestion[];
+  progress: NetworkingProgress;
+}
+
+export interface NetworkingFriendData {
+  friend: NetworkingFriend;
+  questions: NetworkingQuestion[];
   submission: NetworkingSubmission | null;
-  progress: ProgressStat;
+  progress: NetworkingProgress;
+}
+
+export interface SubmitNetworkingInput {
+  photoUrl: string;
+  answers: Array<{ questionId: number; answer: string }>;
+  customQuestion: string;
+  customAnswer: string;
 }
 
 export interface ExplorerSubmission {
@@ -141,20 +173,37 @@ export function invalidateTaskSummaryCache() {
   }
 }
 
-export async function getNetworkingSubmission() {
-  const response =
-    await apiFetch<NetworkingSubmissionData>("tasks/networking");
+export async function getNetworkingOverview() {
+  const response = await apiFetch<NetworkingOverviewData>("tasks/networking");
   return response.data;
 }
 
-export async function submitNetworkingDocs(
-  field: NetworkingSubmissionField,
-  docsUrl: string,
+export async function getNetworkingFriend(friendId: number) {
+  const response = await apiFetch<NetworkingFriendData>(
+    `tasks/networking/${friendId}`,
+  );
+  return response.data;
+}
+
+export async function submitNetworkingFriend(
+  friendId: number,
+  input: SubmitNetworkingInput,
 ) {
-  const response = await apiFetch<NetworkingSubmissionData>("tasks/networking", {
-    method: "POST",
-    body: JSON.stringify({ [field]: docsUrl }),
-  });
+  const response = await apiFetch<NetworkingFriendData>(
+    `tasks/networking/${friendId}`,
+    {
+      method: "PUT",
+      body: JSON.stringify({
+        photo_url: input.photoUrl,
+        answers: input.answers.map(({ questionId, answer }) => ({
+          question_id: questionId,
+          answer,
+        })),
+        custom_question: input.customQuestion,
+        custom_answer: input.customAnswer,
+      }),
+    },
+  );
   invalidateTaskSummaryCache();
   return response.data;
 }

@@ -6,6 +6,7 @@ import {
   useState,
   type DragEvent,
   type InputHTMLAttributes,
+  type Ref,
   type SVGProps,
 } from "react";
 
@@ -35,6 +36,7 @@ export interface FileUploadProps
   fileName?: string;
   maxSizeMb?: number;
   onFileChange?: (file: File | null) => void;
+  browseButtonRef?: Ref<HTMLButtonElement>;
   wrapperClassName?: string;
 }
 
@@ -48,6 +50,7 @@ export function FileUpload({
   maxSizeMb,
   disabled = false,
   onFileChange,
+  browseButtonRef,
   wrapperClassName,
   className,
   ...props
@@ -59,7 +62,7 @@ export function FileUpload({
   const [validationError, setValidationError] = useState<string>();
   const [isDragging, setIsDragging] = useState(false);
   const displayedError = error ?? validationError;
-  const displayedName = fileName ?? selectedName;
+  const displayedName = fileName === undefined ? selectedName : fileName || undefined;
 
   function selectFile(file: File | null) {
     if (!file) {
@@ -109,7 +112,11 @@ export function FileUpload({
         disabled={disabled}
         className="sr-only"
         aria-invalid={displayedError ? true : undefined}
-        onChange={(event) => selectFile(event.target.files?.item(0) ?? null)}
+        onChange={(event) => {
+          selectFile(event.target.files?.item(0) ?? null);
+          // Allow choosing the same file again after a crop dialog is cancelled.
+          event.currentTarget.value = "";
+        }}
         {...props}
       />
 
@@ -143,6 +150,7 @@ export function FileUpload({
         <p className="text-b1 text-purple-200">atau</p>
 
         <button
+          ref={browseButtonRef}
           type="button"
           disabled={disabled}
           onClick={() => inputRef.current?.click()}

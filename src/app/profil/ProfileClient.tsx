@@ -8,8 +8,8 @@ import {
   Button,
   DashboardPageLayout,
   FacultySelect,
-  FileUpload,
   Input,
+  ProfilePhotoUpload,
 } from "@/components";
 import { ImageUploadError, uploadImage } from "@/lib/image-upload";
 import {
@@ -228,7 +228,7 @@ export function ProfileClient() {
                     onClick={startEditing}
                     className="h-10 w-[74px] rounded-3xl px-0 text-b3 sm:h-[50px] sm:w-[111px] sm:text-b2"
                   >
-                    Edit
+                    Ubah
                   </Button>
                 )}
               </div>
@@ -237,13 +237,11 @@ export function ProfileClient() {
             <section className="grid gap-x-5 gap-y-4 px-2 sm:px-8 md:grid-cols-2">
               {isEditing ? (
                 <>
-                  <FileUpload
-                    label="Foto Profil"
-                    hint="Lampirkan foto dengan format .png/.jpg/.jpeg, maksimal 5 MB."
-                    accept="image/png,image/jpeg"
-                    maxSizeMb={5}
+                  <ProfilePhotoUpload
+                    value={photo}
+                    onChange={setPhoto}
+                    existingImageUrl={profile.imgUrl}
                     disabled={isSaving}
-                    onFileChange={setPhoto}
                     wrapperClassName="md:col-span-2"
                   />
                   <Input

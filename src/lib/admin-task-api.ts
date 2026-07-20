@@ -10,6 +10,28 @@ export interface ProgressItem {
   percentage: number;
 }
 
+export interface AdminNetworkingAnswer {
+  questionId: number;
+  prompt: string | null;
+  answer: string;
+  customQuestion?: string | null;
+}
+
+export interface AdminNetworkingSubmission {
+  id: number;
+  friend: {
+    id: number;
+    fullname: string | null;
+    imgUrl: string | null;
+    faculty: string | null;
+    batch: number;
+  };
+  photoUrl: string;
+  answers: AdminNetworkingAnswer[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ParticipantTaskResponse {
   user: {
     id: number;
@@ -31,7 +53,9 @@ export interface ParticipantTaskResponse {
   };
 
   progress: {
-    networking: ProgressItem;
+    networking: ProgressItem & {
+      byBatch?: Record<string, ProgressItem>;
+    };
     explorer: ProgressItem;
     mentoring: ProgressItem;
     fossib: ProgressItem;
@@ -40,10 +64,14 @@ export interface ParticipantTaskResponse {
   };
 
   submissions: {
-    networking: {
-      firstDocsUrl: string | null;
-      secondDocsUrl: string | null;
-    } | null;
+    networking: AdminNetworkingSubmission[];
+    networkingQuestions?: Array<{
+      id: number;
+      code: string;
+      prompt: string;
+      position: number;
+      isCustom: boolean;
+    }>;
 
     explorer: {
       activityName?: string | null;
@@ -86,21 +114,30 @@ export async function getParticipantTask(participantId: string) {
 export function buildSubmissionCards(
   data: ParticipantTaskResponse
 ): SubmissionReviewCardProps[] {
-  const networkingLinks: SubmissionLink[] = [];
-  if (data.submissions.networking?.firstDocsUrl) {
-    networkingLinks.push({
-      href: data.submissions.networking.firstDocsUrl,
-      label: "Networking Angkatan 26",
-      description: "Template/submission dengan teman seangkatan 2026",
-    });
-  }
-  if (data.submissions.networking?.secondDocsUrl) {
-    networkingLinks.push({
-      href: data.submissions.networking.secondDocsUrl,
-      label: "Networking Angkatan 23-25",
-      description: "Template/submission dengan kakak tingkat angkatan 2023-2025",
-    });
-  }
+  const networkingSubmissions = data.submissions.networking ?? [];
+  const networkingLinks: SubmissionLink[] = networkingSubmissions.map(
+    (submission) => ({
+      href: submission.photoUrl,
+      label: `Dokumentasi: ${submission.friend.fullname ?? "Teman"}`,
+      description: `Angkatan ${submission.friend.batch}`,
+    }),
+  );
+  const networkingAnswers = networkingSubmissions
+    .map((submission) => {
+      const friendHeading = `${submission.friend.fullname ?? "Teman"} — Angkatan ${submission.friend.batch}`;
+      const answers = submission.answers
+        .map((entry, index) => {
+          const question =
+            entry.customQuestion?.trim() ||
+            entry.prompt ||
+            `Pertanyaan ${index + 1}`;
+          return `${index + 1}. ${question}\n${entry.answer}`;
+        })
+        .join("\n\n");
+
+      return `${friendHeading}\n${answers}`;
+    })
+    .join("\n\n--------------------\n\n");
   const mentoringLink =
     data.submissions.mentoring?.gdrive_url ??
     data.submissions.mentoring?.submission?.gdriveUrl ??
@@ -110,7 +147,7 @@ export function buildSubmissionCards(
         {
           href: mentoringLink,
           label: "Google Drive Mentoring",
-          description: "Link pengumpulan tugas mentoring",
+          description: "Tautan pengumpulan tugas Mentoring",
         },
       ]
     : [];
@@ -122,6 +159,7 @@ export function buildSubmissionCards(
         ? "submitted"
         : "not-submitted",
       links: networkingLinks,
+      answer: networkingAnswers,
       answerFirst: true,
     },
 

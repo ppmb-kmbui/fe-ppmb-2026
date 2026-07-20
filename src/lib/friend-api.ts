@@ -60,6 +60,8 @@ export interface GetFriendsParams {
   limit?: number;
 }
 
+const acceptedConnectionStatuses = new Set(["accepted", "done", "connected"]);
+
 export async function getFriendsPage({
   name,
   page = 1,
@@ -100,10 +102,15 @@ export async function getMyConnections() {
   const data = response.data;
 
   if (Array.isArray(data)) {
-    return data.map((connection) => connection.to).filter(Boolean) as FriendUser[];
+    return data
+      .filter((connection) => acceptedConnectionStatuses.has(connection.status))
+      .map((connection) => connection.to)
+      .filter(Boolean) as FriendUser[];
   }
 
-  return data?.friends ?? [];
+  return (data?.friends ?? []).filter((friend) =>
+    acceptedConnectionStatuses.has(friend.status),
+  );
 }
 
 export async function getConnectionRequests() {

@@ -1,10 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type SubmitEvent } from "react";
+import { useEffect, useState, type SubmitEvent } from "react";
 
-import { Button, FacultySelect, FileUpload, Input } from "@/components/ui";
+import { Button, FacultySelect, Input, ProfilePhotoUpload } from "@/components/ui";
 import { isFaculty } from "@/lib/faculty";
+import {
+  clearSignupDraft,
+  readSignupDraft,
+  writeSignupDraft,
+} from "@/lib/signup-draft";
 
 export interface SignupFormValues {
   fullName: string;
@@ -43,6 +48,46 @@ export function SignupForm({ onSubmit, formError, serverErrors }: SignupFormProp
   const [photo, setPhoto] = useState<File | null>(null);
   const [fieldErrors, setFieldErrors] = useState<SignupFieldErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDraftReady, setIsDraftReady] = useState(false);
+  const [wasDraftRestored, setWasDraftRestored] = useState(false);
+
+  useEffect(() => {
+    const draft = readSignupDraft(window.sessionStorage);
+    const hydrationTimer = window.setTimeout(() => {
+      if (draft) {
+        setFullName(draft.fullName);
+        setLineId(draft.lineId);
+        setWhatsapp(draft.whatsapp);
+        setEmail(draft.email);
+        setFaculty(draft.faculty);
+        setBatch(draft.batch);
+        setWasDraftRestored(true);
+      }
+
+      setIsDraftReady(true);
+    }, 0);
+
+    return () => window.clearTimeout(hydrationTimer);
+  }, []);
+
+  useEffect(() => {
+    if (!isDraftReady) return;
+
+    const draft = {
+      fullName,
+      lineId,
+      whatsapp,
+      email,
+      faculty,
+      batch,
+    };
+
+    if (Object.values(draft).some(Boolean)) {
+      writeSignupDraft(window.sessionStorage, draft);
+    } else {
+      clearSignupDraft(window.sessionStorage);
+    }
+  }, [batch, email, faculty, fullName, isDraftReady, lineId, whatsapp]);
 
   const displayedErrors: SignupFieldErrors = {
     fullName: fieldErrors.fullName ?? serverErrors?.fullName,
@@ -122,6 +167,7 @@ export function SignupForm({ onSubmit, formError, serverErrors }: SignupFormProp
         confirmPassword,
         photo,
       });
+      clearSignupDraft(window.sessionStorage);
     } catch {
       // Parent is responsible for surfacing the failure via `formError`.
     } finally {
@@ -230,14 +276,18 @@ export function SignupForm({ onSubmit, formError, serverErrors }: SignupFormProp
           />
         </div>
 
-        <FileUpload
-          label="Foto Profil"
-          hint="Lampirkan foto dengan format .png/.jpg/.jpeg, maksimal 5 MB."
-          accept="image/png,image/jpeg"
-          maxSizeMb={5}
-          onFileChange={setPhoto}
+        <ProfilePhotoUpload
+          value={photo}
+          onChange={setPhoto}
           error={displayedErrors.photo}
         />
+
+        {wasDraftRestored && !photo && (
+          <p role="status" className="text-b2 text-purple-100">
+            Draft dipulihkan. Demi keamanan, pilih dan potong ulang foto profil
+            sebelum mendaftar.
+          </p>
+        )}
 
         {formError && (
           <p role="alert" className="text-b2 text-red-300">

@@ -29,7 +29,7 @@ export function SignupFormContainer() {
       setFormError(
         error instanceof ImageUploadError ? error.message : "Gagal mengunggah foto",
       );
-      return;
+      throw error;
     }
 
     try {
@@ -49,6 +49,7 @@ export function SignupFormContainer() {
       const translated = translateAuthError(error);
       setServerErrors(translated.fieldErrors);
       setFormError(translated.formError);
+      throw error;
     }
   }
 

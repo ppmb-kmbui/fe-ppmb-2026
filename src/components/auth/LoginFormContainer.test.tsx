@@ -1,13 +1,14 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ApiError } from "@/lib/api";
 
-const { replaceMock, refreshMock, loginMock } = vi.hoisted(() => ({
+const { replaceMock, refreshMock, loginMock, getProfileCachedMock } = vi.hoisted(() => ({
   replaceMock: vi.fn(),
   refreshMock: vi.fn(),
   loginMock: vi.fn(),
+  getProfileCachedMock: vi.fn(),
 }));
 
 vi.mock("next/navigation", () => ({
@@ -16,16 +17,29 @@ vi.mock("next/navigation", () => ({
 
 vi.mock("@/lib/auth-api", async () => {
   const actual = await vi.importActual<typeof import("@/lib/auth-api")>("@/lib/auth-api");
-  return { ...actual, login: loginMock };
+  return {
+    ...actual,
+    login: loginMock,
+    getProfileCached: getProfileCachedMock,
+  };
 });
 
-import { LoginFormContainer } from "./LoginFormContainer";
+import {
+  LoginFormContainer,
+  registrationToastDurationMs,
+} from "./LoginFormContainer";
 
 describe("LoginFormContainer", () => {
   beforeEach(() => {
     replaceMock.mockReset();
     refreshMock.mockReset();
     loginMock.mockReset();
+    getProfileCachedMock.mockReset();
+    getProfileCachedMock.mockResolvedValue({ isAdmin: false });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("redirects to the home page after a successful login", async () => {
@@ -41,7 +55,7 @@ describe("LoginFormContainer", () => {
       email: "danniel@email.com",
       password: "dannielsigma",
     });
-    expect(replaceMock).toHaveBeenCalledWith("/");
+    await vi.waitFor(() => expect(replaceMock).toHaveBeenCalledWith("/"));
   });
 
   it("shows the backend's error message instead of redirecting when login fails", async () => {
@@ -64,11 +78,22 @@ describe("LoginFormContainer", () => {
     expect(replaceMock).not.toHaveBeenCalled();
   });
 
-  it("renders the success banner when successMessage is provided", () => {
+  it("renders the registration notification at the bottom without shifting the form", () => {
     render(<LoginFormContainer successMessage="Akun berhasil dibuat, silakan masuk." />);
 
-    expect(screen.getByRole("status")).toHaveTextContent(
-      "Akun berhasil dibuat, silakan masuk.",
-    );
+    const notification = screen.getByRole("status");
+    expect(notification).toHaveTextContent("Akun berhasil dibuat, silakan masuk.");
+    expect(notification).toHaveClass("fixed", "bottom-6");
+    expect(screen.getByRole("heading", { name: "Selamat Datang Kembali!" })).toBeVisible();
+  });
+
+  it("dismisses the registration notification and removes its query flag", async () => {
+    vi.useFakeTimers();
+    render(<LoginFormContainer successMessage="Akun berhasil dibuat, silakan masuk." />);
+
+    await vi.advanceTimersByTimeAsync(registrationToastDurationMs);
+
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    expect(replaceMock).toHaveBeenCalledWith("/login", { scroll: false });
   });
 });
