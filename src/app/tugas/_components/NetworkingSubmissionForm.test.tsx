@@ -83,6 +83,9 @@ describe("NetworkingSubmissionForm", () => {
     render(<NetworkingSubmissionForm friendId={42} />);
 
     expect(await screen.findByText("Bersama Budi")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Lihat Templat Pertanyaan" }),
+    ).not.toBeInTheDocument();
 
     for (const [index, question] of questions.entries()) {
       await user.type(

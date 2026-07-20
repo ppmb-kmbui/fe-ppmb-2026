@@ -16,10 +16,7 @@ import {
   type NetworkingQuestion,
 } from "@/lib/task-api";
 
-import {
-  NETWORKING_FIXED_QUESTIONS,
-  NETWORKING_TEMPLATE_URL,
-} from "./networking-requirements";
+import { NETWORKING_FIXED_QUESTIONS } from "./networking-requirements";
 
 const fallbackQuestions: NetworkingQuestion[] = NETWORKING_FIXED_QUESTIONS.map(
   (question, index) => ({
@@ -197,14 +194,6 @@ export function NetworkingSubmissionForm({ friendId }: { friendId: number }) {
           Wawancarai temanmu, isi jawaban sesuai percakapan, lalu unggah foto
           dokumentasi bersama.
         </p>
-        <a
-          href={NETWORKING_TEMPLATE_URL}
-          target="_blank"
-          rel="noreferrer"
-          className="mt-4 inline-flex w-fit items-center justify-center rounded-2xl border border-yellow-100/60 px-5 py-2.5 text-b2 text-yellow-50 transition-colors hover:bg-yellow-100/10"
-        >
-          Lihat Templat Pertanyaan
-        </a>
       </div>
 
       {fixedQuestions.map((question, index) => (
