@@ -36,7 +36,7 @@ vi.mock("@/lib/task-deadlines", () => ({
 
 import { NetworkingSubmissionForm } from "./NetworkingSubmissionForm";
 
-const questions: NetworkingQuestion[] = NETWORKING_FIXED_QUESTIONS.map(
+const peerQuestions: NetworkingQuestion[] = NETWORKING_FIXED_QUESTIONS.map(
   (question, index) => ({
     ...question,
     id: index + 101,
@@ -44,6 +44,25 @@ const questions: NetworkingQuestion[] = NETWORKING_FIXED_QUESTIONS.map(
     isCustom: false,
   }),
 );
+
+const seniorQuestions: NetworkingQuestion[] = Array.from(
+  { length: 5 },
+  (_, index) => ({
+    id: index + 201,
+    code: `senior_question_${index + 1}`,
+    prompt: `Pertanyaan kakak tingkat ${index + 1}`,
+    position: index + 1,
+    isCustom: false,
+  }),
+);
+
+const customCatalogQuestion: NetworkingQuestion = {
+  id: 999,
+  code: "custom",
+  prompt: "Pertanyaan Bebas dari mahasiswa baru",
+  position: 99,
+  isCustom: true,
+};
 
 describe("NetworkingSubmissionForm", () => {
   beforeEach(() => {
@@ -57,16 +76,18 @@ describe("NetworkingSubmissionForm", () => {
         fullname: "Budi",
         faculty: "FIB",
         imgUrl: null,
-        batch: 2025,
+        batch: 2026,
       },
-      questions,
+      networkingType: "peer",
+      questions: [...peerQuestions, customCatalogQuestion],
       submission: null,
       progress: { completed: 0, required: 18, percentage: 0 },
     });
     uploadImageMock.mockResolvedValue("https://cdn.example/networking.jpg");
     submitNetworkingFriendMock.mockResolvedValue({
-      friend: { id: 42, fullname: "Budi", batch: 2025 },
-      questions,
+      friend: { id: 42, fullname: "Budi", batch: 2026 },
+      networkingType: "peer",
+      questions: [...peerQuestions, customCatalogQuestion],
       submission: {
         id: 9,
         photoUrl: "https://cdn.example/networking.jpg",
@@ -83,14 +104,14 @@ describe("NetworkingSubmissionForm", () => {
     render(<NetworkingSubmissionForm friendId={42} />);
 
     expect(
-      await screen.findByLabelText(`1. ${questions[0].prompt}`),
+      await screen.findByLabelText(`1. ${peerQuestions[0].prompt}`),
     ).toBeEnabled();
     expect(screen.queryByText("Bersama Budi")).not.toBeInTheDocument();
     expect(
       screen.queryByRole("link", { name: "Lihat Templat Pertanyaan" }),
     ).not.toBeInTheDocument();
 
-    for (const [index, question] of questions.entries()) {
+    for (const [index, question] of peerQuestions.entries()) {
       await user.type(
         screen.getByLabelText(`${index + 1}. ${question.prompt}`),
         `Jawaban ${index + 1}`,
@@ -114,7 +135,7 @@ describe("NetworkingSubmissionForm", () => {
     await vi.waitFor(() =>
       expect(submitNetworkingFriendMock).toHaveBeenCalledWith(42, {
         photoUrl: "https://cdn.example/networking.jpg",
-        answers: questions.map((question, index) => ({
+        answers: peerQuestions.map((question, index) => ({
           questionId: question.id,
           answer: `Jawaban ${index + 1}`,
         })),
@@ -135,10 +156,11 @@ describe("NetworkingSubmissionForm", () => {
         fullname: "Budi",
         faculty: "FIB",
         imgUrl: null,
-        batch: 2025,
+        batch: 2026,
       },
+      networkingType: "peer",
       questions: [
-        ...questions,
+        ...peerQuestions,
         {
           id: 200,
           code: "custom",
@@ -151,7 +173,7 @@ describe("NetworkingSubmissionForm", () => {
         id: 9,
         photoUrl: "https://cdn.example/old.jpg",
         answers: [
-          ...questions.map((question, index) => ({
+          ...peerQuestions.map((question, index) => ({
             questionId: question.id,
             answer: `Jawaban lama ${index + 1}`,
           })),
@@ -178,14 +200,71 @@ describe("NetworkingSubmissionForm", () => {
     ).toBeInTheDocument();
   });
 
+  it("uses the five-question senior catalog and shows its template", async () => {
+    const user = userEvent.setup();
+    getNetworkingFriendMock.mockResolvedValueOnce({
+      friend: {
+        id: 84,
+        fullname: "Kak Sari",
+        faculty: "FIB",
+        imgUrl: null,
+        batch: 2025,
+      },
+      networkingType: "senior",
+      questions: [...seniorQuestions, customCatalogQuestion],
+      submission: null,
+      progress: { completed: 0, required: 18, percentage: 0 },
+    });
+
+    render(<NetworkingSubmissionForm friendId={84} />);
+
+    expect(
+      await screen.findByRole("link", {
+        name: "Lihat Templat Pertanyaan Kakak Tingkat",
+      }),
+    ).toHaveAttribute("target", "_blank");
+
+    for (const [index, question] of seniorQuestions.entries()) {
+      await user.type(
+        screen.getByLabelText(`${index + 1}. ${question.prompt}`),
+        `Jawaban senior ${index + 1}`,
+      );
+    }
+    await user.type(
+      screen.getByLabelText("Pertanyaan Bebas dari mahasiswa baru"),
+      "Apa pesan untuk mahasiswa baru?",
+    );
+    await user.type(
+      screen.getByLabelText("Jawaban pertanyaan bebas"),
+      "Tetap semangat.",
+    );
+    await user.upload(
+      screen.getByLabelText("Unggah foto"),
+      new File(["photo"], "bersama-kakak.png", { type: "image/png" }),
+    );
+    await user.click(screen.getByRole("button", { name: "Simpan Networking" }));
+
+    await vi.waitFor(() =>
+      expect(submitNetworkingFriendMock).toHaveBeenCalledWith(84, {
+        photoUrl: "https://cdn.example/networking.jpg",
+        answers: seniorQuestions.map((question, index) => ({
+          questionId: question.id,
+          answer: `Jawaban senior ${index + 1}`,
+        })),
+        customQuestion: "Apa pesan untuk mahasiswa baru?",
+        customAnswer: "Tetap semangat.",
+      }),
+    );
+  });
+
   it("does not submit without the custom fields and documentation photo", async () => {
     const user = userEvent.setup();
     render(<NetworkingSubmissionForm friendId={42} />);
 
     expect(
-      await screen.findByLabelText(`1. ${questions[0].prompt}`),
+      await screen.findByLabelText(`1. ${peerQuestions[0].prompt}`),
     ).toBeEnabled();
-    for (const [index, question] of questions.entries()) {
+    for (const [index, question] of peerQuestions.entries()) {
       await user.type(
         screen.getByLabelText(`${index + 1}. ${question.prompt}`),
         `Jawaban ${index + 1}`,

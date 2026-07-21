@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FaCircleUser } from "react-icons/fa6";
 
-import { BackButton, DashboardPageLayout } from "@/components";
-import type { FriendUser } from "@/lib/friend-api";
-import { getPublicProfile } from "@/lib/profile-api";
+import { BackButton, DashboardPageLayout, UserAvatar } from "@/components";
+import { ApiError } from "@/lib/api";
+import {
+  getPublicProfile,
+  type PublicProfileUser,
+} from "@/lib/profile-api";
 
 function DisplayField({
   label,
@@ -26,32 +28,21 @@ function DisplayField({
   );
 }
 
-function ProfileAvatar({ imgUrl }: { imgUrl?: string | null }) {
-  if (imgUrl) {
-    return (
-      <span
-        aria-hidden="true"
-        className="size-[129px] shrink-0 rounded-full bg-cover bg-center"
-        style={{ backgroundImage: `url(${imgUrl})` }}
-      />
-    );
-  }
-
-  return (
-    <FaCircleUser
-      aria-hidden="true"
-      className="size-[129px] shrink-0 text-yellow-300"
-    />
-  );
-}
-
 export function PublicProfileClient({ id }: { id: number }) {
-  const [profile, setProfile] = useState<FriendUser | null>(null);
+  const [profile, setProfile] = useState<PublicProfileUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
     let active = true;
+    queueMicrotask(() => {
+      if (!active) return;
+      setIsLoading(true);
+      setNotFound(false);
+      setLoadError("");
+      setProfile(null);
+    });
 
     getPublicProfile(id)
       .then((data) => {
@@ -59,8 +50,17 @@ export function PublicProfileClient({ id }: { id: number }) {
         setProfile(data);
         setNotFound(!data);
       })
-      .catch(() => {
-        if (active) setNotFound(true);
+      .catch((error: unknown) => {
+        if (!active) return;
+        if (error instanceof ApiError && error.status === 404) {
+          setNotFound(true);
+          return;
+        }
+        setLoadError(
+          error instanceof ApiError && error.status === 401
+            ? "Sesi login berakhir. Silakan masuk kembali."
+            : "Profil belum dapat dimuat. Silakan coba lagi.",
+        );
       })
       .finally(() => {
         if (active) setIsLoading(false);
@@ -76,20 +76,31 @@ export function PublicProfileClient({ id }: { id: number }) {
   return (
     <DashboardPageLayout activeItem="friends" mainClassName="md:pt-6" rightRail={null}>
       <div className="flex w-full max-w-[1345px] flex-col gap-8">
-        <BackButton href="/kalyanamitta?tab=connected" />
+        <BackButton href="/kalyanamitta" />
 
         {isLoading ? (
           <p className="rounded-2xl bg-blue-200/20 px-4 py-3 text-b2">
             Memuat profil...
           </p>
+        ) : loadError ? (
+          <p
+            role="alert"
+            className="rounded-2xl bg-red-400/10 px-4 py-3 text-b2 text-red-100"
+          >
+            {loadError}
+          </p>
         ) : notFound || !profile ? (
           <p className="rounded-2xl bg-red-400/10 px-4 py-3 text-b2 text-red-100">
-            Profil tidak ditemukan dari daftar koneksi.
+            Profil peserta tidak ditemukan.
           </p>
         ) : (
           <>
             <section className="flex flex-col items-center gap-4 px-2 text-center sm:flex-row sm:px-8 sm:text-left">
-              <ProfileAvatar imgUrl={profile.imgUrl} />
+              <UserAvatar
+                src={profile.imgUrl}
+                alt={`Foto ${name}`}
+                className="size-[129px] rounded-full"
+              />
               <div className="min-w-0">
                 <h1 className="break-words font-heading text-h3 text-yellow-500 sm:text-h2">
                   {name}

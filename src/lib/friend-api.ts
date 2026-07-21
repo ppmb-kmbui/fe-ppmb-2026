@@ -8,6 +8,9 @@ export interface FriendUser {
   imgUrl: string | null;
   batch: number;
   status: string;
+  canConnect?: boolean;
+  canNetwork?: boolean;
+  networkingType?: "peer" | "senior" | null;
   lineId?: string | null;
   whatsappNumber?: string | null;
 }
@@ -56,6 +59,8 @@ export interface ConnectionItem {
 
 export interface GetFriendsParams {
   name?: string;
+  batch?: number;
+  scope?: "discover";
   page?: number;
   limit?: number;
 }
@@ -64,6 +69,8 @@ const acceptedConnectionStatuses = new Set(["accepted", "done", "connected"]);
 
 export async function getFriendsPage({
   name,
+  batch,
+  scope,
   page = 1,
   limit = 12,
 }: GetFriendsParams = {}) {
@@ -74,6 +81,14 @@ export async function getFriendsPage({
 
   if (name?.trim()) {
     params.set("name", name.trim());
+  }
+
+  if (batch) {
+    params.set("batch", String(batch));
+  }
+
+  if (scope) {
+    params.set("scope", scope);
   }
 
   const response = await apiFetch<FriendListResponse>(

@@ -1,6 +1,7 @@
 import { BackButton } from "@/components";
 
 import { NetworkingProgressClient } from "../_components/NetworkingProgressClient";
+import { NetworkingAccessGate } from "../_components/NetworkingAccessGate";
 import { NetworkingSubmissionRightRail } from "../_components/NetworkingSubmissionRightRail";
 import { TaskPageShell } from "../_components/TaskPageShell";
 import {
@@ -11,30 +12,33 @@ import {
 
 export default function NetworkingTaskPage() {
   return (
-    <TaskPageShell
-      rightRail={<NetworkingSubmissionRightRail />}
-      mobileRailLabel="Progres"
-      withConstellation
-    >
-      <div className="flex max-w-[958px] flex-col gap-8">
-        <BackButton href="/tugas" />
-        <GradientTaskTitle>Networking</GradientTaskTitle>
+    <NetworkingAccessGate>
+      <TaskPageShell
+        rightRail={<NetworkingSubmissionRightRail />}
+        mobileRailLabel="Progres"
+        withConstellation
+      >
+        <div className="flex max-w-[958px] flex-col gap-8">
+          <BackButton href="/tugas" />
+          <GradientTaskTitle>Networking</GradientTaskTitle>
 
-        <TaskSectionCard>
-          <TaskDescription>
-            Tugas Networking adalah tugas yang bertujuan untuk membangun dan
-            memperluas relasi mahasiswa baru angkatan 2026 dengan teman
-            seangkatan maupun kakak tingkat.
-          </TaskDescription>
-          <TaskDescription>
-            Tambahkan teman melalui halaman Teman Saya dan tunggu sampai
-            permintaan diterima. Setelah terhubung, pilih tombol Networking pada
-            kartu teman untuk mengisi jawaban dan foto dokumentasi.
-          </TaskDescription>
-        </TaskSectionCard>
+          <TaskSectionCard>
+            <TaskDescription>
+              Tugas Networking bertujuan membangun dan memperluas relasi
+              mahasiswa baru angkatan 2026 dengan teman seangkatan maupun kakak
+              tingkat.
+            </TaskDescription>
+            <TaskDescription>
+              Untuk teman angkatan 2026, kirim permintaan pertemanan dan tunggu
+              sampai diterima sebelum mengisi Networking. Untuk kakak tingkat
+              angkatan 2023, 2024, dan 2025, pilih tombol Networking secara
+              langsung tanpa menambahkan teman terlebih dahulu.
+            </TaskDescription>
+          </TaskSectionCard>
 
-        <NetworkingProgressClient />
-      </div>
-    </TaskPageShell>
+          <NetworkingProgressClient />
+        </div>
+      </TaskPageShell>
+    </NetworkingAccessGate>
   );
 }

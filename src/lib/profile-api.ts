@@ -1,7 +1,6 @@
 import { apiFetch } from "@/lib/api";
 import type { AuthUser } from "@/lib/auth-api";
 import { setCachedProfileSnapshot } from "@/lib/auth-api";
-import { getFriends, getMyConnections } from "@/lib/friend-api";
 
 export interface ProfileUser extends AuthUser {
   followers?: number;
@@ -14,6 +13,16 @@ export interface UpdateProfileInput {
   lineId?: string;
   whatsappNumber?: string;
   faculty?: string;
+}
+
+export interface PublicProfileUser {
+  id: number;
+  fullname: string | null;
+  imgUrl: string | null;
+  faculty: string | null;
+  batch: number;
+  lineId: string | null;
+  whatsappNumber: string | null;
 }
 
 export async function getOwnProfile() {
@@ -34,9 +43,6 @@ export async function updateOwnProfile(input: UpdateProfileInput) {
 }
 
 export async function getPublicProfile(id: number) {
-  const [connections, friends] = await Promise.all([
-    getMyConnections().catch(() => []),
-    getFriends().catch(() => []),
-  ]);
-  return [...connections, ...friends].find((user) => user.id === id) ?? null;
+  const response = await apiFetch<PublicProfileUser>(`profile/${id}`);
+  return response.data ?? null;
 }

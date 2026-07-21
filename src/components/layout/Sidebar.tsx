@@ -20,6 +20,7 @@ import {
 } from "react-icons/fa6";
 
 import { cn } from "@/lib/cn";
+import { useViewerNavigationItems } from "./useViewerNavigationItems";
 
 export type SidebarRoute = "home" | "tasks" | "friends" | "materials";
 
@@ -88,6 +89,7 @@ export function Sidebar({
   const collapseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isPinned = pinned ?? internalPinned;
   const isExpanded = isPinned || isPointerInside || isFocusWithin;
+  const visibleItems = useViewerNavigationItems(items);
 
   function clearCollapseTimer() {
     if (collapseTimer.current) {
@@ -182,7 +184,7 @@ export function Sidebar({
         )}
 
         <nav className="flex flex-col gap-10">
-          {items.map((item) => {
+          {visibleItems.map((item) => {
             const isActive = item.key === activeItem;
 
             return (

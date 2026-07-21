@@ -8,7 +8,7 @@ vi.mock("@/lib/api", () => ({
   apiFetch: apiFetchMock,
 }));
 
-import { getMyConnections } from "@/lib/friend-api";
+import { getFriendsPage, getMyConnections } from "@/lib/friend-api";
 
 function friend(id: number, fullname: string) {
   return {
@@ -41,5 +41,29 @@ describe("getMyConnections", () => {
       expect.objectContaining({ id: 10, fullname: "A" }),
       expect.objectContaining({ id: 12, fullname: "C" }),
     ]);
+  });
+});
+
+describe("getFriendsPage", () => {
+  beforeEach(() => {
+    apiFetchMock.mockReset();
+    apiFetchMock.mockResolvedValue({
+      success: true,
+      data: { friends: [], pagination: { page: 1, limit: 8, total: 0, totalPages: 1 } },
+    });
+  });
+
+  it("forwards target-batch and discovery filters", async () => {
+    await getFriendsPage({
+      name: "Budi",
+      batch: 2025,
+      scope: "discover",
+      page: 1,
+      limit: 8,
+    });
+
+    expect(apiFetchMock).toHaveBeenCalledWith(
+      "friends?page=1&limit=8&name=Budi&batch=2025&scope=discover",
+    );
   });
 });

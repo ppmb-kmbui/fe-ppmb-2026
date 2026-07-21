@@ -1,9 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
-import { LuCornerUpLeft, LuUser, LuUserPlus } from "react-icons/lu";
+import { LuCornerUpLeft, LuUserPlus } from "react-icons/lu";
 
 import {
   Button,
@@ -11,7 +10,13 @@ import {
   FriendRequestCard,
   MemberCard,
   SearchInput,
+  UserAvatar,
 } from "@/components";
+import {
+  getCachedProfileSnapshot,
+  getProfileCached,
+  type AuthUser,
+} from "@/lib/auth-api";
 import {
   acceptConnectionRequest,
   getConnectionRequests,
@@ -22,7 +27,11 @@ import {
   type ConnectionRequestItem,
   type FriendUser,
 } from "@/lib/friend-api";
-import { isNetworkingTargetBatch } from "@/app/tugas/_components/networking-requirements";
+import {
+  isNetworkingTargetBatch,
+  isNetworkingViewerBatch,
+} from "@/app/tugas/_components/networking-requirements";
+import { getKalyanamittaActionPolicy } from "./kalyanamitta-actions";
 
 function getFriendActionErrorMessage(error: unknown) {
   if (error instanceof Error && error.message) return error.message;
@@ -33,9 +42,20 @@ function getFriendActionErrorMessage(error: unknown) {
 const toastDurationMs = 3000;
 const friendsPerPage = 8;
 
+function parseBatchFilter(value: string | null) {
+  const batch = Number(value);
+  return Number.isInteger(batch) && isNetworkingTargetBatch(batch)
+    ? batch
+    : undefined;
+}
+
 function KalyanamittaContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [viewer, setViewer] = useState<AuthUser | null>(() =>
+    getCachedProfileSnapshot(),
+  );
+  const [isViewerResolved, setIsViewerResolved] = useState(false);
   const [myConnections, setMyConnection] = useState<FriendUser[]>([]);
   const [allFriends, setAllFriends] = useState<FriendUser[]>([]);
   const [friendRequests, setFriendRequests] = useState<ConnectionRequestItem[]>(
@@ -61,6 +81,11 @@ function KalyanamittaContent() {
   const [friendsTotalPages, setFriendsTotalPages] = useState(1);
   const [friendsTotal, setFriendsTotal] = useState(0);
   const [isFriendsLoading, setIsFriendsLoading] = useState(false);
+  const [batchFilter, setBatchFilter] = useState<number | undefined>(() =>
+    parseBatchFilter(searchParams.get("batch")),
+  );
+  const viewerCanNetwork =
+    isNetworkingViewerBatch(viewer?.batch ?? 0) && viewer?.isAdmin !== true;
 
   const refreshKalyanamittaData = useCallback(async () => {
     const [connections, connectionRequests] = await Promise.all([
@@ -68,7 +93,8 @@ function KalyanamittaContent() {
       getConnectionRequests(),
     ]);
     const pendingReceived = (connectionRequests?.received ?? []).filter(
-      (request) => request.status === "pending",
+      (request) =>
+        request.status === "pending" && request.from?.batch === 2026,
     );
     const pendingSentIds = new Set(
       (connectionRequests?.sent ?? [])
@@ -92,6 +118,8 @@ function KalyanamittaContent() {
     try {
       const { friends, pagination } = await getFriendsPage({
         name: debouncedSearchQuery,
+        batch: batchFilter,
+        scope: "discover",
         page: friendsPage,
         limit: friendsPerPage,
       });
@@ -104,7 +132,7 @@ function KalyanamittaContent() {
     } finally {
       setIsFriendsLoading(false);
     }
-  }, [debouncedSearchQuery, friendsPage]);
+  }, [batchFilter, debouncedSearchQuery, friendsPage]);
 
   useEffect(() => {
     let active = true;
@@ -114,11 +142,25 @@ function KalyanamittaContent() {
       setActionError("");
 
       try {
-        await refreshKalyanamittaData();
+        const profile = await getProfileCached();
+        if (!active) return;
+        setViewer(profile);
+
+        if (isNetworkingViewerBatch(profile.batch) && !profile.isAdmin) {
+          await refreshKalyanamittaData();
+        } else {
+          setActiveTab("not-connected");
+          setMyConnection([]);
+          setFriendRequests([]);
+          setSentRequestIds(new Set());
+        }
       } catch (error) {
         if (active) setActionError(getFriendActionErrorMessage(error));
       } finally {
-        if (active) setLoading(false);
+        if (active) {
+          setIsViewerResolved(true);
+          setLoading(false);
+        }
       }
     }
 
@@ -139,14 +181,14 @@ function KalyanamittaContent() {
   }, [searchQuery]);
 
   useEffect(() => {
-    if (activeTab !== "not-connected") return;
+    if (!isViewerResolved || activeTab !== "not-connected") return;
 
     const timeout = setTimeout(() => {
       void loadFriendCandidates();
     }, 0);
 
     return () => clearTimeout(timeout);
-  }, [activeTab, loadFriendCandidates]);
+  }, [activeTab, isViewerResolved, loadFriendCandidates]);
 
   useEffect(() => {
     if (!statusMessage && !actionError) return;
@@ -159,25 +201,18 @@ function KalyanamittaContent() {
     return () => clearTimeout(timeout);
   }, [statusMessage, actionError]);
 
-  const notConnectedFriends = useMemo(
-    () =>
-      allFriends.filter(
-        (friend) =>
-          friend.status === "not_connected" ||
-          friend.status === "menunggu_konfirmasi",
-      ),
-    [allFriends],
-  );
   const displayedFriends = useMemo(
     () =>
-      (activeTab === "connected" ? myConnections : notConnectedFriends).filter(
+      (activeTab === "connected" ? myConnections : allFriends).filter(
         (friend) =>
           friend.fullname?.toLowerCase().includes(searchQuery.toLowerCase()),
       ),
-    [activeTab, myConnections, notConnectedFriends, searchQuery],
+    [activeTab, allFriends, myConnections, searchQuery],
   );
 
   async function handleSendRequest(friendId: number) {
+    if (!viewerCanNetwork) return;
+
     setProcessingFriendIds((prev) => new Set(prev).add(friendId));
     setActionError("");
     setStatusMessage("");
@@ -282,18 +317,11 @@ function KalyanamittaContent() {
             key={`request-${request.id}`}
             name={request.from?.fullname ?? "Nama tidak diketahui"}
             avatar={
-              request.from?.imgUrl ? (
-                <Image
-                  src={request.from.imgUrl}
-                  alt={`Foto ${request.from.fullname ?? "pengguna"}`}
-                  width={134}
-                  height={91}
-                  unoptimized
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <LuUser aria-hidden="true" className="size-10" />
-              )
+              <UserAvatar
+                src={request.from?.imgUrl}
+                alt={`Foto ${request.from?.fullname ?? "pengguna"}`}
+                className="h-full w-full"
+              />
             }
             batch={request.from?.batch ?? "-"}
             isLoading={processingRequestIds.has(request.id)}
@@ -308,7 +336,7 @@ function KalyanamittaContent() {
   return (
     <DashboardPageLayout
       activeItem="friends"
-      rightRail={friendRequest}
+      rightRail={viewerCanNetwork ? friendRequest : null}
       rightRailClassName="max-lg:hidden"
     >
       {(statusMessage || actionError) && (
@@ -343,7 +371,7 @@ function KalyanamittaContent() {
                 </span>
               )}
             </h1>
-            {!requestOpen && (
+            {!requestOpen && viewerCanNetwork && (
               <Button
                 className="flex-0 relative lg:hidden"
                 onClick={() => setRequestOpen(true)}
@@ -379,19 +407,21 @@ function KalyanamittaContent() {
                       : "bg-[#683592]/25 hover:bg-purple-300/30"
                   }`}
                 >
-                  Cari Teman
+                  {viewerCanNetwork ? "Cari Teman" : "Cari Peserta"}
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab("connected")}
-                  className={`inline-flex h-11 min-w-35 items-center justify-center rounded-2xl px-6 text-b2 transition-colors ${
-                    activeTab === "connected"
-                      ? "bg-purple-300/50"
-                      : "bg-[#683592]/25 hover:bg-purple-300/30"
-                  }`}
-                >
-                  Teman Saya
-                </button>
+                {viewerCanNetwork && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("connected")}
+                    className={`inline-flex h-11 min-w-35 items-center justify-center rounded-2xl px-6 text-b2 transition-colors ${
+                      activeTab === "connected"
+                        ? "bg-purple-300/50"
+                        : "bg-[#683592]/25 hover:bg-purple-300/30"
+                    }`}
+                  >
+                    Teman Saya
+                  </button>
+                )}
               </div>
 
               <SearchInput
@@ -399,6 +429,29 @@ function KalyanamittaContent() {
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
               />
+
+              {activeTab === "not-connected" && (
+                <div className="mt-4 flex flex-wrap gap-2" aria-label="Filter angkatan">
+                  {[undefined, 2026, 2025, 2024, 2023].map((batch) => (
+                    <button
+                      key={batch ?? "all"}
+                      type="button"
+                      aria-pressed={batchFilter === batch}
+                      onClick={() => {
+                        setBatchFilter(batch);
+                        setFriendsPage(1);
+                      }}
+                      className={`rounded-full px-4 py-2 text-b3 transition-colors ${
+                        batchFilter === batch
+                          ? "bg-purple-300/55 text-yellow-50"
+                          : "bg-purple-900/25 hover:bg-purple-300/30"
+                      }`}
+                    >
+                      {batch ? `Angkatan ${batch}` : "Semua"}
+                    </button>
+                  ))}
+                </div>
+              )}
 
               <div className="mt-6 grid gap-5 lg:grid-cols-2">
                 {activeTab === "not-connected" && isFriendsLoading ? (
@@ -419,20 +472,21 @@ function KalyanamittaContent() {
                       sentRequestIds.has(friend.id) ||
                       friend.status === "menunggu_konfirmasi";
                     const isProcessing = processingFriendIds.has(friend.id);
-                    const canDoNetworking =
-                      activeTab === "connected" &&
-                      isNetworkingTargetBatch(friend.batch);
-                    const avatar = friend.imgUrl ? (
-                      <Image
+                    const policy = getKalyanamittaActionPolicy({
+                      viewerBatch: viewer?.batch ?? 0,
+                      friend,
+                      isConnected: activeTab === "connected",
+                      isRequestSent: isSent,
+                    });
+                    const primaryIsProfile = policy.primaryAction === "profile";
+                    const primaryIsPending = policy.primaryAction === "pending";
+                    const avatar = (
+                      <UserAvatar
                         src={friend.imgUrl}
                         alt={`Foto ${friend.fullname ?? "pengguna"}`}
-                        width={132}
-                        height={132}
-                        unoptimized
-                        className="h-full w-full object-contain lg:object-cover"
+                        className="h-full w-full"
+                        imageClassName="object-contain lg:object-cover"
                       />
-                    ) : (
-                      <LuUser aria-hidden="true" className="size-10" />
                     );
 
                     return (
@@ -442,26 +496,26 @@ function KalyanamittaContent() {
                         name={friend.fullname ?? "Nama tidak diketahui"}
                         batch={friend.batch}
                         actionLabel={
-                          activeTab === "connected"
+                          primaryIsProfile
                             ? "Lihat Profil"
-                            : isSent
+                            : primaryIsPending
                               ? "Terkirim"
-                              : undefined
+                              : "Kenalan"
                         }
                         isActionLoading={isProcessing}
-                        isActionDisabled={activeTab !== "connected" && isSent}
+                        isActionDisabled={primaryIsPending}
                         onAction={
-                          activeTab === "connected"
+                          primaryIsProfile
                             ? () => router.push(`/profil/${friend.id}`)
-                            : isSent
+                            : primaryIsPending
                               ? undefined
                               : () => handleSendRequest(friend.id)
                         }
                         secondaryActionLabel={
-                          canDoNetworking ? "Networking" : undefined
+                          policy.canNetwork ? "Networking" : undefined
                         }
                         onSecondaryAction={
-                          canDoNetworking
+                          policy.canNetwork
                             ? () => router.push(`/tugas/networking/${friend.id}`)
                             : undefined
                         }
@@ -473,7 +527,7 @@ function KalyanamittaContent() {
 
               {activeTab === "not-connected" &&
                 !isFriendsLoading &&
-                displayedFriends.length > 0 && (
+                friendsTotal > 0 && (
                   <div className="mt-6 flex flex-col items-center justify-between gap-4 rounded-2xl bg-purple-900/20 px-4 py-3 text-b3 sm:flex-row">
                     <p>
                       Menampilkan {displayedFriends.length} dari {friendsTotal} kandidat

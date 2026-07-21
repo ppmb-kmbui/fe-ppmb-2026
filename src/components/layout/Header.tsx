@@ -6,10 +6,9 @@ import { useEffect, useState } from "react";
 import {
   FaArrowRightFromBracket,
   FaBurger,
-  FaCircleUser,
 } from "react-icons/fa6";
 
-import { BrandLogo } from "@/components/ui";
+import { BrandLogo, UserAvatar } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import {
   getCachedProfileSnapshot,
@@ -21,6 +20,7 @@ import {
   type SidebarItem,
   type SidebarRoute,
 } from "./Sidebar";
+import { useViewerNavigationItems } from "./useViewerNavigationItems";
 
 export interface HeaderUser {
   fullName: string;
@@ -66,6 +66,7 @@ export function Header({
   };
   const displayedUser = user ?? profileUser;
   const isDashboardHeader = activeItem !== undefined;
+  const visibleMobileNavItems = useViewerNavigationItems(mobileNavItems);
 
   useEffect(() => {
     let active = true;
@@ -107,18 +108,11 @@ export function Header({
 
   const profileContent = displayedUser ? (
     <>
-      {displayedUser.imgUrl ? (
-        <span
-          aria-hidden="true"
-          className="size-10 rounded-full bg-cover bg-center md:size-[50px]"
-          style={{ backgroundImage: `url(${displayedUser.imgUrl})` }}
-        />
-      ) : (
-        <FaCircleUser
-          aria-hidden="true"
-          className="size-10 text-yellow-100 md:size-[50px]"
-        />
-      )}
+      <UserAvatar
+        src={displayedUser.imgUrl}
+        alt={`Foto ${displayedUser.fullName}`}
+        className="size-10 rounded-full md:size-[50px]"
+      />
       <div className="hidden flex-col items-end gap-2 sm:flex">
         <p className="font-heading text-h5">{displayedUser.fullName}</p>
         {(displayedUser.subtitle || displayedUser.batch) && (
@@ -151,15 +145,15 @@ export function Header({
       }
       className="grid size-[50px] shrink-0 place-items-center rounded-full text-yellow-100 transition-colors hover:bg-white/10 md:hidden"
     >
-      {displayedUser?.imgUrl ? (
-        <span
-          aria-hidden="true"
-          className="size-[50px] rounded-full bg-cover bg-center"
-          style={{ backgroundImage: `url(${displayedUser.imgUrl})` }}
-        />
-      ) : (
-        <FaCircleUser aria-hidden="true" className="size-[42px]" />
-      )}
+      <UserAvatar
+        src={displayedUser?.imgUrl}
+        alt={
+          displayedUser
+            ? `Foto ${displayedUser.fullName}`
+            : "Foto profil pengguna"
+        }
+        className="size-[50px] rounded-full"
+      />
     </Link>
   );
 
@@ -263,7 +257,7 @@ export function Header({
             className="absolute left-4 top-[104px] flex w-[260px] flex-col rounded-2xl border border-white/10 bg-[rgba(104,53,146,0.25)] px-4 py-8 shadow-[0_20px_60px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-[36px] before:pointer-events-none before:absolute before:inset-0 before:rounded-2xl before:bg-[linear-gradient(135deg,rgba(255,255,255,0.16),rgba(255,255,255,0.03)_45%,rgba(0,0,0,0.16))]"
           >
             <div className="relative z-10 flex flex-col gap-2.5">
-              {mobileNavItems.map((item) => {
+              {visibleMobileNavItems.map((item) => {
                 const isActive = item.key === activeItem;
 
                 return (

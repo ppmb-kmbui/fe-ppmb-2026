@@ -16,22 +16,17 @@ import {
   type NetworkingQuestion,
 } from "@/lib/task-api";
 
-import { NETWORKING_FIXED_QUESTIONS } from "./networking-requirements";
-
-const fallbackQuestions: NetworkingQuestion[] = NETWORKING_FIXED_QUESTIONS.map(
-  (question, index) => ({
-    id: -(index + 1),
-    code: question.code,
-    prompt: question.prompt,
-    position: index + 1,
-    isCustom: false,
-  }),
-);
+import {
+  getNetworkingFixedQuestionCount,
+  getNetworkingTypeForBatch,
+  NETWORKING_SENIOR_TEMPLATE_URL,
+  type NetworkingType,
+} from "./networking-requirements";
 
 export function NetworkingSubmissionForm({ friendId }: { friendId: number }) {
   const [friend, setFriend] = useState<NetworkingFriend>();
-  const [questions, setQuestions] =
-    useState<NetworkingQuestion[]>(fallbackQuestions);
+  const [networkingType, setNetworkingType] = useState<NetworkingType>();
+  const [questions, setQuestions] = useState<NetworkingQuestion[]>([]);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [customQuestion, setCustomQuestion] = useState("");
   const [customAnswer, setCustomAnswer] = useState("");
@@ -43,6 +38,9 @@ export function NetworkingSubmissionForm({ friendId }: { friendId: number }) {
   const [message, setMessage] = useState<string>();
   const [error, setError] = useState<string>();
   const isSubmissionClosed = isTaskSubmissionClosed("networking");
+  const expectedFixedQuestionCount = networkingType
+    ? getNetworkingFixedQuestionCount(networkingType)
+    : 0;
 
   const fixedQuestions = useMemo(
     () =>
@@ -62,12 +60,12 @@ export function NetworkingSubmissionForm({ friendId }: { friendId: number }) {
         const loadedQuestions = data.questions
           .filter((question) => !question.isCustom)
           .sort((left, right) => left.position - right.position);
-        const renderedQuestions = loadedQuestions.length
-          ? loadedQuestions
-          : fallbackQuestions;
-        const customCatalogQuestion = data.questions.find(
+        const loadedNetworkingType =
+          data.networkingType ?? getNetworkingTypeForBatch(data.friend.batch);
+        const customCatalogQuestions = data.questions.filter(
           (question) => question.isCustom,
         );
+        const customCatalogQuestion = customCatalogQuestions[0];
         const customSubmissionAnswer = data.submission?.answers.find(
           (answer) =>
             Boolean(answer.customQuestion?.trim()) ||
@@ -77,17 +75,24 @@ export function NetworkingSubmissionForm({ friendId }: { friendId: number }) {
         );
 
         setFriend(data.friend);
-        setQuestions(renderedQuestions);
-        setIsReady(
-          loadedQuestions.length === 3 &&
-            loadedQuestions.every((question) => question.id > 0),
-        );
-        if (loadedQuestions.length !== 3) {
+        setNetworkingType(loadedNetworkingType ?? undefined);
+        setQuestions(loadedQuestions);
+        const expectedCount = loadedNetworkingType
+          ? getNetworkingFixedQuestionCount(loadedNetworkingType)
+          : 0;
+        const hasValidCatalog =
+          expectedCount > 0 &&
+          loadedQuestions.length === expectedCount &&
+          loadedQuestions.every((question) => question.id > 0) &&
+          customCatalogQuestions.length === 1 &&
+          Boolean(customCatalogQuestion && customCatalogQuestion.id > 0);
+        setIsReady(hasValidCatalog);
+        if (!hasValidCatalog) {
           setError("Konfigurasi pertanyaan Networking belum tersedia.");
         }
         setAnswers(
           Object.fromEntries(
-            renderedQuestions.map((question) => [
+            loadedQuestions.map((question) => [
               question.id,
               data.submission?.answers.find(
                 (answer) => answer.questionId === question.id,
@@ -125,7 +130,11 @@ export function NetworkingSubmissionForm({ friendId }: { friendId: number }) {
       return;
     }
 
-    if (fixedQuestions.length !== 3 || fixedQuestions.some(({ id }) => id < 1)) {
+    if (
+      expectedFixedQuestionCount < 1 ||
+      fixedQuestions.length !== expectedFixedQuestionCount ||
+      fixedQuestions.some(({ id }) => id < 1)
+    ) {
       setError("Daftar pertanyaan belum berhasil dimuat. Silakan muat ulang halaman.");
       return;
     }
@@ -178,8 +187,30 @@ export function NetworkingSubmissionForm({ friendId }: { friendId: number }) {
   const disabled =
     isLoading || !isReady || isSubmitting || isSubmissionClosed;
 
+  if (isLoading) {
+    return (
+      <p
+        role="status"
+        className="rounded-2xl border border-white/10 bg-blue-200/20 px-4 py-3 text-b2"
+      >
+        Memuat pertanyaan Networking...
+      </p>
+    );
+  }
+
   return (
     <form className="flex flex-col gap-7" onSubmit={handleSubmit}>
+      {networkingType === "senior" && (
+        <a
+          href={NETWORKING_SENIOR_TEMPLATE_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="w-fit rounded-full border border-yellow-100/60 bg-yellow-100/10 px-5 py-3 text-b2 text-yellow-50 transition-colors hover:bg-yellow-100/20"
+        >
+          Lihat Templat Pertanyaan Kakak Tingkat
+        </a>
+      )}
+
       {fixedQuestions.map((question, index) => (
         <Textarea
           key={question.code || question.id}

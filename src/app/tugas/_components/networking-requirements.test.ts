@@ -2,9 +2,12 @@ import { describe, expect, it } from "vitest";
 
 import {
   isNetworkingTargetBatch,
+  getNetworkingFixedQuestionCount,
+  getNetworkingTypeForBatch,
   NETWORKING_BATCH_REQUIREMENTS,
   NETWORKING_FIXED_QUESTIONS,
   NETWORKING_TOTAL_REQUIRED,
+  isNetworkingViewerBatch,
 } from "./networking-requirements";
 
 describe("networking requirements", () => {
@@ -31,5 +34,18 @@ describe("networking requirements", () => {
       "formative_experience",
       "first_year_goal",
     ]);
+  });
+
+  it("allows only angkatan 2026 to perform Networking", () => {
+    expect(isNetworkingViewerBatch(2026)).toBe(true);
+    expect(isNetworkingViewerBatch(2025)).toBe(false);
+  });
+
+  it("selects the peer or senior catalog from the target batch", () => {
+    expect(getNetworkingTypeForBatch(2026)).toBe("peer");
+    expect(getNetworkingTypeForBatch(2025)).toBe("senior");
+    expect(getNetworkingTypeForBatch(2022)).toBeNull();
+    expect(getNetworkingFixedQuestionCount("peer")).toBe(3);
+    expect(getNetworkingFixedQuestionCount("senior")).toBe(5);
   });
 });

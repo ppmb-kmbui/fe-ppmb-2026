@@ -7,6 +7,7 @@ import { FaUserShield } from "react-icons/fa6";
 import { ParticipantCard } from "@/components/admin";
 import type { Participant } from "@/components/admin/Participant";
 import { Header, type HeaderUser } from "@/components/layout/Header";
+import { UserAvatar } from "@/components/ui";
 import { getProfileCached } from "@/lib/auth-api";
 import { getParticipants } from "@/lib/admin-api";
 
@@ -144,13 +145,11 @@ export default function AdminPage() {
                   batch={participant.batch}
                   progress={participant.progress.percentage}
                   avatar={
-                    participant.imgUrl ? (
-                      <img
-                        src={participant.imgUrl}
-                        alt={name}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : undefined
+                    <UserAvatar
+                      src={participant.imgUrl}
+                      alt={`Foto ${name}`}
+                      className="h-full w-full"
+                    />
                   }
                   href={`/admin/peserta/${participant.id}`}
                 />

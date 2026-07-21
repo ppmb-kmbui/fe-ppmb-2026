@@ -18,3 +18,4 @@ export {
   type SubmissionStatus,
 } from "./StatusBadge";
 export { Textarea, type TextareaProps } from "./Textarea";
+export { UserAvatar, type UserAvatarProps } from "./UserAvatar";

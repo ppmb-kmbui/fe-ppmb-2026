@@ -22,6 +22,7 @@ describe("Networking task API", () => {
         success: true,
         data: {
           friend: { id: 42, fullname: "Budi", batch: 2025 },
+          networkingType: "senior",
           questions: [],
           submission: null,
           progress: { completed: 0, required: 18, percentage: 0 },

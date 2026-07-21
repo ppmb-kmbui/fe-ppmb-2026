@@ -1,13 +1,18 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { TaskCard } from "@/components";
+import {
+  getCachedProfileSnapshot,
+  getProfileCached,
+} from "@/lib/auth-api";
 import type { TaskSummary } from "@/lib/task-api";
 
 import { taskCards } from "./task-page-data";
 import { getTaskIcon, type TaskIconKey } from "./task-icons";
 import { useTaskSummary } from "./useTaskSummary";
+import { isNetworkingViewerBatch } from "./networking-requirements";
 
 function getProgressByTitle(summary?: TaskSummary) {
   if (!summary) return new Map<string, number>();
@@ -24,6 +29,33 @@ function getProgressByTitle(summary?: TaskSummary) {
 export function TasksOverviewClient() {
   const { summary, statusMessage } = useTaskSummary("Memuat progres tugas...");
   const progressByTitle = useMemo(() => getProgressByTitle(summary), [summary]);
+  const [canAccessNetworking, setCanAccessNetworking] = useState(() => {
+    const profile = getCachedProfileSnapshot();
+    return profile ? isNetworkingViewerBatch(profile.batch) : false;
+  });
+
+  useEffect(() => {
+    let active = true;
+    getProfileCached()
+      .then((profile) => {
+        if (active) {
+          setCanAccessNetworking(isNetworkingViewerBatch(profile.batch));
+        }
+      })
+      .catch(() => undefined);
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const visibleTasks = useMemo(
+    () =>
+      taskCards.filter(
+        (task) => task.title !== "Networking" || canAccessNetworking,
+      ),
+    [canAccessNetworking],
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -34,7 +66,7 @@ export function TasksOverviewClient() {
       )}
 
       <div className="grid gap-5 lg:grid-cols-2">
-        {taskCards.map((task) => (
+        {visibleTasks.map((task) => (
           <TaskCard
             key={task.title}
             title={task.title}
