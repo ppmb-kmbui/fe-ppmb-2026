@@ -1,8 +1,35 @@
 import { apiFetch } from "@/lib/api";
 import {
-  SubmissionReviewCardProps,
+  type SubmissionReviewCardProps,
   type SubmissionLink,
 } from "@/components/admin/SubmissionReviewCard";
+
+export const ADMIN_TASK_TYPES = [
+  "networking",
+  "explorer",
+  "mentoring",
+  "fossib",
+  "insight-hunting",
+] as const;
+
+export type AdminTaskType = (typeof ADMIN_TASK_TYPES)[number];
+
+export interface AdminTaskReview {
+  taskType: AdminTaskType;
+  score: number;
+  feedback: string | null;
+  reviewedAt: string;
+  reviewer: {
+    id: number;
+    fullname: string | null;
+    email: string;
+  };
+}
+
+export interface SaveAdminTaskReviewInput {
+  score: number;
+  feedback?: string | null;
+}
 
 export interface ProgressItem {
   completed: number;
@@ -63,6 +90,8 @@ export interface ParticipantTaskResponse {
     overall: ProgressItem;
   };
 
+  reviews?: Partial<Record<AdminTaskType, AdminTaskReview | null>>;
+
   submissions: {
     networking: AdminNetworkingSubmission[];
     networkingQuestions?: Array<{
@@ -111,6 +140,29 @@ export async function getParticipantTask(participantId: string) {
   return response.data;
 }
 
+export async function saveParticipantTaskReview(
+  participantId: string,
+  taskType: AdminTaskType,
+  input: SaveAdminTaskReviewInput,
+): Promise<AdminTaskReview> {
+  const response = await apiFetch<{ review: AdminTaskReview }>(
+    `admin/tasks/${encodeURIComponent(participantId)}/reviews/${taskType}`,
+    {
+      method: "PUT",
+      body: JSON.stringify({
+        score: input.score,
+        feedback: input.feedback?.trim() || null,
+      }),
+    },
+  );
+
+  if (!response.data?.review) {
+    throw new Error("Nilai tersimpan tetapi data pemeriksa tidak diterima");
+  }
+
+  return response.data.review;
+}
+
 export function buildSubmissionCards(
   data: ParticipantTaskResponse
 ): SubmissionReviewCardProps[] {
@@ -154,47 +206,57 @@ export function buildSubmissionCards(
 
   return [
     {
+      taskType: "networking",
       title: "Networking",
       status: data.status.networking
         ? "submitted"
         : "not-submitted",
+      review: data.reviews?.networking ?? null,
       links: networkingLinks,
       answer: networkingAnswers,
       answerFirst: true,
     },
 
     {
+      taskType: "explorer",
       title: "Explorer",
       status: data.status.explorer
         ? "submitted"
         : "not-submitted",
+      review: data.reviews?.explorer ?? null,
       media: data.submissions.explorer?.img_url ?? "",
       answer: data.submissions.explorer?.activityName ?? "",
     },
 
     {
+      taskType: "mentoring",
       title: "Mentoring",
       status: data.status.mentoring
         ? "submitted"
         : "not-submitted",
+      review: data.reviews?.mentoring ?? null,
       links: mentoringLinks,
     },
 
     {
+      taskType: "insight-hunting",
       title: "Insight Hunting",
       status: data.status.insightHunting
         ? "submitted"
         : "not-submitted",
+      review: data.reviews?.["insight-hunting"] ?? null,
       file: {
         href: data.submissions.insightHunting?.file_url ?? "",
         label: "Insight Hunting.pdf",
       },
     },
     {
+      taskType: "fossib",
       title: "Foster Siblings",
       status: data.status.fosterSiblings
         ? "submitted"
         : "not-submitted",
+      review: data.reviews?.fossib ?? null,
       media:
         data.submissions.fossib?.photoUrl ??
         data.submissions.fossib?.photo_url ??

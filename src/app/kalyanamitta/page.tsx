@@ -485,7 +485,7 @@ function KalyanamittaContent() {
                         src={friend.imgUrl}
                         alt={`Foto ${friend.fullname ?? "pengguna"}`}
                         className="h-full w-full"
-                        imageClassName="object-contain lg:object-cover"
+                        imageClassName="object-contain lg:object-cover lg:object-top"
                       />
                     );
 

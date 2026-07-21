@@ -14,7 +14,10 @@ import { getProfileCached } from "@/lib/auth-api";
 import {
   buildSubmissionCards,
   getParticipantTask,
+  saveParticipantTaskReview,
+  type AdminTaskType,
   type ParticipantTaskResponse,
+  type SaveAdminTaskReviewInput,
 } from "@/lib/admin-task-api";
 
 const adminNavItems = [
@@ -76,6 +79,25 @@ export default function AdminParticipantPage() {
     };
   }, [participantId, router]);
 
+  async function handleSaveReview(
+    taskType: AdminTaskType,
+    input: SaveAdminTaskReviewInput,
+  ) {
+    const review = await saveParticipantTaskReview(
+      participantId,
+      taskType,
+      input,
+    );
+
+    setSubmissions((current) =>
+      current.map((submission) =>
+        submission.taskType === taskType
+          ? { ...submission, review }
+          : submission,
+      ),
+    );
+  }
+
   const participantName = participant?.fullname ?? "Peserta";
 
   return (
@@ -119,7 +141,11 @@ export default function AdminParticipantPage() {
           {!isLoading && !error && (
             <div className="grid w-full gap-5">
               {submissions.map((submission) => (
-                <SubmissionReviewCard key={submission.title} {...submission} />
+                <SubmissionReviewCard
+                  key={submission.title}
+                  {...submission}
+                  onSaveReview={handleSaveReview}
+                />
               ))}
             </div>
           )}
@@ -128,4 +154,3 @@ export default function AdminParticipantPage() {
     </div>
   );
 }
-
