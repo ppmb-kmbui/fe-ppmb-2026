@@ -57,7 +57,10 @@ export function NetworkingProgressClient() {
           requirement.required,
         ),
         total: requirement.required,
-        href: "/kalyanamitta?tab=connected",
+        href:
+          requirement.batch === 2026
+            ? "/kalyanamitta?tab=connected"
+            : `/kalyanamitta?tab=not-connected&batch=${requirement.batch}`,
       })),
     [overview],
   );
@@ -73,8 +76,9 @@ export function NetworkingProgressClient() {
           Progres Networking
         </h2>
         <p className="text-b2 text-foreground/80">
-          Selesaikan sesi bersama 18 teman yang sudah terhubung. Setiap teman
-          memerlukan jawaban lengkap dan satu foto dokumentasi.
+          Selesaikan 10 sesi dengan teman angkatan 2026 yang sudah terhubung dan
+          8 sesi langsung dengan kakak tingkat. Setiap sesi memerlukan jawaban
+          lengkap dan satu foto dokumentasi.
         </p>
       </div>
 
@@ -110,7 +114,7 @@ export function NetworkingProgressClient() {
         href="/kalyanamitta?tab=connected"
         className="inline-flex min-h-[50px] w-fit items-center justify-center rounded-2xl bg-primary px-6 text-b1 text-yellow-50 transition-colors hover:bg-primary-hover"
       >
-        Buka Teman Saya
+        Buka Kalyanamitta
       </Link>
     </section>
   );

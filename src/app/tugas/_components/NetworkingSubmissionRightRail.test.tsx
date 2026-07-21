@@ -24,7 +24,7 @@ describe("NetworkingSubmissionRightRail", () => {
     getNetworkingOverviewMock.mockResolvedValue({
       friends: [],
       submissions: [],
-      questions: [],
+      questionSets: { peer: [], senior: [] },
       progress: {
         completed: 15,
         required: 18,

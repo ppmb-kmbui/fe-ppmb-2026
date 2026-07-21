@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FaCircleUser } from "react-icons/fa6";
 
 import {
   BackButton,
@@ -10,6 +9,7 @@ import {
   FacultySelect,
   Input,
   ProfilePhotoUpload,
+  UserAvatar,
 } from "@/components";
 import { ImageUploadError, uploadImage } from "@/lib/image-upload";
 import {
@@ -34,25 +34,6 @@ function DisplayField({
         {value || "-"}
       </div>
     </div>
-  );
-}
-
-function ProfileAvatar({ imgUrl }: { imgUrl?: string | null }) {
-  if (imgUrl) {
-    return (
-      <span
-        aria-hidden="true"
-        className="size-[129px] shrink-0 rounded-full bg-cover bg-center"
-        style={{ backgroundImage: `url(${imgUrl})` }}
-      />
-    );
-  }
-
-  return (
-    <FaCircleUser
-      aria-hidden="true"
-      className="size-[129px] shrink-0 text-yellow-300"
-    />
   );
 }
 
@@ -176,7 +157,11 @@ export function ProfileClient() {
           <div className="flex flex-col gap-8">
             <section className="flex flex-col gap-6 px-2 sm:px-8 lg:flex-row lg:items-center lg:justify-between">
               <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
-                <ProfileAvatar imgUrl={profile.imgUrl} />
+                <UserAvatar
+                  src={profile.imgUrl}
+                  alt={`Foto ${name}`}
+                  className="size-[129px] rounded-full"
+                />
                 <div className="min-w-0">
                   {isEditing ? (
                     <Input

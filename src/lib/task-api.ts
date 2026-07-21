@@ -46,6 +46,7 @@ export interface NetworkingFriend {
   imgUrl: string | null;
   faculty: string | null;
   batch: number;
+  networkingType?: "peer" | "senior";
   completed?: boolean;
   updatedAt?: string | null;
 }
@@ -61,6 +62,7 @@ export interface NetworkingSubmission {
   id: number;
   friendId?: number;
   friend?: NetworkingFriend;
+  networkingType?: "peer" | "senior";
   photoUrl: string;
   answers: NetworkingAnswer[];
   createdAt: string;
@@ -70,12 +72,16 @@ export interface NetworkingSubmission {
 export interface NetworkingOverviewData {
   friends: NetworkingFriend[];
   submissions: NetworkingSubmission[];
-  questions: NetworkingQuestion[];
+  questionSets: {
+    peer: NetworkingQuestion[];
+    senior: NetworkingQuestion[];
+  };
   progress: NetworkingProgress;
 }
 
 export interface NetworkingFriendData {
   friend: NetworkingFriend;
+  networkingType: "peer" | "senior";
   questions: NetworkingQuestion[];
   submission: NetworkingSubmission | null;
   progress: NetworkingProgress;

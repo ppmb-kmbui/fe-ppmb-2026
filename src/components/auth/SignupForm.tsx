@@ -33,8 +33,7 @@ export interface SignupFormProps {
 
 const WHATSAPP_REGEX = /^(?:\+62|62|0)8\d{7,12}$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const MIN_BATCH = 2020;
-const MAX_BATCH = 2100;
+const REGISTRATION_BATCH = 2026;
 
 export function SignupForm({ onSubmit, formError, serverErrors }: SignupFormProps) {
   const [fullName, setFullName] = useState("");
@@ -42,7 +41,6 @@ export function SignupForm({ onSubmit, formError, serverErrors }: SignupFormProp
   const [whatsapp, setWhatsapp] = useState("");
   const [email, setEmail] = useState("");
   const [faculty, setFaculty] = useState("");
-  const [batch, setBatch] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
@@ -60,7 +58,6 @@ export function SignupForm({ onSubmit, formError, serverErrors }: SignupFormProp
         setWhatsapp(draft.whatsapp);
         setEmail(draft.email);
         setFaculty(draft.faculty);
-        setBatch(draft.batch);
         setWasDraftRestored(true);
       }
 
@@ -79,7 +76,7 @@ export function SignupForm({ onSubmit, formError, serverErrors }: SignupFormProp
       whatsapp,
       email,
       faculty,
-      batch,
+      batch: String(REGISTRATION_BATCH),
     };
 
     if (Object.values(draft).some(Boolean)) {
@@ -87,7 +84,7 @@ export function SignupForm({ onSubmit, formError, serverErrors }: SignupFormProp
     } else {
       clearSignupDraft(window.sessionStorage);
     }
-  }, [batch, email, faculty, fullName, isDraftReady, lineId, whatsapp]);
+  }, [email, faculty, fullName, isDraftReady, lineId, whatsapp]);
 
   const displayedErrors: SignupFieldErrors = {
     fullName: fieldErrors.fullName ?? serverErrors?.fullName,
@@ -130,13 +127,6 @@ export function SignupForm({ onSubmit, formError, serverErrors }: SignupFormProp
     } else if (!isFaculty(faculty)) {
       nextErrors.faculty = "Pilih salah satu fakultas yang tersedia";
     }
-    if (!batch) {
-      nextErrors.batch = "Angkatan wajib diisi";
-    } else if (!/^\d+$/.test(batch)) {
-      nextErrors.batch = "Angkatan harus berupa angka";
-    } else if (Number(batch) < MIN_BATCH || Number(batch) > MAX_BATCH) {
-      nextErrors.batch = `Angkatan harus antara ${MIN_BATCH}-${MAX_BATCH}`;
-    }
     if (!password) {
       nextErrors.password = "Kata sandi wajib diisi";
     } else if (password.length < 8) {
@@ -162,7 +152,7 @@ export function SignupForm({ onSubmit, formError, serverErrors }: SignupFormProp
         whatsapp,
         email,
         faculty,
-        batch: Number(batch),
+        batch: REGISTRATION_BATCH,
         password,
         confirmPassword,
         photo,
@@ -246,12 +236,10 @@ export function SignupForm({ onSubmit, formError, serverErrors }: SignupFormProp
           />
           <Input
             type="text"
-            inputMode="numeric"
             name="batch"
             label="Angkatan"
-            placeholder="Contoh : 2024"
-            value={batch}
-            onChange={(event) => setBatch(event.target.value)}
+            value={String(REGISTRATION_BATCH)}
+            readOnly
             error={displayedErrors.batch}
           />
           <Input

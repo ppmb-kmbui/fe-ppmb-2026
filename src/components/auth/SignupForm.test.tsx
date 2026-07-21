@@ -37,7 +37,6 @@ async function fillValidForm(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText("Nomor Whatsapp"), "081234567890");
   await user.type(screen.getByLabelText("Email"), "danniel@email.com");
   await user.selectOptions(screen.getByLabelText("Fakultas"), "FIB");
-  await user.type(screen.getByLabelText("Angkatan"), "2026");
   await user.type(screen.getByLabelText("Kata Sandi (Min. 8 Karakter)"), "password123");
   await user.type(screen.getByLabelText("Konfirmasi Kata Sandi"), "password123");
 }
@@ -72,14 +71,11 @@ describe("SignupForm", () => {
     expect(await screen.findByText("Nomor WhatsApp tidak valid")).toBeInTheDocument();
   });
 
-  it("rejects a batch year outside the 2020-2100 range", async () => {
-    const user = userEvent.setup();
+  it("locks public registration to angkatan 2026", () => {
     render(<SignupForm onSubmit={vi.fn()} />);
 
-    await user.type(screen.getByLabelText("Angkatan"), "1999");
-    await user.click(screen.getByRole("button", { name: "Daftar" }));
-
-    expect(await screen.findByText("Angkatan harus antara 2020-2100")).toBeInTheDocument();
+    expect(screen.getByLabelText("Angkatan")).toHaveValue("2026");
+    expect(screen.getByLabelText("Angkatan")).toHaveAttribute("readonly");
   });
 
   it("rejects a confirm-password value that does not match the password", async () => {
@@ -129,7 +125,6 @@ describe("SignupForm", () => {
     await user.type(screen.getByLabelText("Nama Lengkap (sesuai SIAK)"), "Made Peserta");
     await user.type(screen.getByLabelText("Email"), "made@example.com");
     await user.selectOptions(screen.getByLabelText("Fakultas"), "FIB");
-    await user.type(screen.getByLabelText("Angkatan"), "2026");
     await user.type(
       screen.getByLabelText("Kata Sandi (Min. 8 Karakter)"),
       "password123",
