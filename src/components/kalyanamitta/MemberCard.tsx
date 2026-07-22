@@ -5,6 +5,7 @@ import { cn } from "@/lib/cn";
 export interface MemberCardProps extends HTMLAttributes<HTMLElement> {
   name: string;
   batch: string | number;
+  faculty?: string | null;
   avatar?: ReactNode;
   actionLabel?: string;
   onAction?: () => void;
@@ -18,6 +19,7 @@ export interface MemberCardProps extends HTMLAttributes<HTMLElement> {
 export function MemberCard({
   name,
   batch,
+  faculty,
   avatar,
   actionLabel = "Kenalan",
   onAction,
@@ -29,6 +31,8 @@ export function MemberCard({
   className,
   ...props
 }: MemberCardProps) {
+  const normalizedFaculty = faculty?.trim();
+
   return (
     <article
       className={cn(
@@ -48,7 +52,10 @@ export function MemberCard({
           <h3 className="break-words font-subheading text-s4 leading-tight sm:text-s3">
             {name}
           </h3>
-          <p className="mt-2 text-b3">Angkatan {batch}</p>
+          <p className="mt-2 text-b3">
+            {normalizedFaculty ? `${normalizedFaculty} • ` : ""}
+            Angkatan {batch}
+          </p>
         </div>
         <div className="flex w-full flex-wrap gap-2">
           <button
