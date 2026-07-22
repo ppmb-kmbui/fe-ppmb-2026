@@ -495,6 +495,7 @@ function KalyanamittaContent() {
                         avatar={avatar}
                         name={friend.fullname ?? "Nama tidak diketahui"}
                         batch={friend.batch}
+                        faculty={friend.faculty}
                         actionLabel={
                           primaryIsProfile
                             ? "Lihat Profil"
