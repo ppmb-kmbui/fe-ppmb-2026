@@ -1,24 +1,19 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FaUserShield } from "react-icons/fa6";
+import { FaArrowRight, FaEyeSlash } from "react-icons/fa6";
 
-import { ParticipantCard } from "@/components/admin";
+import {
+  getAdminNavigationItems,
+  ParticipantCard,
+} from "@/components/admin";
 import type { Participant } from "@/components/admin/Participant";
 import { Header, type HeaderUser } from "@/components/layout/Header";
 import { UserAvatar } from "@/components/ui";
 import { getProfileCached } from "@/lib/auth-api";
 import { getParticipants } from "@/lib/admin-api";
-
-const adminNavItems = [
-  {
-    key: "admin",
-    label: "Admin",
-    href: "/admin",
-    icon: <FaUserShield />,
-  },
-] as const;
 
 const participantsPerPage = 12;
 
@@ -33,6 +28,7 @@ export default function AdminPage() {
   const [totalParticipants, setTotalParticipants] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>();
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -52,15 +48,16 @@ export default function AdminPage() {
 
       try {
         const profile = await getProfileCached();
-        if (!profile.isAdmin) {
+        if (!profile.isAdmin && !profile.isSuperAdmin) {
           router.replace("/");
           return;
         }
 
         if (!active) return;
+        setIsSuperAdmin(profile.isSuperAdmin);
         setAdminUser({
           fullName: profile.fullname ?? "Admin",
-          subtitle: "Admin",
+          subtitle: profile.isSuperAdmin ? "Superadmin" : "Admin",
           imgUrl: profile.imgUrl,
         });
 
@@ -92,7 +89,7 @@ export default function AdminPage() {
     <div className="relative isolate min-h-screen overflow-x-clip bg-[image:var(--gradient-dashboard)] bg-cover text-foreground">
       <Header
         activeItem="admin"
-        mobileNavItems={adminNavItems}
+        mobileNavItems={getAdminNavigationItems(isSuperAdmin)}
         user={adminUser}
         className="relative z-30"
       />
@@ -115,6 +112,36 @@ export default function AdminPage() {
               />
             </label>
           </div>
+
+          {isSuperAdmin && (
+            <Link
+              href="/admin/profiles"
+              className="group flex flex-col gap-5 rounded-3xl border border-yellow-300/25 bg-[linear-gradient(135deg,rgba(251,191,36,0.16),rgba(104,53,146,0.24))] p-5 shadow-modal transition-transform hover:-translate-y-0.5 sm:flex-row sm:items-center sm:p-6"
+            >
+              <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-yellow-300/20 text-2xl text-yellow-200">
+                <FaEyeSlash aria-hidden="true" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="text-b3 font-semibold tracking-[0.18em] text-yellow-200">
+                  SUPERADMIN
+                </span>
+                <span className="mt-1 block font-subheading text-s3 text-yellow-50">
+                  Kelola visibilitas profil
+                </span>
+                <span className="mt-1 block text-b3 text-purple-50/80">
+                  Cari profil angkatan 2023–2026, lalu sembunyikan atau tampilkan
+                  kembali tanpa menghapus akun.
+                </span>
+              </span>
+              <span className="inline-flex items-center gap-2 text-b2 font-semibold text-yellow-100">
+                Buka pengelolaan
+                <FaArrowRight
+                  aria-hidden="true"
+                  className="transition-transform group-hover:translate-x-1"
+                />
+              </span>
+            </Link>
+          )}
 
           {isLoading && (
             <p className="rounded-2xl bg-blue-200/20 px-4 py-3 text-b2">
