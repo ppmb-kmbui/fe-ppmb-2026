@@ -26,6 +26,7 @@ export interface AuthUser {
   faculty: string | null;
   batch: number;
   isAdmin: boolean;
+  isSuperAdmin: boolean;
   lineId: string | null;
   whatsappNumber: string | null;
   createdAt: string;

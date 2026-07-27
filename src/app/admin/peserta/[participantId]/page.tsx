@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { FaUserShield } from "react-icons/fa6";
 
 import { BackButton } from "@/components";
 import {
+  getAdminNavigationItems,
   SubmissionReviewCard,
   type SubmissionReviewCardProps,
-} from "@/components/admin/SubmissionReviewCard";
+} from "@/components/admin";
 import { Header, type HeaderUser } from "@/components/layout/Header";
 import { getProfileCached } from "@/lib/auth-api";
 import {
@@ -20,15 +20,6 @@ import {
   type SaveAdminTaskReviewInput,
 } from "@/lib/admin-task-api";
 
-const adminNavItems = [
-  {
-    key: "admin",
-    label: "Admin",
-    href: "/admin",
-    icon: <FaUserShield />,
-  },
-] as const;
-
 export default function AdminParticipantPage() {
   const router = useRouter();
   const { participantId } = useParams<{ participantId: string }>();
@@ -38,6 +29,7 @@ export default function AdminParticipantPage() {
   const [submissions, setSubmissions] = useState<SubmissionReviewCardProps[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>();
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -48,15 +40,16 @@ export default function AdminParticipantPage() {
 
       try {
         const profile = await getProfileCached();
-        if (!profile.isAdmin) {
+        if (!profile.isAdmin && !profile.isSuperAdmin) {
           router.replace("/");
           return;
         }
 
         if (!active) return;
+        setIsSuperAdmin(profile.isSuperAdmin);
         setAdminUser({
           fullName: profile.fullname ?? "Admin",
-          subtitle: "Admin",
+          subtitle: profile.isSuperAdmin ? "Superadmin" : "Admin",
           imgUrl: profile.imgUrl,
         });
 
@@ -104,7 +97,7 @@ export default function AdminParticipantPage() {
     <div className="relative isolate min-h-screen overflow-x-clip bg-[image:var(--gradient-dashboard)] bg-cover text-foreground">
       <Header
         activeItem="admin"
-        mobileNavItems={adminNavItems}
+        mobileNavItems={getAdminNavigationItems(isSuperAdmin)}
         user={adminUser}
         className="relative z-30"
       />

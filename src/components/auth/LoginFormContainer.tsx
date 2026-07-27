@@ -50,7 +50,7 @@ export function LoginFormContainer({ successMessage }: LoginFormContainerProps) 
     try {
       await login(values);
       const profile = await getProfileCached();
-      replace(profile.isAdmin ? "/admin" : "/");
+      replace(profile.isAdmin || profile.isSuperAdmin ? "/admin" : "/");
       refresh();
     } catch (error) {
       const translated = translateAuthError(error);

@@ -11,6 +11,7 @@ function decodeBase64Url(value: string): string {
 interface TokenPayload {
   exp?: number;
   is_admin?: boolean;
+  is_super_admin?: boolean;
 }
 
 function getTokenPayload(token: string): TokenPayload | null {
@@ -30,7 +31,8 @@ export function proxy(req: NextRequest) {
   const payload = token ? getTokenPayload(token) : null;
   const hasSession =
     !!payload && typeof payload.exp === "number" && payload.exp * 1000 > Date.now();
-  const isAdmin = payload?.is_admin === true;
+  const isSuperAdmin = payload?.is_super_admin === true;
+  const isAdmin = payload?.is_admin === true || isSuperAdmin;
 
   if ((pathname === "/login" || pathname === "/signup") && hasSession) {
     return NextResponse.redirect(new URL(isAdmin ? "/admin" : "/", req.url));
@@ -62,6 +64,15 @@ export function proxy(req: NextRequest) {
     isProtectedRoute &&
     pathname !== "/admin" &&
     !pathname.startsWith("/admin/")
+  ) {
+    return NextResponse.redirect(new URL("/admin", req.url));
+  }
+
+  if (
+    (pathname === "/admin/profiles" ||
+      pathname.startsWith("/admin/profiles/")) &&
+    isAdmin &&
+    !isSuperAdmin
   ) {
     return NextResponse.redirect(new URL("/admin", req.url));
   }

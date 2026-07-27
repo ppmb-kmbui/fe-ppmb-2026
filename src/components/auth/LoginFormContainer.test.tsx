@@ -58,6 +58,24 @@ describe("LoginFormContainer", () => {
     await vi.waitFor(() => expect(replaceMock).toHaveBeenCalledWith("/"));
   });
 
+  it("redirects a SUPERADMIN to the admin dashboard", async () => {
+    const user = userEvent.setup();
+    loginMock.mockResolvedValue(undefined);
+    getProfileCachedMock.mockResolvedValue({
+      isAdmin: true,
+      isSuperAdmin: true,
+    });
+    render(<LoginFormContainer />);
+
+    await user.type(screen.getByLabelText("Email"), "adminppmb@gmail.com");
+    await user.type(screen.getByLabelText("Kata Sandi"), "superadmin-password");
+    await user.click(screen.getByRole("button", { name: "Masuk" }));
+
+    await vi.waitFor(() =>
+      expect(replaceMock).toHaveBeenCalledWith("/admin"),
+    );
+  });
+
   it("shows the backend's error message instead of redirecting when login fails", async () => {
     const user = userEvent.setup();
     loginMock.mockRejectedValue(
