@@ -259,6 +259,21 @@ export async function submitInsightHuntingFile(fileUrl: string) {
   return response.data;
 }
 
+export async function submitInsightHuntingUpload(file: File) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await apiFetch<InsightHuntingSubmission>(
+    "tasks/insight-hunting/upload",
+    {
+      method: "POST",
+      body: formData,
+    },
+  );
+  invalidateTaskSummaryCache();
+  return response.data;
+}
+
 export async function getMentoringSubmission() {
   const response =
     await apiFetch<MentoringSubmissionData>("tasks/mentoring");

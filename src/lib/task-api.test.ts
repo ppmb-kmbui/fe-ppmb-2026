@@ -1,10 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { submitNetworkingFriend } from "@/lib/task-api";
+import {
+  submitInsightHuntingUpload,
+  submitNetworkingFriend,
+} from "@/lib/task-api";
 
 const originalEnv = { ...process.env };
 
-describe("Networking task API", () => {
+describe("Task API", () => {
   beforeEach(() => {
     process.env.NEXT_PUBLIC_API_BASE_URL = "https://api.example.test/api/v1";
   });
@@ -60,5 +63,37 @@ describe("Networking task API", () => {
       custom_question: "Pertanyaan bebas?",
       custom_answer: "Jawaban bebas",
     });
+  });
+
+  it("uploads an Insight Hunting PDF as same-origin multipart form data", async () => {
+    process.env.NEXT_PUBLIC_API_BASE_URL = "/api/v1";
+    const submission = {
+      id: 17,
+      userId: 29,
+      file_url: "https://cdn.example/insight-hunting.pdf",
+    };
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      headers: new Headers({ "content-type": "application/json" }),
+      json: async () => ({ success: true, data: submission }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const file = new File(["%PDF-1.7"], "insight-hunting.pdf", {
+      type: "application/pdf",
+    });
+
+    await expect(submitInsightHuntingUpload(file)).resolves.toEqual(submission);
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/v1/tasks/insight-hunting/upload",
+      expect.objectContaining({
+        method: "POST",
+        credentials: "same-origin",
+      }),
+    );
+    const request = fetchMock.mock.calls[0][1] as RequestInit;
+    expect(request.body).toBeInstanceOf(FormData);
+    expect((request.body as FormData).get("file")).toBe(file);
+    expect(new Headers(request.headers).has("Content-Type")).toBe(false);
   });
 });
