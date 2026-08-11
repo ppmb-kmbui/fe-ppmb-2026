@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 
 import { Button, TaskFileUpload } from "@/components";
-import { uploadRawFile } from "@/lib/image-upload";
+import { ApiError } from "@/lib/api";
 import {
   getClosedSubmissionMessage,
   isTaskSubmissionClosed,
@@ -11,11 +11,26 @@ import {
 import {
   getInsightHuntingSubmission,
   getTaskApiErrorMessage,
-  submitInsightHuntingFile,
+  submitInsightHuntingUpload,
 } from "@/lib/task-api";
 
 const insightHuntingTemplateUrl =
   "https://docs.google.com/document/d/1Was6EOpZ41ps1UQqj8P-UC4KfiQNot6m/edit?usp=sharing&ouid=100133896649194217758&rtpof=true&sd=true";
+const insightHuntingErrorFallback =
+  "Pengumpulan Insight Hunting gagal. Silakan coba lagi.";
+
+function getInsightHuntingErrorMessage(error: unknown) {
+  if (error instanceof ApiError) {
+    if (error.status === 401) {
+      return getTaskApiErrorMessage(error) || insightHuntingErrorFallback;
+    }
+
+    const payloadMessage = error.payload?.message?.trim();
+    if (payloadMessage) return payloadMessage;
+  }
+
+  return getTaskApiErrorMessage(error) || insightHuntingErrorFallback;
+}
 
 export function InsightHuntingForm() {
   const [file, setFile] = useState<File | null>(null);
@@ -36,7 +51,7 @@ export function InsightHuntingForm() {
       })
       .catch((loadError: unknown) => {
         if (!active) return;
-        setError(getTaskApiErrorMessage(loadError));
+        setError(getInsightHuntingErrorMessage(loadError));
       })
       .finally(() => {
         if (active) setIsLoading(false);
@@ -65,12 +80,11 @@ export function InsightHuntingForm() {
 
     setIsSubmitting(true);
     try {
-      const fileUrl = await uploadRawFile(file);
-      const submission = await submitInsightHuntingFile(fileUrl);
-      setExistingFileUrl(submission?.file_url ?? fileUrl);
+      const submission = await submitInsightHuntingUpload(file);
+      setExistingFileUrl(submission?.file_url ?? "");
       setMessage("Pengumpulan Insight Hunting berhasil disimpan.");
     } catch (submitError) {
-      setError(getTaskApiErrorMessage(submitError));
+      setError(getInsightHuntingErrorMessage(submitError));
     } finally {
       setIsSubmitting(false);
     }
@@ -103,9 +117,11 @@ export function InsightHuntingForm() {
             ulang, berkas lama akan diganti dengan berkas terbaru.
           </p>
         )}
+        <p className="text-b2 text-foreground/80">Format PDF, maksimal 4 MB.</p>
         <TaskFileUpload
           fileType="pdf"
-          maxSizeMb={10}
+          accept="application/pdf,.pdf"
+          maxSizeMb={4}
           disabled={isLoading || isSubmitting || isSubmissionClosed}
           onFileChange={setFile}
         />
