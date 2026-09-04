@@ -29,11 +29,6 @@ vi.mock("@/lib/image-upload", () => ({
   uploadImage: uploadImageMock,
 }));
 
-vi.mock("@/lib/task-deadlines", () => ({
-  isTaskSubmissionClosed: () => false,
-  getClosedSubmissionMessage: () => "Pengumpulan tugas sudah ditutup.",
-}));
-
 import { NetworkingSubmissionForm } from "./NetworkingSubmissionForm";
 
 const peerQuestions: NetworkingQuestion[] = NETWORKING_FIXED_QUESTIONS.map(

@@ -5,10 +5,6 @@ import { FormEvent, useEffect, useState } from "react";
 import { Button, Input, TaskFileUpload } from "@/components";
 import { uploadImage } from "@/lib/image-upload";
 import {
-  getClosedSubmissionMessage,
-  isTaskSubmissionClosed,
-} from "@/lib/task-deadlines";
-import {
   getExplorerSubmission,
   getTaskApiErrorMessage,
   submitExplorer,
@@ -22,7 +18,6 @@ export function KmbuiExplorerForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string>();
   const [error, setError] = useState<string>();
-  const isSubmissionClosed = isTaskSubmissionClosed("explorer");
 
   useEffect(() => {
     let active = true;
@@ -51,11 +46,6 @@ export function KmbuiExplorerForm() {
 
     setError(undefined);
     setMessage(undefined);
-
-    if (isSubmissionClosed) {
-      setError(getClosedSubmissionMessage());
-      return;
-    }
 
     if (!activityName.trim()) {
       setError("Nama kegiatan wajib diisi.");
@@ -86,7 +76,7 @@ export function KmbuiExplorerForm() {
         label="Nama Kegiatan"
         placeholder="Tulis nama kegiatan yang sudah kamu ikuti!"
         value={activityName}
-        disabled={isLoading || isSubmitting || isSubmissionClosed}
+        disabled={isLoading || isSubmitting}
         onChange={(event) => setActivityName(event.target.value)}
         className="bg-[rgba(41,0,75,0.25)] placeholder:text-white/50"
       />
@@ -104,16 +94,10 @@ export function KmbuiExplorerForm() {
         <TaskFileUpload
           fileType="image"
           maxSizeMb={5}
-          disabled={isLoading || isSubmitting || isSubmissionClosed}
+          disabled={isLoading || isSubmitting}
           onFileChange={setFile}
         />
       </div>
-
-      {isSubmissionClosed && (
-        <p className="rounded-2xl border border-yellow-300/30 bg-yellow-400/10 px-4 py-3 text-b2 text-yellow-100">
-          {getClosedSubmissionMessage()}
-        </p>
-      )}
 
       {message && (
         <p className="rounded-2xl border border-green-300/30 bg-green-400/10 px-4 py-3 text-b2 text-green-100">
@@ -129,7 +113,7 @@ export function KmbuiExplorerForm() {
       <Button
         type="submit"
         isLoading={isSubmitting}
-        disabled={isLoading || isSubmissionClosed}
+        disabled={isLoading || isSubmitting}
         className="h-[50px] rounded-2xl"
       >
         Kumpulkan

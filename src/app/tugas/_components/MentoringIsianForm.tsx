@@ -4,10 +4,6 @@ import { FormEvent, useEffect, useState } from "react";
 
 import { Button, Input } from "@/components";
 import {
-  getClosedSubmissionMessage,
-  isTaskSubmissionClosed,
-} from "@/lib/task-deadlines";
-import {
   getMentoringSubmission,
   getTaskApiErrorMessage,
   submitMentoring,
@@ -19,7 +15,6 @@ export function MentoringIsianForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string>();
   const [error, setError] = useState<string>();
-  const isSubmissionClosed = isTaskSubmissionClosed("mentoring");
 
   useEffect(() => {
     let active = true;
@@ -49,11 +44,6 @@ export function MentoringIsianForm() {
     setError(undefined);
     setMessage(undefined);
 
-    if (isSubmissionClosed) {
-      setError(getClosedSubmissionMessage());
-      return;
-    }
-
     if (!trimmedUrl) {
       setError("Tautan Google Drive wajib diisi.");
       return;
@@ -79,16 +69,10 @@ export function MentoringIsianForm() {
         placeholder="https://drive.google.com/drive/folders/..."
         type="url"
         value={gdriveUrl}
-        disabled={isLoading || isSubmitting || isSubmissionClosed}
+        disabled={isLoading || isSubmitting}
         onChange={(event) => setGdriveUrl(event.target.value)}
         className="bg-[rgba(41,0,75,0.25)] placeholder:text-white/50"
       />
-
-      {isSubmissionClosed && (
-        <p className="rounded-2xl border border-yellow-300/30 bg-yellow-400/10 px-4 py-3 text-b2 text-yellow-100">
-          {getClosedSubmissionMessage()}
-        </p>
-      )}
 
       {gdriveUrl && !message && (
         <p className="rounded-2xl border border-green-300/30 bg-green-400/10 px-4 py-3 text-b2 text-green-100">
@@ -111,7 +95,7 @@ export function MentoringIsianForm() {
       <Button
         type="submit"
         isLoading={isSubmitting}
-        disabled={isLoading || isSubmissionClosed}
+        disabled={isLoading || isSubmitting}
         className="h-[50px] rounded-2xl"
       >
         Kumpulkan

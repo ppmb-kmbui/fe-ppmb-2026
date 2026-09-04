@@ -22,11 +22,6 @@ vi.mock("@/lib/task-api", async () => {
   };
 });
 
-vi.mock("@/lib/task-deadlines", () => ({
-  isTaskSubmissionClosed: () => false,
-  getClosedSubmissionMessage: () => "Pengumpulan tugas sudah ditutup.",
-}));
-
 import { InsightHuntingForm } from "./InsightHuntingForm";
 
 function makePdf() {

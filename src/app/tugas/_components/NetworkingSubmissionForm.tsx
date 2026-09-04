@@ -5,10 +5,6 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Button, TaskFileUpload, Textarea } from "@/components";
 import { uploadImage } from "@/lib/image-upload";
 import {
-  getClosedSubmissionMessage,
-  isTaskSubmissionClosed,
-} from "@/lib/task-deadlines";
-import {
   getNetworkingFriend,
   getTaskApiErrorMessage,
   submitNetworkingFriend,
@@ -37,7 +33,6 @@ export function NetworkingSubmissionForm({ friendId }: { friendId: number }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string>();
   const [error, setError] = useState<string>();
-  const isSubmissionClosed = isTaskSubmissionClosed("networking");
   const expectedFixedQuestionCount = networkingType
     ? getNetworkingFixedQuestionCount(networkingType)
     : 0;
@@ -125,11 +120,6 @@ export function NetworkingSubmissionForm({ friendId }: { friendId: number }) {
     setError(undefined);
     setMessage(undefined);
 
-    if (isSubmissionClosed) {
-      setError(getClosedSubmissionMessage());
-      return;
-    }
-
     if (
       expectedFixedQuestionCount < 1 ||
       fixedQuestions.length !== expectedFixedQuestionCount ||
@@ -184,8 +174,7 @@ export function NetworkingSubmissionForm({ friendId }: { friendId: number }) {
     }
   }
 
-  const disabled =
-    isLoading || !isReady || isSubmitting || isSubmissionClosed;
+  const disabled = isLoading || !isReady || isSubmitting;
 
   if (isLoading) {
     return (
@@ -266,11 +255,6 @@ export function NetworkingSubmissionForm({ friendId }: { friendId: number }) {
         />
       </div>
 
-      {isSubmissionClosed && (
-        <p className="rounded-2xl border border-yellow-300/30 bg-yellow-400/10 px-4 py-3 text-b2 text-yellow-100">
-          {getClosedSubmissionMessage()}
-        </p>
-      )}
       {message && (
         <p role="status" className="rounded-2xl border border-green-300/30 bg-green-400/10 px-4 py-3 text-b2 text-green-100">
           {message}
