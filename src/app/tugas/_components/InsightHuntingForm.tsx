@@ -5,10 +5,6 @@ import { FormEvent, useEffect, useState } from "react";
 import { Button, TaskFileUpload } from "@/components";
 import { ApiError } from "@/lib/api";
 import {
-  getClosedSubmissionMessage,
-  isTaskSubmissionClosed,
-} from "@/lib/task-deadlines";
-import {
   getInsightHuntingSubmission,
   getTaskApiErrorMessage,
   submitInsightHuntingUpload,
@@ -39,7 +35,6 @@ export function InsightHuntingForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string>();
   const [error, setError] = useState<string>();
-  const isSubmissionClosed = isTaskSubmissionClosed("insightHunting");
 
   useEffect(() => {
     let active = true;
@@ -67,11 +62,6 @@ export function InsightHuntingForm() {
 
     setError(undefined);
     setMessage(undefined);
-
-    if (isSubmissionClosed) {
-      setError(getClosedSubmissionMessage());
-      return;
-    }
 
     if (!file) {
       setError("Berkas PDF Insight Hunting wajib dipilih.");
@@ -122,16 +112,10 @@ export function InsightHuntingForm() {
           fileType="pdf"
           accept="application/pdf,.pdf"
           maxSizeMb={4}
-          disabled={isLoading || isSubmitting || isSubmissionClosed}
+          disabled={isLoading || isSubmitting}
           onFileChange={setFile}
         />
       </div>
-
-      {isSubmissionClosed && (
-        <p className="rounded-2xl border border-yellow-300/30 bg-yellow-400/10 px-4 py-3 text-b2 text-yellow-100">
-          {getClosedSubmissionMessage()}
-        </p>
-      )}
 
       {message && (
         <p className="rounded-2xl border border-green-300/30 bg-green-400/10 px-4 py-3 text-b2 text-green-100">
@@ -147,7 +131,7 @@ export function InsightHuntingForm() {
       <Button
         type="submit"
         isLoading={isSubmitting}
-        disabled={isLoading || isSubmissionClosed}
+        disabled={isLoading || isSubmitting}
         className="h-[50px] rounded-2xl"
       >
         Kumpulkan

@@ -5,10 +5,6 @@ import { FormEvent, useEffect, useState } from "react";
 import { Button, TaskFileUpload } from "@/components";
 import { uploadImage, uploadRawFile } from "@/lib/image-upload";
 import {
-  getClosedSubmissionMessage,
-  isTaskSubmissionClosed,
-} from "@/lib/task-deadlines";
-import {
   getFosterSiblingsSubmission,
   getTaskApiErrorMessage,
   submitFosterSiblings,
@@ -26,7 +22,6 @@ export function FosterSiblingsForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string>();
   const [error, setError] = useState<string>();
-  const isSubmissionClosed = isTaskSubmissionClosed("fossib");
 
   useEffect(() => {
     let active = true;
@@ -55,11 +50,6 @@ export function FosterSiblingsForm() {
 
     setError(undefined);
     setMessage(undefined);
-
-    if (isSubmissionClosed) {
-      setError(getClosedSubmissionMessage());
-      return;
-    }
 
     if (!imageFile) {
       setError("Foto dokumentasi wajib dipilih.");
@@ -117,7 +107,7 @@ export function FosterSiblingsForm() {
         )}
         <TaskFileUpload
           fileType="image"
-          disabled={isLoading || isSubmitting || isSubmissionClosed}
+          disabled={isLoading || isSubmitting}
           onFileChange={setImageFile}
         />
       </div>
@@ -135,16 +125,10 @@ export function FosterSiblingsForm() {
         <TaskFileUpload
           fileType="pdf"
           maxSizeMb={10}
-          disabled={isLoading || isSubmitting || isSubmissionClosed}
+          disabled={isLoading || isSubmitting}
           onFileChange={setPdfFile}
         />
       </div>
-
-      {isSubmissionClosed && (
-        <p className="rounded-2xl border border-yellow-300/30 bg-yellow-400/10 px-4 py-3 text-b2 text-yellow-100">
-          {getClosedSubmissionMessage()}
-        </p>
-      )}
 
       {message && (
         <p className="rounded-2xl border border-green-300/30 bg-green-400/10 px-4 py-3 text-b2 text-green-100">
@@ -160,7 +144,7 @@ export function FosterSiblingsForm() {
       <Button
         type="submit"
         isLoading={isSubmitting}
-        disabled={isLoading || isSubmissionClosed}
+        disabled={isLoading || isSubmitting}
         className="h-13 rounded-2xl"
       >
         Kumpulkan
