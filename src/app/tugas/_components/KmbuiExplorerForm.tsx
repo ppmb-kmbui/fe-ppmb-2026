@@ -99,6 +99,26 @@ export function KmbuiExplorerForm() {
         />
       </div>
 
+      <div className="flex flex-col gap-3">
+        <h2 className="font-subheading text-s3 max-md:text-s5 font-semibold">
+          Alternatif
+        </h2>
+        <div className="text-s3">
+          <p>
+            Bagi KoCiTe yang terkendala dan telat dalam mengumpulkan Tugas, boleh upload
+            pada link Google Drive di bawah ini yaa
+          </p>
+          <br />
+          <a
+            href="https://drive.google.com/drive/folders/1S5uIjM9i5UCqoZAgYhG7BE1fpfd_tBE-?usp=sharing"
+            className="underline"
+          >
+            Klik Disini
+          </a>
+        </div>
+        
+      </div>
+
       {message && (
         <p className="rounded-2xl border border-green-300/30 bg-green-400/10 px-4 py-3 text-b2 text-green-100">
           {message}
