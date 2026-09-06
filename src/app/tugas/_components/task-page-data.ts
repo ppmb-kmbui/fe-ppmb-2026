@@ -1,8 +1,8 @@
 export const networkingAgendaItems = [
   {
     category: "Networking",
-    title: "Batas Waktu Angkatan",
-    date: "31 Agustus",
+    title: "Pengumpulan Tugas",
+    date: "Tetap dibuka",
     icon: "networking",
   },
 ];
@@ -16,8 +16,8 @@ export const insightAgendaItems = [
   },
   {
     category: "Insight Hunting",
-    title: "Batas Waktu Tugas",
-    date: "12 Agustus",
+    title: "Pengumpulan Tugas",
+    date: "Tetap dibuka",
     icon: "insight",
   },
 ];
@@ -25,8 +25,8 @@ export const insightAgendaItems = [
 export const explorerAgendaItems = [
   {
     category: "KMBUI Explorer",
-    title: "Batas Waktu Tugas",
-    date: "5 September",
+    title: "Pengumpulan Tugas",
+    date: "Tetap dibuka",
     icon: "explorer",
   },
 ];
@@ -40,8 +40,8 @@ export const mentoringAgendaItems = [
   },
   {
     category: "Mentoring",
-    title: "Batas Waktu Mentoring",
-    date: "31 Agustus",
+    title: "Pengumpulan Tugas",
+    date: "Tetap dibuka",
     icon: "mentoring",
   },
 ];
@@ -49,8 +49,8 @@ export const mentoringAgendaItems = [
 export const fosterSiblingsAgendaItems = [
   {
     category: "Foster Siblings",
-    title: "Batas Waktu Tugas",
-    date: "5 September",
+    title: "Pengumpulan Tugas",
+    date: "Tetap dibuka",
     icon: "foster",
   },
 ];

@@ -5,6 +5,37 @@ import { describe, expect, it, vi } from "vitest";
 import { SubmissionReviewCard } from "./SubmissionReviewCard";
 
 describe("SubmissionReviewCard", () => {
+  it("marks a late task and displays its latest submission in WIB without blocking grading", () => {
+    render(<SubmissionReviewCard taskType="explorer" title="Explorer" status="submitted"
+      submissionTiming={{ submittedAt: "2026-09-05T17:00:00.000Z", isLate: true }} onSaveReview={vi.fn()} />);
+    expect(screen.getByText("Telat")).toBeInTheDocument();
+    expect(screen.getByText("Sudah Dikumpulkan")).toBeInTheDocument();
+    expect(screen.getByText(/Pengumpulan terakhir:/)).toHaveTextContent(/6 Sep 2026.*00[.:]00 WIB/);
+    expect(screen.getByRole("spinbutton", { name: /nilai/i })).toBeEnabled();
+  });
+
+  it("keeps a late label on partial networking submissions", () => {
+    render(<SubmissionReviewCard taskType="networking" title="Networking" status="not-submitted"
+      submissionTiming={{ submittedAt: "2026-09-06T10:00:00.000Z", isLate: true }} />);
+    expect(screen.getByText("Telat")).toBeInTheDocument();
+    expect(screen.getByRole("spinbutton", { name: /nilai/i })).toBeDisabled();
+  });
+
+  it("does not mark an on-time task late after an administrator reviews it later", () => {
+    render(<SubmissionReviewCard taskType="mentoring" title="Mentoring" status="submitted"
+      submissionTiming={{ submittedAt: "2026-09-05T16:59:59.999Z", isLate: false }}
+      review={{ taskType: "mentoring", score: 80, feedback: null, reviewedAt: "2026-09-07T12:00:00.000Z",
+        reviewer: { id: 9, fullname: "Admin", email: "admin@example.com" } }} />);
+    expect(screen.queryByText("Telat")).not.toBeInTheDocument();
+    expect(screen.getByText("Sudah Diperiksa")).toBeInTheDocument();
+  });
+
+  it("shows unknown legacy timing without claiming the submission was on time or late", () => {
+    render(<SubmissionReviewCard title="Insight Hunting" status="submitted"
+      submissionTiming={{ submittedAt: null, isLate: null }} />);
+    expect(screen.getByText("Waktu pengumpulan lama belum tercatat.")).toBeInTheDocument();
+    expect(screen.queryByText("Telat")).not.toBeInTheDocument();
+  });
   it("shows the latest reviewer and saves an integer score with optional feedback", async () => {
     const user = userEvent.setup();
     const onSaveReview = vi.fn().mockResolvedValue(undefined);

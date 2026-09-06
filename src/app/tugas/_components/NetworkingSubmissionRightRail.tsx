@@ -98,8 +98,8 @@ export function NetworkingSubmissionRightRail() {
       agenda={[
         {
           category: "Networking",
-          title: "Batas Waktu Tugas",
-          date: "31 Agustus",
+          title: "Pengumpulan Tugas",
+          date: "Tetap dibuka",
           icon: "networking",
         },
       ]}

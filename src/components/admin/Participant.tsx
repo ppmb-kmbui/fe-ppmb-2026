@@ -5,6 +5,7 @@ export interface Participant {
   faculty?: string | null;
   batch: number;
   imgUrl: string | null;
+  lateTaskCount?: number;
 
   progress: {
     percentage: number;

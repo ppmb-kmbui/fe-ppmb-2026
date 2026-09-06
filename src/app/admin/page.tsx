@@ -171,6 +171,7 @@ export default function AdminPage() {
                   name={name}
                   batch={participant.batch}
                   progress={participant.progress.percentage}
+                  lateTaskCount={participant.lateTaskCount}
                   avatar={
                     <UserAvatar
                       src={participant.imgUrl}

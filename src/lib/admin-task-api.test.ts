@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   buildSubmissionCards,
+  ADMIN_TASK_TYPES,
   saveParticipantTaskReview,
   type AdminTaskReview,
   type ParticipantTaskResponse,
@@ -93,6 +94,26 @@ function participantTaskFixture(): ParticipantTaskResponse {
 }
 
 describe("admin task API", () => {
+  it("carries backend timing into all five task cards independently of review and completion", () => {
+    const fixture = participantTaskFixture();
+    fixture.status.networking = false;
+    fixture.submissionTiming = Object.fromEntries(ADMIN_TASK_TYPES.map((taskType) => [
+      taskType, { submittedAt: "2026-09-05T17:00:00.000Z", isLate: true },
+    ]));
+    const cards = buildSubmissionCards(fixture);
+    expect(cards).toHaveLength(5);
+    for (const card of cards) {
+      expect(card.submissionTiming).toEqual({ submittedAt: "2026-09-05T17:00:00.000Z", isLate: true });
+    }
+    expect(cards[0].status).toBe("not-submitted");
+    expect(cards[0].review).toEqual(review);
+  });
+
+  it("preserves unknown historical submission times without marking them late", () => {
+    const fixture = participantTaskFixture();
+    fixture.submissionTiming = { explorer: { submittedAt: null, isLate: null } };
+    expect(buildSubmissionCards(fixture)[1].submissionTiming).toEqual({ submittedAt: null, isLate: null });
+  });
   beforeEach(() => {
     process.env.NEXT_PUBLIC_API_BASE_URL = "https://api.example.test/api/v1";
   });

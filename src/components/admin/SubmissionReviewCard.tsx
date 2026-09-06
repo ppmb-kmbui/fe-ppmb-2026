@@ -15,7 +15,9 @@ import type {
   AdminTaskReview,
   AdminTaskType,
   SaveAdminTaskReviewInput,
+  TaskSubmissionTiming,
 } from "@/lib/admin-task-api";
+import { LateSubmissionBadge } from "./LateSubmissionBadge";
 
 export interface SubmissionFile {
   href: string;
@@ -33,6 +35,7 @@ export interface SubmissionReviewCardProps extends HTMLAttributes<HTMLElement> {
   title: string;
   status: SubmissionStatus;
   review?: AdminTaskReview | null;
+  submissionTiming?: TaskSubmissionTiming;
   media?: ReactNode;
   answer?: ReactNode;
   file?: SubmissionFile;
@@ -72,6 +75,7 @@ export function SubmissionReviewCard({
   title,
   status,
   review,
+  submissionTiming,
   media,
   answer,
   file,
@@ -214,6 +218,9 @@ export function SubmissionReviewCard({
         <h3 className="font-subheading pt-2 text-s3">{title}</h3>
         <div className="flex flex-wrap justify-end gap-2">
           <StatusBadge status={status} />
+          {submissionTiming?.isLate === true && (
+            <LateSubmissionBadge className="min-h-[45px] rounded-2xl text-b2" />
+          )}
           {taskType && (
             <span
               role="status"
@@ -229,6 +236,15 @@ export function SubmissionReviewCard({
           )}
         </div>
       </div>
+      {submissionTiming?.submittedAt ? (
+        <p className="text-b3 text-foreground/85">
+          Pengumpulan terakhir: {formatReviewedAt(submissionTiming.submittedAt)} WIB
+        </p>
+      ) : submissionTiming && isSubmitted ? (
+        <p className="text-b3 text-foreground/70">
+          Waktu pengumpulan lama belum tercatat.
+        </p>
+      ) : null}
       {visiblePanels.length > 0 && (
         <div className="grid gap-4 md:grid-cols-2">
           {visiblePanels.map((panel, index) => (

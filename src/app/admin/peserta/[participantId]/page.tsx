@@ -133,6 +133,9 @@ export default function AdminParticipantPage() {
 
           {!isLoading && !error && (
             <div className="grid w-full gap-5">
+              <p className="text-b3 text-foreground/80">
+                Telat berarti pengumpulan terakhir setelah 5 September 2026 WIB, termasuk edit.
+              </p>
               {submissions.map((submission) => (
                 <SubmissionReviewCard
                   key={submission.title}
