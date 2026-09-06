@@ -14,6 +14,11 @@ export const ADMIN_TASK_TYPES = [
 
 export type AdminTaskType = (typeof ADMIN_TASK_TYPES)[number];
 
+export interface TaskSubmissionTiming {
+  submittedAt: string | null;
+  isLate: boolean | null;
+}
+
 export interface AdminTaskReview {
   taskType: AdminTaskType;
   score: number;
@@ -91,6 +96,7 @@ export interface ParticipantTaskResponse {
   };
 
   reviews?: Partial<Record<AdminTaskType, AdminTaskReview | null>>;
+  submissionTiming?: Partial<Record<AdminTaskType, TaskSubmissionTiming>>;
 
   submissions: {
     networking: AdminNetworkingSubmission[];
@@ -212,6 +218,7 @@ export function buildSubmissionCards(
         ? "submitted"
         : "not-submitted",
       review: data.reviews?.networking ?? null,
+      submissionTiming: data.submissionTiming?.networking,
       links: networkingLinks,
       answer: networkingAnswers,
       answerFirst: true,
@@ -224,6 +231,7 @@ export function buildSubmissionCards(
         ? "submitted"
         : "not-submitted",
       review: data.reviews?.explorer ?? null,
+      submissionTiming: data.submissionTiming?.explorer,
       media: data.submissions.explorer?.img_url ?? "",
       answer: data.submissions.explorer?.activityName ?? "",
     },
@@ -235,6 +243,7 @@ export function buildSubmissionCards(
         ? "submitted"
         : "not-submitted",
       review: data.reviews?.mentoring ?? null,
+      submissionTiming: data.submissionTiming?.mentoring,
       links: mentoringLinks,
     },
 
@@ -245,6 +254,7 @@ export function buildSubmissionCards(
         ? "submitted"
         : "not-submitted",
       review: data.reviews?.["insight-hunting"] ?? null,
+      submissionTiming: data.submissionTiming?.["insight-hunting"],
       file: {
         href: data.submissions.insightHunting?.file_url ?? "",
         label: "Insight Hunting.pdf",
@@ -257,6 +267,7 @@ export function buildSubmissionCards(
         ? "submitted"
         : "not-submitted",
       review: data.reviews?.fossib ?? null,
+      submissionTiming: data.submissionTiming?.fossib,
       media:
         data.submissions.fossib?.photoUrl ??
         data.submissions.fossib?.photo_url ??
