@@ -107,6 +107,22 @@ const SponsorData: { src: string; alt: string }[] = [
     src: "assets/sponsor-king.webp",
     alt: "King Logo",
   },
+  {
+    src: "assets/sponsor-jiep.webp",
+    alt: "Jiep Logo",
+  },
+  {
+    src: "assets/sponsor-mbi.webp",
+    alt: "MBI Logo",
+  },
+  {
+    src: "assets/sponsor-lamrin.webp",
+    alt: "Lamrin Logo",
+  },
+  {
+    src: "assets/sponsor-samadhi.webp",
+    alt: "Samadhi Logo",
+  },
 ];
 
 function decodeBase64Url(value: string): string {
@@ -213,19 +229,7 @@ function HomeContent({ isDashboard = false }: { isDashboard?: boolean }) {
               Sponsor
             </span>
           </h1>
-          <div className="w-full flex items-center justify-center gap-12 max-lg:hidden">
-            {SponsorData.map((sponsor) => (
-              <Image
-                key={`${sponsor.src}-${sponsor.alt}`}
-                src={`/${sponsor.src}`}
-                alt={sponsor.alt}
-                width={136}
-                height={136}
-                className="w-auto h-34"
-              />
-            ))}
-          </div>
-          <SponsorMarquee items={SponsorData} speed={10} className="lg:hidden" />
+          <SponsorMarquee items={SponsorData} speed={30} />
         </section>
       </div>
 
